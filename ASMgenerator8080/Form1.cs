@@ -31,11 +31,13 @@ namespace ASMgenerator8080
             else
             { 
                 MessageBox.Show("Locate the XML file for ASM", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                var OFD = new OpenFileDialog();
-                OFD.InitialDirectory = Directory.GetCurrentDirectory();
-                OFD.Filter = "xml files (*.xml)|*.xml";
-                OFD.FilterIndex = 2;
-                OFD.RestoreDirectory = true;
+                var OFD = new OpenFileDialog
+                {
+                    InitialDirectory = Directory.GetCurrentDirectory(),
+                    Filter = "xml files (*.xml)|*.xml",
+                    FilterIndex = 2,
+                    RestoreDirectory = true
+                };
                 if (OFD.ShowDialog() == DialogResult.OK)
                     mainField.DescriptionFile = OFD.FileName;
                 else

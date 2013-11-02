@@ -12,6 +12,8 @@ namespace ASMgenerator8080
     {
         private const int minAddr = 0x2100;
         private const int maxAddr = 0x10000;
+
+        private static readonly ArrayList opsRegDst = new ArrayList() { "inr", "dcr" };
         private static readonly Dictionary<string, char> ops0 = new Dictionary<string, char>()
         { 
             { "nop" , (char)0x00 },
@@ -121,26 +123,34 @@ namespace ASMgenerator8080
             { "pop" , (char)0xc1 }
         };
 
-        private char[] binaryInstruction;
         private ArrayList mem;
-        private int startAddr;
+        private int startAddr = 0x2100;
         private int LabelsCount = 0;
-        private Object[] labels;
-        
+        private ArrayList textlabels;
+        private Dictionary<string, int> labels;
+        private ArrayList references;
+        private ArrayList resolveTable;
+
         public BinaryGenerator(int startAddress)
+        {
+            references = new ArrayList();
+            resolveTable = new ArrayList();
+            textlabels = new ArrayList();
+            labels = new Dictionary<string,int>();
+            mem = new ArrayList();
+        }
+
+        public void setStartAddress(int startAddress)
         {
             if (startAddress >= minAddr && startAddress < maxAddr)
             {
                 startAddr = startAddress;
-                mem = new ArrayList();
-                binaryInstruction = new char[1];
-            }
-            else throw new BinaryGeneratorException();
+            } else throw new BinaryGeneratorException();
         }
 
-        public char[] getBinary(string instruction)
+        public int getStartAddress()
         {
-            return binaryInstruction;
+            return startAddr;
         }
 
         private void setmem16(char immediate) 
@@ -154,6 +164,10 @@ namespace ASMgenerator8080
             }
         }
         
+        private void setmem8(char immediate) {
+            mem.Add(immediate < 0 ? immediate : immediate & 0xff);
+        }
+
         private string getExpr(string[] s) {
                 string ex = String.Join(" ", s, 1, s.Length-1);
                 if (ex[0] == '"' || ex[0] == '\'') {
@@ -171,45 +185,46 @@ namespace ASMgenerator8080
             return immediate;
         }
 
-        private int markLabel(string identifier, int address, int linenumber) {
+        private int markLabel(string identifier, int address, int linenumber, bool _override = false) {
             Regex rgx1 = new Regex(@"/\$([0-9a-fA-F]+)/");
             Regex rgx2 = new Regex(@"/(^|[^'])(\$|\.)/");
 
             identifier = rgx1.Replace(identifier, "0x$1");
             identifier = rgx2.Replace(identifier, " "+address+" ");
-          var number = resolveNumber(identifier.Trim());
-          if (number != -1) return number;
+            var number = resolveNumber(identifier.Trim());
+            if (number != -1) return number;
   
             LabelsCount++;
             address = -1 - LabelsCount;
  
             identifier = identifier.ToLower();
-  
-          var found = labels[identifier];
-            if (found != undefined) {
+            
+            try 
+            {
+                int found = labels[identifier];
                 if (address >= 0) {
                     resolveTable[-found] = address;
                 } else {
                     address = found;
                 }
-            }
- 
-          if (!found || override) {
-                labels[identifier] = address;
-          }
- 
-            if (linenumber != undefined) {
-                textlabels[linenumber] = identifier;
-            }
+
+                if (found == 0 || _override) {
+                    labels[identifier] = address;
+                }
+
+
+            } catch (KeyNotFoundException) {};
+            
+            textlabels[linenumber] = identifier;
   
-          return address;
+            return address;
         }
 
         private void referencesLabel(string identifier, int linenumber) {
             identifier = identifier.ToLower();
-            if (references[linenumber] == undefined) {
-                references[linenumber] = identifier;
-            }
+
+            if (references.Capacity < linenumber)
+                references.Insert(linenumber, identifier);
         }
 
         private int FromBinary(string val) {
@@ -223,7 +238,8 @@ namespace ASMgenerator8080
                 n *= 2;
             }
             return Convert.ToInt32(x);
-        }
+        }
+
 
         private int resolveNumber(string identifier)
         {
@@ -237,7 +253,7 @@ namespace ASMgenerator8080
  
             if (identifier[0] == '$') {
                 identifier = "0x" + identifier.Substring(1, identifier.Length-1);
-            }
+          }
  
           if ("0123456789".IndexOf(identifier[0]) != -1)
           {
@@ -245,7 +261,7 @@ namespace ASMgenerator8080
               test = Convert.ToInt32(identifier);
 
               var suffix = Convert.ToString(identifier[identifier.Length - 1]).ToLower();
-                switch (suffix) {
+               switch (suffix) {
                 case "d":
                     test = Convert.ToInt32(identifier.Substring(0, identifier.Length-1));
                     break;
@@ -265,19 +281,26 @@ namespace ASMgenerator8080
                     } catch(Exception e) {}
                     break;
                 }
-          }
-        return -1;
-    }
+            }
+            return -1;
+        }
+
         private int parseRegisterPair(string s) {
             if (s != "") {
                 s = s.Split(';')[0].ToLower();
-              if (s == "b" || s == "bc") return 0;
+                if (s == "b" || s == "bc") return 0;
                 if (s == "d" || s == "de") return 1;
-               if (s == "h" || s == "hl") return 2;
-                    if (s == "sp"|| s == "psw" || s == "a") return 3;
+                if (s == "h" || s == "hl") return 2;
+                if (s == "sp"|| s == "psw" || s == "a") return 3;
             }
-          return -1;
-        }
+            return -1;
+        }
+
+        private int parseRegister(string s) {
+            if (s.Length == 0) return -1;
+                s = s.ToLower();
+            return "bcdehlma".IndexOf(s[0]);
+        }
 
         private int parseInstruction(string s, int addr, int linenumber)
         {
@@ -309,81 +332,69 @@ namespace ASMgenerator8080
         } catch (KeyNotFoundException) {}
     
         // immediate word
-            try
-            {
-                mem.Add(opsIm16[mnemonic]);
-                int immediate = useExpr(parts.Slice(1), addr, linenumber);
-                //if (!immediate) return -3;
-
-                setmem16(addr + 1, immediate);
-                return 3;
-            }
-            catch (Exception e)
-            {
-                
-            }
+        try
+        {
+            mem.Add(opsIm16[mnemonic]);
+            char immediate = (char)useExpr(parts, addr, linenumber);
+            setmem16(immediate);
+            return 3;
+        }
+        catch (KeyNotFoundException) {}
     
         // register pair <- immediate
         try
         {
-            char opcs = opsRpIm16[mnemonic];
-            if (parts.Length < 2) return -3;
-            rp = parseRegisterPair(subparts[0]);
+            if (partsLen < 2) return -3;
+            int rp = parseRegisterPair(parts[1]);
             if (rp == -1) return -3;
- 
-            mem.Add(("0x" + opcs) | (rp << 4));
- 
-                immediate = useExpr(subparts.slice(1), addr, linenumber);
- 
-            setmem16(addr+1, immediate);
+            mem.Add(opsRpIm16[mnemonic] | (rp << 4));
+            char immediate = (char)useExpr(parts, addr, linenumber);
+            setmem16(immediate);
             return 3;
         } catch (KeyNotFoundException) {}
  
         // immediate byte    
-        if ((opcs = opsIm8[mnemonic]) != undefined) {
-            mem[addr] = new Number("0x" + opcs);
-                immediate = useExpr(parts.slice(1), addr, linenumber);
-                //if (!immediate) return -2;
-                setmem8(addr+1, immediate);
-                return 2;
-        }
+        try
+        {
+            mem.Add(opsIm8[mnemonic]);
+            char immediate = (char)useExpr(parts, addr, linenumber);
+            setmem8(immediate);
+            return 2;
+        } catch (KeyNotFoundException) {}
  
         // single register, im8
-        if ((opcs = opsRegIm8[mnemonic]) != undefined) {
-            subparts = parts.slice(1).join(" ").split(",");
-            if (subparts.length < 2) return -2;
-            reg = parseRegister(subparts[0]);
+        try
+        {   
+            if (partsLen < 2) return -2;
+            int reg = parseRegister(parts[1]);
             if (reg == -1) return -2;
- 
-            mem[addr] = new Number("0x" + opcs) | reg << 3;
- 
-                immediate = useExpr(subparts.slice(1), addr, linenumber);
- 
-                setmem8(addr+1, immediate);
+            mem.Add(opsRegIm8[mnemonic] | reg << 3);
+            char immediate = (char)useExpr(parts, addr, linenumber);
+            setmem8(immediate);
             return 2;      
-        }
+        } catch (KeyNotFoundException) {};
         
         // dual register (mov)
-        if ((opcs = opsRegReg[mnemonic]) != undefined) {
-            subparts = parts.slice(1).join(" ").split(",");
-            if (subparts.length < 2) return -1;
-            reg1 = parseRegister(subparts[0].trim());
-            reg2 = parseRegister(subparts[1].trim());
+        try
+        {
+            if (partsLen < 2) return -1;
+            int reg1 = parseRegister(parts[1].Trim());
+            int reg2 = parseRegister(parts[2].Trim());
             if (reg1 == -1 || reg2 == -1) return -1;
-            mem[addr] = new Number("0x" + opcs) | reg1 << 3 | reg2;
+            mem.Add(opsRegReg[mnemonic] | reg1 << 3 | reg2);
             return 1;
-        }
+        } catch (KeyNotFoundException) {};
  
         // single register
         if ((opcs = opsReg[mnemonic]) != undefined) {
-            reg = parseRegister(parts[1]);
+            int reg = parseRegister(parts[1]);
             if (reg == -1) return -1;
       
-            if (opsRegDst.indexOf(mnemonic) != -1) {
+            if (opsRegDst..indexOf(mnemonic) != -1) {
             reg <<= 3;
             }
       
-            mem[addr] = new Number("0x" + opcs) | reg;
+            mem.Add(opsReg[mnemonic] | reg);
             return 1;
         }
     
