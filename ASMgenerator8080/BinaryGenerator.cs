@@ -140,12 +140,11 @@ namespace ASMgenerator8080
             mem = new ArrayList();
         }
 
-        public void generateBinary(string s, int addr, int line)
+        public void generateBinary(string s, int line)
         {
             if (line < 0) return;
-            setStartAddress(addr);
             mem.Clear();
-            parseInstruction(s, addr, line);
+            startAddr += parseInstruction(s, startAddr, line);
         }
 
         public ArrayList getBinaryDump()
