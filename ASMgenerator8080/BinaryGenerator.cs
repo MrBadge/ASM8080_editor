@@ -131,13 +131,26 @@ namespace ASMgenerator8080
         private ArrayList references;
         private ArrayList resolveTable;
 
-        public BinaryGenerator(int startAddress)
+        public BinaryGenerator()
         {
             references = new ArrayList();
             resolveTable = new ArrayList();
             textlabels = new ArrayList();
             labels = new Dictionary<string,int>();
             mem = new ArrayList();
+        }
+
+        public void generateBinary(string s, int addr, int line)
+        {
+            if (line < 0) return;
+            setStartAddress(addr);
+            mem.Clear();
+            parseInstruction(s, addr, line);
+        }
+
+        public ArrayList getBinaryDump()
+        {
+            return mem;
         }
 
         public void setStartAddress(int startAddress)
