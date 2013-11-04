@@ -32,6 +32,7 @@
             this.menu = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -52,7 +53,6 @@
             this.sendToKR580ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadASMDescFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.loadASMCommandsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.serialPortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.comToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tsFiles = new FarsiLibrary.Win.FATabStrip();
@@ -77,12 +77,14 @@
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.newToolStripMenuItem,
+            this.toolStripSeparator4,
             this.openToolStripMenuItem,
             this.saveToolStripMenuItem,
             this.saveAsToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
+            this.fileToolStripMenuItem.DropDownOpening += new System.EventHandler(this.fileToolStripMenuItem_DropDownOpening);
             // 
             // newToolStripMenuItem
             // 
@@ -91,6 +93,11 @@
             this.newToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
             this.newToolStripMenuItem.Text = "New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(193, 6);
             // 
             // openToolStripMenuItem
             // 
@@ -136,6 +143,7 @@
             this.editToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.editToolStripMenuItem.Text = "Edit";
+            this.editToolStripMenuItem.DropDownOpening += new System.EventHandler(this.editToolStripMenuItem_DropDownOpening);
             // 
             // copyToolStripMenuItem
             // 
@@ -224,6 +232,7 @@
             this.projectToolStripMenuItem.Name = "projectToolStripMenuItem";
             this.projectToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
             this.projectToolStripMenuItem.Text = "Project";
+            this.projectToolStripMenuItem.DropDownOpening += new System.EventHandler(this.projectToolStripMenuItem_DropDownOpening);
             // 
             // compileToolStripMenuItem
             // 
@@ -246,7 +255,6 @@
             // 
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loadASMDescFileToolStripMenuItem,
-            this.loadASMCommandsToolStripMenuItem,
             this.serialPortToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
@@ -255,23 +263,16 @@
             // loadASMDescFileToolStripMenuItem
             // 
             this.loadASMDescFileToolStripMenuItem.Name = "loadASMDescFileToolStripMenuItem";
-            this.loadASMDescFileToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
+            this.loadASMDescFileToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
             this.loadASMDescFileToolStripMenuItem.Text = "Load ASM Desc file";
             this.loadASMDescFileToolStripMenuItem.Click += new System.EventHandler(this.loadASMDescFileToolStripMenuItem_Click);
-            // 
-            // loadASMCommandsToolStripMenuItem
-            // 
-            this.loadASMCommandsToolStripMenuItem.Name = "loadASMCommandsToolStripMenuItem";
-            this.loadASMCommandsToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.loadASMCommandsToolStripMenuItem.Text = "Load ASM commands";
-            this.loadASMCommandsToolStripMenuItem.Click += new System.EventHandler(this.loadASMCommandsToolStripMenuItem_Click);
             // 
             // serialPortToolStripMenuItem
             // 
             this.serialPortToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.comToolStripMenuItem});
             this.serialPortToolStripMenuItem.Name = "serialPortToolStripMenuItem";
-            this.serialPortToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
+            this.serialPortToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
             this.serialPortToolStripMenuItem.Text = "Serial Port";
             this.serialPortToolStripMenuItem.DropDownOpening += new System.EventHandler(this.serialPortToolStripMenuItem_DropDownOpening);
             // 
@@ -324,7 +325,6 @@
         private System.Windows.Forms.ToolStripMenuItem compileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem loadASMDescFileToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem loadASMCommandsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem findToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem replaceToolStripMenuItem;
@@ -343,6 +343,7 @@
         private System.Windows.Forms.ToolStripMenuItem serialPortToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sendToKR580ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem comToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
     }
 }
 

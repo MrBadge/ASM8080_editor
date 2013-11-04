@@ -19,11 +19,15 @@ namespace ASMgenerator8080
 {   
     public partial class Form1 : Form
     {
-        public List<string> commands = new List<string>();
+        //public List<string> commands = new List<string>
+        //{
+        //    "MOV",
+
+        //};
         public List<string> labels = new List<string>();
         //public List<TabPage> pages = new List<TabPage>(); 
         //public List<FastColoredTextBox> fields = new List<FastColoredTextBox>(); 
-        public AutocompleteMenu popMenu;
+        //public AutocompleteMenu popMenu;
         public string DescFile = "";
         public string ComPort = "";
         private SaveFileDialog SFD;
@@ -111,7 +115,7 @@ namespace ASMgenerator8080
             }
         }
 
-        private void LoadCMDs(string filename)
+        /*private void LoadCMDs(string filename)
         {
             if (filename == null) return;
             using (var r = new StreamReader(filename))
@@ -123,7 +127,7 @@ namespace ASMgenerator8080
                     commands.Add(line);
                 }
             }
-        }
+        } */
 
         FastColoredTextBox CurrentTB
         {
@@ -162,6 +166,8 @@ namespace ASMgenerator8080
                 };
                 if (fileName != null)
                     tb.Text = File.ReadAllText(fileName);
+                else
+                    tb.Text = "\n"; //bug? 
                 tb.ClearUndo();
                 tb.Tag = new TbInfo();
                 tb.IsChanged = false;
@@ -180,15 +186,15 @@ namespace ASMgenerator8080
                 //tb.ShowFoldingLines = btShowFoldingLines.Checked;
                 tb.DescriptionFile = DescFile;
                 tb.HighlightingRangeType = HighlightingRangeType.VisibleRange;
-                popMenu = new AutocompleteMenu(tb) { MinFragmentLength = 1 };
-                popMenu.Items.Width = 100;
-                popMenu.Items.SetAutocompleteItems(commands);
+                var popupMenu = new AutocompleteMenu(tb) { MinFragmentLength = 1 };
+                popupMenu.Items.Width = 100;
+                popupMenu.Items.SetAutocompleteItems(Constants.Commands);
                 //create autocomplete popup menu
                 //AutocompleteMenu popupMenu = new AutocompleteMenu(tb);
                 //popupMenu.Items.ImageList = ilAutocomplete;
                 //popupMenu.Opening += new EventHandler<CancelEventArgs>(popupMenu_Opening);
                 //BuildAutocompleteMenu(popupMenu);
-                (tb.Tag as TbInfo).popupMenu = popMenu;
+                (tb.Tag as TbInfo).popupMenu = popupMenu;
             }
             catch (Exception ex)
             {
@@ -210,9 +216,9 @@ namespace ASMgenerator8080
             //var list = new List<string>();
             DescFile = LocateFile("asmDesc.xml", "Please, locate the XML file for ASM",
                 "Continue without code highlighting?", "xml files (*.xml)|*.xml", false, "ASM description file");
-            var cmds = LocateFile("cmds.txt", "Please, locate file with asm commands",
-                "Continue without autocomplete?", "txt files (*.txt)|*.txt", false, "ASM commands file");
-            LoadCMDs(cmds);
+            //var cmds = LocateFile("cmds.txt", "Please, locate file with asm commands",
+            //    "Continue without autocomplete?", "txt files (*.txt)|*.txt", false, "ASM commands file");
+            //LoadCMDs(cmds);
             KeyPreview = true;
 
             Top -= 100;
@@ -245,7 +251,7 @@ namespace ASMgenerator8080
             }
         }
 
-        private void loadASMCommandsToolStripMenuItem_Click(object sender, EventArgs e)
+        /*private void loadASMCommandsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var filename = OpenFile("ASM commands file", "txt files (*.txt)|*.txt");
             if (filename == null) return;
@@ -254,7 +260,7 @@ namespace ASMgenerator8080
             {
                 popMenu.Items.SetAutocompleteItems(commands);
             }
-        }
+        }*/
 
         private void UpdateHighlighting()
         {
@@ -323,29 +329,32 @@ namespace ASMgenerator8080
 
         private void undoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CurrentTB.UndoEnabled)
+            if (CurrentTB != null && CurrentTB.UndoEnabled)
                 CurrentTB.Undo();
         }
 
         private void redoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CurrentTB.RedoEnabled)
+            if (CurrentTB != null && CurrentTB.RedoEnabled)
                 CurrentTB.Redo();
         }
 
         private void cutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            CurrentTB.Cut();
+            if (CurrentTB != null)
+                CurrentTB.Cut();
         }
 
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            CurrentTB.Paste();
+            if (CurrentTB != null)    
+                CurrentTB.Paste();
         }
 
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            CurrentTB.Copy();
+            if (CurrentTB != null)
+                CurrentTB.Copy();
         }
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -370,8 +379,6 @@ namespace ASMgenerator8080
 
         private void commentSelectedToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CurrentTB == null)
-                return;
             CurrentTB.CommentSelected(";");
             //CurrentTB.InsertLinePrefix(";");
             //UpdateHighlighting();
@@ -463,6 +470,31 @@ namespace ASMgenerator8080
                     else
                         break;
             }
+        }
+
+        private void editToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            foreach (var dropDownItem in editToolStripMenuItem.DropDownItems)
+            {
+                if (!(dropDownItem is ToolStripSeparator))
+                    (dropDownItem as ToolStripMenuItem).Enabled = (CurrentTB != null);
+            }  
+        }
+
+        private void projectToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            foreach (var dropDownItem in projectToolStripMenuItem.DropDownItems)
+            {
+
+                if (!(dropDownItem is ToolStripSeparator))
+                    (dropDownItem as ToolStripMenuItem).Enabled = (CurrentTB != null);
+            } 
+        }
+
+        private void fileToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            saveToolStripMenuItem.Enabled = (CurrentTB != null);
+            saveAsToolStripMenuItem.Enabled = (CurrentTB != null);
         }
 
         

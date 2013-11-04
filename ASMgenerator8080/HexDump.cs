@@ -108,6 +108,7 @@ namespace ASMgenerator8080
         {
             Control control = (Control)sender;
             dumpView.Size = new Size(control.Size.Width - padSize.Width, control.Size.Height - padSize.Height);
+            Size = new System.Drawing.Size(592, Height);
         }
 
     }
