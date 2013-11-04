@@ -227,25 +227,25 @@ namespace ASMgenerator8080
             }
         }
 
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        private void UpdateHighlighting()
         {
-            var filename = OpenFile("Open file", "asm files (*.asm)|*.asm");
-            if (filename == null) return;
-            CreateTab(filename);
-            //CurrentTB.OpenBindingFile(filename, Encoding.Unicode);
-            var lines = new ArrayList();
-            foreach (var line in CurrentTB.Lines)
-            {
-                lines.Add(line);
-            }
+            var lines = new List<string>(CurrentTB.Lines);
             string s = "";
             for (int i = 0; i < lines.Count; i++)
             {
                 lines[i] = lines[i] + " ";
                 s += lines[i] + "\n";
             }
-            CurrentTB.Text = s;
+            CurrentTB.Text = s;   
+        }
 
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var filename = OpenFile("Open file", "asm files (*.asm)|*.asm");
+            if (filename == null) return;
+            CreateTab(filename);
+            //CurrentTB.OpenBindingFile(filename, Encoding.Unicode);
+            UpdateHighlighting();
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -330,6 +330,20 @@ namespace ASMgenerator8080
                     tsFiles.SelectedItem.Title = Path.GetFileName(newFile);   
                 }
             }
+        }
+
+        private void commentSelectedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (CurrentTB == null)
+                return;
+            CurrentTB.CommentSelected(";");
+            //CurrentTB.InsertLinePrefix(";");
+            //UpdateHighlighting();
+        }
+
+        private void compileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
