@@ -39,20 +39,20 @@
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.findToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.commentSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.projectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.compileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadASMDescFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadASMCommandsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tsFiles = new FarsiLibrary.Win.FATabStrip();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.commentSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tsFiles)).BeginInit();
             this.SuspendLayout();
@@ -121,13 +121,13 @@
             this.copyToolStripMenuItem,
             this.pasteToolStripMenuItem,
             this.cutToolStripMenuItem,
-            this.toolStripSeparator1,
+            this.toolStripSeparator2,
             this.findToolStripMenuItem,
             this.replaceToolStripMenuItem,
-            this.toolStripSeparator2,
+            this.toolStripSeparator3,
             this.undoToolStripMenuItem,
             this.redoToolStripMenuItem,
-            this.toolStripSeparator3,
+            this.toolStripSeparator1,
             this.commentSelectedToolStripMenuItem});
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
@@ -158,6 +158,11 @@
             this.cutToolStripMenuItem.Text = "Cut";
             this.cutToolStripMenuItem.Click += new System.EventHandler(this.cutToolStripMenuItem_Click);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(204, 6);
+            // 
             // findToolStripMenuItem
             // 
             this.findToolStripMenuItem.Name = "findToolStripMenuItem";
@@ -174,6 +179,11 @@
             this.replaceToolStripMenuItem.Text = "Replace";
             this.replaceToolStripMenuItem.Click += new System.EventHandler(this.replaceToolStripMenuItem_Click);
             // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(204, 6);
+            // 
             // undoToolStripMenuItem
             // 
             this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
@@ -189,6 +199,19 @@
             this.redoToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
             this.redoToolStripMenuItem.Text = "Redo";
             this.redoToolStripMenuItem.Click += new System.EventHandler(this.redoToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(204, 6);
+            // 
+            // commentSelectedToolStripMenuItem
+            // 
+            this.commentSelectedToolStripMenuItem.Name = "commentSelectedToolStripMenuItem";
+            this.commentSelectedToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.K)));
+            this.commentSelectedToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.commentSelectedToolStripMenuItem.Text = "Comm/Uncomm";
+            this.commentSelectedToolStripMenuItem.Click += new System.EventHandler(this.commentSelectedToolStripMenuItem_Click);
             // 
             // projectToolStripMenuItem
             // 
@@ -238,29 +261,6 @@
             this.tsFiles.Size = new System.Drawing.Size(372, 241);
             this.tsFiles.TabIndex = 3;
             this.tsFiles.Text = "faTabStrip1";
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(204, 6);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(204, 6);
-            // 
-            // commentSelectedToolStripMenuItem
-            // 
-            this.commentSelectedToolStripMenuItem.Name = "commentSelectedToolStripMenuItem";
-            this.commentSelectedToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.K)));
-            this.commentSelectedToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
-            this.commentSelectedToolStripMenuItem.Text = "Comm/Uncomm";
-            this.commentSelectedToolStripMenuItem.Click += new System.EventHandler(this.commentSelectedToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(204, 6);
             // 
             // Form1
             // 
