@@ -39,19 +39,22 @@
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.findToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.commentSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.projectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.compileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sendToKR580ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadASMDescFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadASMCommandsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.serialPortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.comToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tsFiles = new FarsiLibrary.Win.FATabStrip();
             this.menu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tsFiles)).BeginInit();
@@ -158,10 +161,10 @@
             this.cutToolStripMenuItem.Text = "Cut";
             this.cutToolStripMenuItem.Click += new System.EventHandler(this.cutToolStripMenuItem_Click);
             // 
-            // toolStripSeparator1
+            // toolStripSeparator2
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(204, 6);
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(204, 6);
             // 
             // findToolStripMenuItem
             // 
@@ -179,10 +182,10 @@
             this.replaceToolStripMenuItem.Text = "Replace";
             this.replaceToolStripMenuItem.Click += new System.EventHandler(this.replaceToolStripMenuItem_Click);
             // 
-            // toolStripSeparator2
+            // toolStripSeparator3
             // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(204, 6);
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(204, 6);
             // 
             // undoToolStripMenuItem
             // 
@@ -200,10 +203,10 @@
             this.redoToolStripMenuItem.Text = "Redo";
             this.redoToolStripMenuItem.Click += new System.EventHandler(this.redoToolStripMenuItem_Click);
             // 
-            // toolStripSeparator3
+            // toolStripSeparator1
             // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(204, 6);
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(204, 6);
             // 
             // commentSelectedToolStripMenuItem
             // 
@@ -216,7 +219,8 @@
             // projectToolStripMenuItem
             // 
             this.projectToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.compileToolStripMenuItem});
+            this.compileToolStripMenuItem,
+            this.sendToKR580ToolStripMenuItem});
             this.projectToolStripMenuItem.Name = "projectToolStripMenuItem";
             this.projectToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
             this.projectToolStripMenuItem.Text = "Project";
@@ -230,11 +234,20 @@
             this.compileToolStripMenuItem.Text = "Compile into bin";
             this.compileToolStripMenuItem.Click += new System.EventHandler(this.compileToolStripMenuItem_Click);
             // 
+            // sendToKR580ToolStripMenuItem
+            // 
+            this.sendToKR580ToolStripMenuItem.Name = "sendToKR580ToolStripMenuItem";
+            this.sendToKR580ToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
+            this.sendToKR580ToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
+            this.sendToKR580ToolStripMenuItem.Text = "Send to KR580";
+            this.sendToKR580ToolStripMenuItem.Click += new System.EventHandler(this.sendToKR580ToolStripMenuItem_Click);
+            // 
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loadASMDescFileToolStripMenuItem,
-            this.loadASMCommandsToolStripMenuItem});
+            this.loadASMCommandsToolStripMenuItem,
+            this.serialPortToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.settingsToolStripMenuItem.Text = "Settings";
@@ -253,6 +266,21 @@
             this.loadASMCommandsToolStripMenuItem.Text = "Load ASM commands";
             this.loadASMCommandsToolStripMenuItem.Click += new System.EventHandler(this.loadASMCommandsToolStripMenuItem_Click);
             // 
+            // serialPortToolStripMenuItem
+            // 
+            this.serialPortToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.comToolStripMenuItem});
+            this.serialPortToolStripMenuItem.Name = "serialPortToolStripMenuItem";
+            this.serialPortToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
+            this.serialPortToolStripMenuItem.Text = "Serial Port";
+            this.serialPortToolStripMenuItem.DropDownOpening += new System.EventHandler(this.serialPortToolStripMenuItem_DropDownOpening);
+            // 
+            // comToolStripMenuItem
+            // 
+            this.comToolStripMenuItem.Name = "comToolStripMenuItem";
+            this.comToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.comToolStripMenuItem.Text = "com";
+            // 
             // tsFiles
             // 
             this.tsFiles.Font = new System.Drawing.Font("Tahoma", 8.25F);
@@ -261,6 +289,7 @@
             this.tsFiles.Size = new System.Drawing.Size(372, 241);
             this.tsFiles.TabIndex = 3;
             this.tsFiles.Text = "faTabStrip1";
+            this.tsFiles.TabStripItemClosing += new FarsiLibrary.Win.TabStripItemClosingHandler(this.tsFiles_TabStripItemClosing);
             // 
             // Form1
             // 
@@ -311,6 +340,9 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem commentSelectedToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem serialPortToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem sendToKR580ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem comToolStripMenuItem;
     }
 }
 

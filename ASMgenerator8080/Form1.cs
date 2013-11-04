@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using FarsiLibrary.Win;
 using FastColoredTextBoxNS;
+using System.IO.Ports;
 
 namespace ASMgenerator8080
 {   
@@ -20,39 +21,64 @@ namespace ASMgenerator8080
     {
         public List<string> commands = new List<string>();
         public List<string> labels = new List<string>();
-        public List<TabPage> pages = new List<TabPage>(); 
-        public List<FastColoredTextBox> fields = new List<FastColoredTextBox>(); 
+        //public List<TabPage> pages = new List<TabPage>(); 
+        //public List<FastColoredTextBox> fields = new List<FastColoredTextBox>(); 
         public AutocompleteMenu popMenu;
         public string DescFile = "";
+        public string ComPort = "";
+        private SaveFileDialog SFD;
+        private OpenFileDialog OFD;
 
         public Form1()
         {
             InitializeComponent();
-        }
-
-        private string SaveFile(string capt, string template)
-        {
-            var SVD = new SaveFileDialog
+            this.SFD = new SaveFileDialog
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
-                Filter = template,
+                Filter = "asm files (*.asm)|*.asm",
                 FilterIndex = 2,
                 RestoreDirectory = true,
-                Title = capt
             };
-            return SVD.ShowDialog() == DialogResult.OK ? SVD.FileName : null;
+            this.OFD = new OpenFileDialog
+            {
+                InitialDirectory = Directory.GetCurrentDirectory(),
+                FilterIndex = 2,
+                RestoreDirectory = true,
+            };
+        }
+
+
+        private bool Save(FATabStripItem tab)
+        {
+            FastColoredTextBox fastColoredTextBox = tab.Controls[0] as FastColoredTextBox;
+            
+            if (tab.Tag == null)
+            {
+                if (this.SFD.ShowDialog() != DialogResult.OK)
+                    return false;
+                tab.Title = Path.GetFileName(SFD.FileName);
+                tab.Tag = (object)SFD.FileName;
+            }
+            try
+            {
+                File.WriteAllText(tab.Tag as string, fastColoredTextBox.Text);
+                fastColoredTextBox.IsChanged = false;
+            }
+            catch (Exception ex)
+            {
+                if (MessageBox.Show(ex.Message, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Hand) == DialogResult.Retry)
+                    return this.Save(tab);
+                else
+                    return false;
+            }
+            fastColoredTextBox.Invalidate();
+            return true;
         }
 
         private string OpenFile(string capt, string template)
         {
-            var OFD = new OpenFileDialog
-                {
-                    InitialDirectory = Directory.GetCurrentDirectory(),
-                    Filter = template,
-                    FilterIndex = 2,
-                    RestoreDirectory = true,
-                    Title = capt
-                };
+            OFD.Filter = template;
+            OFD.Title = capt;
             return OFD.ShowDialog() == DialogResult.OK ? OFD.FileName : null;
         }
 
@@ -119,17 +145,21 @@ namespace ASMgenerator8080
         {
             try
             {
-                var tb = new FastColoredTextBox();
-                tb.Font = new Font("Consolas", 9.75f);
+                var tb = new FastColoredTextBox
+                {
+                    Font = new Font("Consolas", 9.75f),
+                    Dock = DockStyle.Fill,
+                    BorderStyle = BorderStyle.Fixed3D,
+                    VirtualSpace = true,
+                    LeftPadding = 10,
+                    Language = Language.Custom
+                };
                 //tb.ContextMenuStrip = cmMain;
-                tb.Dock = DockStyle.Fill;
-                tb.BorderStyle = BorderStyle.Fixed3D;
-                tb.VirtualSpace = true;
-                tb.LeftPadding = 10;
-                tb.Language = Language.Custom;
                 tb.AddStyle(new MarkerStyle(new SolidBrush(Color.FromArgb(50, Color.Gray))));//same words style
-                var tab = new FATabStripItem(fileName != null ? Path.GetFileName(fileName) : "[new]", tb);
-                tab.Tag = fileName;
+                var tab = new FATabStripItem(fileName != null ? Path.GetFileName(fileName) : "[new]", tb)
+                {
+                    Tag = fileName
+                };
                 if (fileName != null)
                     tb.Text = File.ReadAllText(fileName);
                 tb.ClearUndo();
@@ -249,14 +279,16 @@ namespace ASMgenerator8080
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if ((CurrentTB.Parent as FATabStripItem) == null) { return; }
-            string filename = (CurrentTB.Parent as FATabStripItem).Title == "[new]"
-                ? SaveFile("Save file", "asm files (*.asm)|*.asm")
-                : (CurrentTB.Parent as FATabStripItem).Title;
-            if (filename == null) return;
-            if (CurrentTB != null)
-                CurrentTB.SaveToFile(filename, Encoding.Unicode);
-            (CurrentTB.Parent as FATabStripItem).Title = Path.GetFileName(filename);
+            if (tsFiles.SelectedItem == null)
+                return;
+            Save(tsFiles.SelectedItem);
+            //string filename = (CurrentTB.Parent as FATabStripItem).Title == "[new]"
+            //    ? SaveFile("Save file", "asm files (*.asm)|*.asm")
+            //    : (CurrentTB.Parent as FATabStripItem).Title;
+            //if (filename == null) return;
+            //if (CurrentTB != null)
+            //    CurrentTB.SaveToFile(filename, Encoding.Unicode);
+            //(CurrentTB.Parent as FATabStripItem).Title = Path.GetFileName(filename);
         }
 
         private void mainField_TextChanging(object sender, TextChangingEventArgs e)
@@ -318,16 +350,21 @@ namespace ASMgenerator8080
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (tsFiles.SelectedItem != null)
+            //if (tsFiles.SelectedItem == null) return;
+            //string oldFile = tsFiles.SelectedItem.Tag as string;
+            //tsFiles.SelectedItem.Tag = null;
+            //string newFile = SaveFile("Save file", "asm files (*.asm)|*.asm");
+            //if (newFile == null) return;
+            //tsFiles.SelectedItem.Tag = newFile;
+            //tsFiles.SelectedItem.Title = Path.GetFileName(newFile);
+            if (this.tsFiles.SelectedItem == null)
+                return;
+            string path = this.tsFiles.SelectedItem.Tag as string;
+            this.tsFiles.SelectedItem.Tag = (object)null;
+            if (!this.Save(this.tsFiles.SelectedItem) && path != null)
             {
-                string oldFile = tsFiles.SelectedItem.Tag as string;
-                tsFiles.SelectedItem.Tag = null;
-                string newFile = SaveFile("Save file", "asm files (*.asm)|*.asm");
-                if (newFile != null)
-                {
-                    tsFiles.SelectedItem.Tag = newFile;
-                    tsFiles.SelectedItem.Title = Path.GetFileName(newFile);   
-                }
+                this.tsFiles.SelectedItem.Tag = (object)path;
+                this.tsFiles.SelectedItem.Title = Path.GetFileName(path);
             }
         }
 
@@ -347,6 +384,85 @@ namespace ASMgenerator8080
             
             var hexView = new HexDump();
             hexView.viewBinaryDump(source);
+        }
+
+        private void serialPortToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            string[] ports = SerialPort.GetPortNames();
+            var tmpComPort = ComPort;
+            var portsArr = new ArrayList();
+            portsArr.AddRange(ports);
+            if (portsArr.Count == 0)
+            {
+                serialPortToolStripMenuItem.DropDownItems.Clear();
+                var tmp = new ToolStripMenuItem {CheckState = CheckState.Indeterminate, Text = "No ports found"};
+                serialPortToolStripMenuItem.DropDownItems.Add(tmp);
+            }
+            else
+            {
+                foreach (var port in ports)
+                {
+                    var tmp = new ToolStripMenuItem {CheckState = CheckState.Unchecked, Checked = false, Text = port};
+                    if (tmp.Text == tmpComPort)
+                        tmp.Checked = true;
+                    tmp.Click += comToolStripMenuItem_Click;
+                    serialPortToolStripMenuItem.DropDownItems.Add(tmp);
+                }
+            }
+        }
+
+        private void sendToKR580ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (ComPort == "")
+            {
+                MessageBox.Show("Choose appropriate Com-Port first", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            else
+            {
+                var port = new SerialPort(ComPort, 4800, Parity.None, 8, StopBits.One);
+                try
+                {
+                    port.Open();
+
+                    //byte[] data = { 0, 1, 2, 1, 0 };
+                    //port.Write(data, 0, data.Length);
+
+                    port.Close();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                    throw;
+                }
+            }
+        }
+
+        private void comToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //if ((sender as ToolStripMenuItem).Name != "No ports found")
+            (sender as ToolStripMenuItem).Checked = !(sender as ToolStripMenuItem).Checked;
+            ComPort = (sender as ToolStripMenuItem).Text;
+        }
+
+        private void tsFiles_TabStripItemClosing(TabStripItemClosingEventArgs e)
+        {
+            if (!(e.Item.Controls[0] as FastColoredTextBox).IsChanged)
+                return;
+            switch (MessageBox.Show("Do you want save " + e.Item.Title + " ?", "Save", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Asterisk))
+            {
+                case DialogResult.Cancel:
+                    e.Cancel = true;
+                    break;
+                case DialogResult.Yes:
+                    if (!this.Save(e.Item))
+                    {
+                        e.Cancel = true;
+                        break;
+                    }
+                    else
+                        break;
+            }
         }
 
         
