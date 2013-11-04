@@ -191,7 +191,6 @@ namespace ASMgenerator8080
             tsFiles.Top = menu.Top + menu.Height + 2;
             tsFiles.Width = Width - 15;
             tsFiles.Height = Height - 15;
-            
         }
 
         private void Form1_SizeChanged(object sender, EventArgs e)
@@ -331,5 +330,16 @@ namespace ASMgenerator8080
                 }
             }
         }
+
+        private void compileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (CurrentTB == null) return;
+            string source = CurrentTB.Text;
+            
+            var hexView = new HexDump();
+            hexView.viewBinaryDump(source);
+        }
+
+        
     }
 }

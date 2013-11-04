@@ -131,6 +131,7 @@ namespace ASMgenerator8080
         private Dictionary<string, int> labels;
         private ArrayList references;
         private ArrayList resolveTable;
+        private Dictionary<string, int> unresolvedLabels;
 
         public BinaryGenerator()
         {
@@ -138,16 +139,56 @@ namespace ASMgenerator8080
             resolveTable = new ArrayList();
             textlabels = new ArrayList();
             labels = new Dictionary<string,int>();
+            unresolvedLabels = new Dictionary<string, int>();
             mem = new ArrayList();
         }
 
-        public void generateBinary(string s, int line)
+        public void generateBinary(string s, int addr = 0x2100)
         {
-            if (line < 0) return;
+            if (s == null) throw new BinaryGeneratorException();
+            setStartAddress(addr);
+            Regex rgx = new Regex("\r\n");
+            string[] lines = rgx.Split(s);
             int size = 0;
-            size = parseInstruction(s, currentAddr, line);
-            currentAddr += size > 0 ? size : 0;
-            if (size < 0) throw new BinaryGeneratorException(); 
+            for (int i = 0; i < lines.Length; ++i)
+            {
+                size = parseInstruction(lines[i], currentAddr, i);
+                currentAddr += size > 0 ? size : 0;
+                if (size < 0) throw new BinaryGeneratorException();
+            }
+        }
+
+        public string[] getBinaryDumpToString(int len = 0)
+        {
+            int size = mem.Count / len + (mem.Count % len == 0 ? 0 : 1);
+            string[] res = new string[size];
+            if (len < 0) return null;
+
+            int j = 0;
+            for (int i = 0; i < mem.Count; ++i)
+                if (mem[i] != null)
+                {
+                    if (len > 0 && i > 0 && i % len == 0) ++j;
+                    res[j] += (byte)mem[i] < 10 ? "0" + (byte)mem[i]: ((byte)mem[i]).ToString("x");
+                    res[j] += " ";
+                }
+            return res;
+        }
+
+        public string[] getACIIDumpToString(int len = 0)
+        {
+            int size = mem.Count / len + (mem.Count % len == 0 ? 0 : 1);
+            string[] res = new string[size];
+            if (len < 0) return null;
+
+            int j = 0;
+            for (int i = 0; i < mem.Count; ++i)
+                if (mem[i] != null)
+                {
+                    if (len > 0 && i > 0 && i % len == 0) ++j;
+                    res[j] += (byte)mem[i] < 32 || (byte)mem[i] > 127 ? '.' :(char)(byte)mem[i];
+                }
+            return res;
         }
 
         public ArrayList getBinaryDump()
@@ -177,31 +218,31 @@ namespace ASMgenerator8080
         private void setmem16(int addr, int immediate) 
         {
             if (immediate >= 0) {
-                if (mem.Count < addr - startAddr + 1) fillArray(mem, addr - startAddr + 1);
-                mem.Insert(addr - startAddr, (byte)(immediate & 0xff));
-                mem.Insert(addr - startAddr + 1, (byte)(immediate >> 8));
+                if (mem.Count <= addr - startAddr + 1) fillArray(mem, addr - startAddr + 1);
+                mem[addr - startAddr] = (byte)(immediate & 0xff);
+                mem[addr - startAddr + 1] = (byte)(immediate >> 8);
             } else {
-                if (mem.Count < addr - startAddr + 1) fillArray(mem, addr - startAddr + 1);
-                mem.Insert(addr - startAddr, (byte)immediate);
-                mem.Insert(addr - startAddr + 1, (byte)immediate);
+                if (mem.Count <= addr - startAddr + 1) fillArray(mem, addr - startAddr + 1);
+                mem[addr - startAddr] = (byte)immediate;
+                mem[addr - startAddr] = (byte)immediate;
             }
         }
         
         private void setmem8(int addr, int immediate) {
-            if (mem.Count < addr - startAddr) fillArray(mem, addr - startAddr);
-            mem.Insert(addr - startAddr, (byte)(immediate < 0 ? immediate : immediate & 0xff));
+            if (mem.Count <= addr - startAddr) fillArray(mem, addr - startAddr);
+            mem[addr - startAddr] = (byte)(immediate < 0 ? immediate : immediate & 0xff);
         }
 
-        private string getExpr(string[] s) {
-                string ex = String.Join(" ", s, 1, s.Length-1);
+        private string getExpr(string[] s, int index) {
+                string ex = String.Join(" ", s, index, s.Length-index);
                 if (ex[0] == '"' || ex[0] == '\'') {
                     return ex;
                 }
                 return ex.Split(';')[0];
             }
  
-        private int useExpr(string[] s, int addr, int linenumber) {
-            string expr = getExpr(s);
+        private int useExpr(string[] s, int addr, int linenumber, int index = 1) {
+            string expr = getExpr(s, index);
             if (expr.Length == 0) return 0;
  
             int immediate = markLabel(expr, addr);
@@ -216,6 +257,8 @@ namespace ASMgenerator8080
             identifier = rgx1.Replace(identifier, "0x$1");
             identifier = rgx2.Replace(identifier, " "+address+" ");
             var number = resolveNumber(identifier.Trim());
+            int instAddr = address;
+
             if (number != -1) return number;
 
             if (linenumber < 0)
@@ -231,8 +274,15 @@ namespace ASMgenerator8080
                 int found = labels[identifier];
                 if (address >= 0)
                 {
-                    if (resolveTable.Count < -found) fillArray(resolveTable, -found);
-                        resolveTable.Insert(-found, address);
+                    if (resolveTable.Count <= -found) fillArray(resolveTable, -found);
+                        resolveTable[-found] = address;
+
+                        try
+                        {
+                            int addr = unresolvedLabels[identifier];
+                            setmem16(addr + 1, address);
+                        }
+                        catch (KeyNotFoundException) { };
                 }
                 else
                 {
@@ -241,14 +291,16 @@ namespace ASMgenerator8080
             }
             catch (KeyNotFoundException)
             {
+                unresolvedLabels.Add(identifier, instAddr);
                 labels.Add(identifier, address);
             };
 
             if (linenumber >= 0)
             {
-                if (textlabels.Count < linenumber) fillArray(textlabels, linenumber);
-                textlabels.Insert(linenumber, identifier);
+                if (textlabels.Count <= linenumber) fillArray(textlabels, linenumber);
+                textlabels[linenumber] = identifier;
             }
+
             return address;
         }
 
@@ -258,13 +310,13 @@ namespace ASMgenerator8080
             if (references.Count <= linenumber)
             {
                 fillArray(references, linenumber);
-                references.Insert(linenumber, identifier);
+                references[linenumber] = identifier;
             }
         }
 
-        private void fillArray(ArrayList arr, int count)
+        private void fillArray(ArrayList arr, int index)
         {
-            int n = count - arr.Count;
+            int n = index - arr.Count + 1;
             if (n <= 0) return;
 
             for (int i = 0; i < n; ++i) arr.Add(null);
@@ -373,6 +425,13 @@ namespace ASMgenerator8080
                 && identifier.Length == 3)
             {
                 return (0xff & identifier[1]);
+            }
+
+            // support 0x numbers
+
+            if (identifier.Length > 2 && identifier[0] == '0' && (identifier[1] == 'x' || identifier[1] == 'X'))
+            {
+                return Convert.ToInt32(identifier, 16);
             }
 
             if (identifier[0] == '$')
@@ -553,12 +612,12 @@ namespace ASMgenerator8080
                     continue;
                 }
 
-                if (mem.Count < addr - startAddr) fillArray(mem, addr - startAddr);
+                if (mem.Count <= addr - startAddr) fillArray(mem, addr - startAddr);
 
                 // no operands
                 try
                 {
-                    mem.Insert(addr - startAddr, ops0[mnemonic]);
+                    mem[addr - startAddr] =  ops0[mnemonic];
                     return 1;
                 }
                 catch (KeyNotFoundException) { }
@@ -566,7 +625,7 @@ namespace ASMgenerator8080
                 // immediate word
                 try
                 {
-                    mem.Insert(addr - startAddr, opsIm16[mnemonic]);
+                    mem[addr - startAddr] = opsIm16[mnemonic];
                     immediate = useExpr(parts, addr, linenumber);
                     setmem16(addr + 1, immediate);
                     return 3;
@@ -580,8 +639,8 @@ namespace ASMgenerator8080
                     if (partsLen < 2) return -3;
                     int rp = parseRegisterPair(parts[1]);
                     if (rp == -1) return -3;
-                    mem.Insert(addr - startAddr, (byte)(opcs | (rp << 4)));
-                    immediate = useExpr(parts, addr, linenumber);
+                    mem[addr - startAddr] = (byte)(opcs | (rp << 4));
+                    immediate = useExpr(parts, addr, linenumber, 2);
                     setmem16(addr + 1, immediate);
                     return 3;
                 }
@@ -590,7 +649,7 @@ namespace ASMgenerator8080
                 // immediate byte    
                 try
                 {
-                    mem.Insert(addr - startAddr, opsIm8[mnemonic]);
+                    mem[addr - startAddr] = opsIm8[mnemonic];
                     immediate = useExpr(parts, addr, linenumber);
                     setmem8(addr + 1, immediate);
                     return 2;
@@ -604,8 +663,8 @@ namespace ASMgenerator8080
                     if (partsLen < 2) return -2;
                     int reg = parseRegister(parts[1]);
                     if (reg == -1) return -2;
-                    mem.Insert(addr - startAddr, (byte)(opcs | reg << 3));
-                    immediate = useExpr(parts, addr, linenumber);
+                    mem[addr - startAddr] = (byte)(opcs | reg << 3);
+                    immediate = useExpr(parts, addr, linenumber, 2);
                     setmem8(addr + 1, immediate);
                     return 2;
                 }
@@ -619,7 +678,7 @@ namespace ASMgenerator8080
                     int reg1 = parseRegister(parts[1].Trim());
                     int reg2 = parseRegister(parts[2].Trim());
                     if (reg1 == -1 || reg2 == -1) return -1;
-                    mem.Insert(addr - startAddr, (byte)(opcs | reg1 << 3 | reg2));
+                    mem[addr - startAddr] = (byte)(opcs | reg1 << 3 | reg2);
                     return 1;
                 }
                 catch (KeyNotFoundException) { };
@@ -631,7 +690,7 @@ namespace ASMgenerator8080
                     int reg = parseRegister(parts[1]);
                     if (reg == -1) return -1;
                     if (opsRegDst.IndexOf(mnemonic) != -1) reg <<= 3;
-                    mem.Insert(addr - startAddr, (byte)(opcs | reg));
+                    mem[addr - startAddr] = (byte)(opcs | reg);
                     return 1;
                 }
                 catch (KeyNotFoundException) { };
@@ -642,7 +701,7 @@ namespace ASMgenerator8080
                     opcs = opsRp[mnemonic];
                     int rp = parseRegisterPair(parts[1]);
                     if (rp == -1) return -1;
-                    mem.Insert(addr - startAddr, (byte)(opcs | rp << 4));
+                    mem[addr - startAddr] = (byte)(opcs | rp << 4);
                     return 1;
                 }
                 catch (KeyNotFoundException) { };
@@ -653,7 +712,7 @@ namespace ASMgenerator8080
                     int n = resolveNumber(parts[1]);
                     if (n >= 0 && n < 8)
                     {
-                        mem.Insert(addr - startAddr, (byte)(0xC7 | n << 3));
+                        mem[addr - startAddr] = (byte)(0xC7 | n << 3);
                         return 1;
                     }
                     return -1;
@@ -714,7 +773,7 @@ namespace ASMgenerator8080
                     continue;
                 }
 
-                mem.Insert(addr - startAddr, (byte)0xFE);
+                mem[addr - startAddr] = (byte)0xFE;
                 return -1; // error
             }
             return 0;

@@ -5,6 +5,7 @@
 	<style name="Blue" color="Blue"/>
 	<style name="Red" color="Red" /> <!-- backColor="#f5f5e5" fontStyle="Bold,Italic" -->
 	<style name="Green" color="Green" />
+	<style name="Gray" color="Gray" />
 	<style name="BlueViolet" color="BlueViolet" />
 	<style name="BlueViolet" color="BlueViolet" />
 	<style name="LightSeaGreen" color="LightSeaGreen" />
@@ -17,6 +18,7 @@
 	<rule style="Green" options="IgnoreCase">;(.+)$</rule> <!-- comments -->
 	<rule style="Green" options="IgnoreCase">\b(D|C|D|E|H|L|M|A|DC|DE|HL|AF|PSW)\b</rule> <!-- registers -->
 	<rule style="LightSeaGreen" options="IgnoreCase">\b[a-fA-f][a-fA-f0-9]*:\s</rule> <!-- registers -->
+	<rule style="Gray" options="IgnoreCase">;\S*</rule>
 
 	<folding start="\b[a-fA-f][a-fA-f0-9]*:\s" finish="\bRET *\b" options="IgnoreCase"/>
 </doc>
