@@ -204,7 +204,7 @@ namespace ASMgenerator8080
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Text = "ASM editor for K580";
+            Text = "ASM editor for KR580";
             //mainField.AutoIndentNeeded += fctb_AutoIndentNeeded;
             //mainField.AutoIndent = true;
             //var list = new List<string>();
@@ -395,7 +395,7 @@ namespace ASMgenerator8080
             if (portsArr.Count == 0)
             {
                 serialPortToolStripMenuItem.DropDownItems.Clear();
-                var tmp = new ToolStripMenuItem {CheckState = CheckState.Indeterminate, Text = "No ports found"};
+                var tmp = new ToolStripMenuItem {CheckState = CheckState.Unchecked, Text = "No ports found"};
                 serialPortToolStripMenuItem.DropDownItems.Add(tmp);
             }
             else
@@ -415,7 +415,7 @@ namespace ASMgenerator8080
         {
             if (ComPort == "")
             {
-                MessageBox.Show("Choose appropriate Com-Port first", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Choose an appropriate COM-Port first", "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 return;
             }
             else
