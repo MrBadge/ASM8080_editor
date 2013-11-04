@@ -1,32 +1,3 @@
-;load programm from terminal
-;used registers: A, B, C, HL
-;input: first byte from terminal is a command
-;commands:
-;	0 - exit program;
-;	1 - next to bytes is starting adress to write
-;	2 - next byte is byte to write
-;output: none
-programLoader:
-	CALL readByte
-	MOV A, B
-	ANA A
-	RZ ; exit program if com zero
-	SUI 0x01
-	JZ programLoader_command_1
-	SUI 0x01
-	JZ programLoader_command_2
-	programLoader_command_1:
-	CALL readByte
-	MOV H, B
-	CALL readByte
-	MOV L, B
-	JMP programLoader
-	programLoader_command_2:
-	CALL readByte
-	mov M, B
-	INX H
-	JMP programLoader
-
 ;init timer
 ;used registers: A
 ;input: none
@@ -47,6 +18,35 @@ init_timer:
     MVI A, 0x40 ; сброс
     OUT 0xFB
 
+;load programm from terminal
+;used registers: A, B, C, HL
+;input: first byte from terminal is a command
+;commands:
+;	0 - exit program;
+;	1 - next two bytes is starting adress to write
+;	2 - next byte is byte to write
+;output: none
+programLoader:
+	CALL readByte
+	MOV A, B
+	ANA A
+	RZ ; exit program if command zero
+	SUI 0x01
+	JZ programLoader_command_1
+	SUI 0x01
+	JZ programLoader_command_2
+	programLoader_command_1:
+	CALL readByte
+	MOV H, B
+	CALL readByte
+	MOV L, B
+	JMP programLoader
+	programLoader_command_2:
+	CALL readByte
+	mov M, B
+	INX H
+	JMP programLoader
+
 ;read byte from terminal
 ;used registers: A, B
 ;input: none
@@ -66,10 +66,10 @@ readByte:
 ;used registers: A, B
 ;input: byte to write in register B
 ;output: none
-writeByte:
-	IN 0xFB
-	ANI 0x01
-	JZ writeByte
-	MOV A, B
-	OUT 0xFA
-	RET
+;writeByte:
+;	IN 0xFB
+;	ANI 0x01
+;	JZ writeByte
+;	MOV A, B
+;	OUT 0xFA
+;	RET
