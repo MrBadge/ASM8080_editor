@@ -77,6 +77,7 @@ namespace ASMgenerator8080
                        DialogResult.Retry && this.Save(tab);
             }
             fastColoredTextBox.Invalidate();
+            tsFiles.TabStripItemClosing += tsFiles_TabStripItemClosing;
             return true;
         }
 
@@ -365,12 +366,14 @@ namespace ASMgenerator8080
 
         private void findToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            CurrentTB.ShowFindDialog(CurrentTB.SelectedText);
+            if (CurrentTB != null && tsFiles.Items.Count > 0)
+                CurrentTB.ShowFindDialog(CurrentTB.SelectedText);
         }
 
         private void replaceToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            CurrentTB.ShowReplaceDialog(CurrentTB.SelectedText);
+            if (CurrentTB != null && tsFiles.Items.Count > 0)
+                CurrentTB.ShowReplaceDialog(CurrentTB.SelectedText);
         }
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
@@ -380,13 +383,13 @@ namespace ASMgenerator8080
 
         private void undoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CurrentTB != null && CurrentTB.UndoEnabled)
+            if (CurrentTB != null && CurrentTB.UndoEnabled && tsFiles.Items.Count > 0)
                 CurrentTB.Undo();
         }
 
         private void redoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CurrentTB != null && CurrentTB.RedoEnabled)
+            if (CurrentTB != null && CurrentTB.RedoEnabled && tsFiles.Items.Count > 0)
                 CurrentTB.Redo();
         }
 
@@ -400,13 +403,13 @@ namespace ASMgenerator8080
 
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CurrentTB != null)    
+            if (CurrentTB != null && tsFiles.Items.Count > 0)    
                 CurrentTB.Paste();
         }
 
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CurrentTB != null)
+            if (CurrentTB != null && tsFiles.Items.Count > 0)
                 CurrentTB.Copy();
         }
 
@@ -523,7 +526,7 @@ namespace ASMgenerator8080
 
         private void tsFiles_TabStripItemClosing(TabStripItemClosingEventArgs e)
         {
-            if (!((e.Item.Controls[0] as FastColoredTextBox).IsChanged || (e.Item.Controls[0] as FastColoredTextBox).Text != ""))
+            if (!(e.Item.Controls[0] as FastColoredTextBox).IsChanged)
                 return;
             switch (MessageBox.Show("Do you want save " + e.Item.Title + " ?", "Save", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Asterisk))
             {
@@ -546,7 +549,7 @@ namespace ASMgenerator8080
             foreach (var dropDownItem in editToolStripMenuItem.DropDownItems)
             {
                 if (!(dropDownItem is ToolStripSeparator))
-                    (dropDownItem as ToolStripMenuItem).Enabled = (CurrentTB != null);
+                    (dropDownItem as ToolStripMenuItem).Enabled = (CurrentTB != null && tsFiles.Items.Count > 0);
             }  
         }
 
@@ -556,7 +559,7 @@ namespace ASMgenerator8080
             {
 
                 if (!(dropDownItem is ToolStripSeparator))
-                    (dropDownItem as ToolStripMenuItem).Enabled = (CurrentTB != null);
+                    (dropDownItem as ToolStripMenuItem).Enabled = (CurrentTB != null && tsFiles.Items.Count > 0);
             } 
         }
 
@@ -593,8 +596,8 @@ namespace ASMgenerator8080
 
         private void fileToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
         {
-            saveToolStripMenuItem.Enabled = (CurrentTB != null);
-            saveAsToolStripMenuItem.Enabled = (CurrentTB != null);
+            saveToolStripMenuItem.Enabled = (CurrentTB != null && tsFiles.Items.Count > 0);
+            saveAsToolStripMenuItem.Enabled = (CurrentTB != null && tsFiles.Items.Count > 0);
         }
 
         private void viewHexToolStripMenuItem_Click(object sender, EventArgs e)
@@ -618,11 +621,6 @@ namespace ASMgenerator8080
                 }
                 tsFiles.RemoveTab(tab);
             }
-        }
-
-        private void Form1_Resize(object sender, EventArgs e)
-        {
-
         }
 
         
