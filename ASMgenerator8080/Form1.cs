@@ -20,21 +20,16 @@ namespace ASMgenerator8080
 {   
     public partial class Form1 : Form
     {
-        //public List<string> commands = new List<string>
-        //{
-        //    "MOV",
-
-        //};
         public List<string> labels = new List<string>();
         //public List<TabPage> pages = new List<TabPage>(); 
         //public List<FastColoredTextBox> fields = new List<FastColoredTextBox>(); 
         //public AutocompleteMenu popMenu;
         public string DescFile = "";
         public string ComPort = "";
-        private SaveFileDialog SFD;
-        private OpenFileDialog OFD;
+        private readonly SaveFileDialog SFD;
+        private readonly OpenFileDialog OFD;
         private BinaryGenerator BinGen;
-        public MarkerStyle MS = new MarkerStyle(new SolidBrush(Color.FromArgb(100, Color.Gray)));
+        private readonly MarkerStyle MS = new MarkerStyle(new SolidBrush(Color.FromArgb(100, Color.Gray)));
 
         public Form1()
         {
