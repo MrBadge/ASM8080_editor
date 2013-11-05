@@ -22,12 +22,9 @@ namespace ASMgenerator8080
             padSize = new Size(this.Size.Width - dumpView.Size.Width, this.Size.Height - dumpView.Size.Height);
         }
 
-        public void viewBinaryDump(string source)
+        public void viewBinaryDump(BinaryGenerator binGen)
         {
-            if (source == null || source.Length == 0) return;
-
-            var binGen = new BinaryGenerator();
-            binGen.generateBinary(source);
+            //if (string.IsNullOrEmpty(source)) return;
 
             int len = 16;
             string[] dump = binGen.getBinaryDumpToString(len);

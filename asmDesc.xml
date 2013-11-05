@@ -20,7 +20,7 @@
 	<rule style="Green" options="IgnoreCase">\b\d*\b</rule> <!-- decimal numbers -->
 	<rule style="Green" options="IgnoreCase">;(.+)$</rule> <!-- comments -->
 	<rule style="Green" options="IgnoreCase">\b(B|C|D|E|H|L|M|A|DC|DE|HL|AF|PSW)\b</rule> <!-- registers -->
-	<rule style="LightSeaGreen" options="IgnoreCase">\b[a-fA-f][a-fA-f0-9]*:?\s</rule> <!-- registers -->
+	<rule style="LightSeaGreen" options="IgnoreCase">\b[a-fA-f][a-fA-f0-9]*:?\s</rule> <!-- labels -->
 
 	<folding start="\b[a-fA-f][a-fA-f0-9]*:\s" finish="\b(RET|HLT)\b" options="IgnoreCase"/>
 	<folding start="\b[a-fA-f][a-fA-f0-9]*:\s" finish="\b[a-fA-f][a-fA-f0-9]*:\s" options="IgnoreCase"/>

@@ -8,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
@@ -32,6 +33,7 @@ namespace ASMgenerator8080
         public string ComPort = "";
         private SaveFileDialog SFD;
         private OpenFileDialog OFD;
+        private BinaryGenerator BinGen;
 
         public Form1()
         {
@@ -49,6 +51,9 @@ namespace ASMgenerator8080
                 FilterIndex = 2,
                 RestoreDirectory = true,
             };
+            BinGen = new BinaryGenerator();
+            tsFiles.Dock = DockStyle.Fill;
+            //tsFiles.Height = Height - 100;
         }
 
 
@@ -70,10 +75,8 @@ namespace ASMgenerator8080
             }
             catch (Exception ex)
             {
-                if (MessageBox.Show(ex.Message, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Hand) == DialogResult.Retry)
-                    return this.Save(tab);
-                else
-                    return false;
+                return MessageBox.Show(ex.Message, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Hand) ==
+                       DialogResult.Retry && this.Save(tab);
             }
             fastColoredTextBox.Invalidate();
             return true;
@@ -149,13 +152,19 @@ namespace ASMgenerator8080
         {
             try
             {
+                //tsFiles.Height = 400;
+                foreach (var item in tsFiles.Items)
+                {
+                    (item as FATabStripItem).Height = 400;
+
+                }
                 var tb = new FastColoredTextBox
                 {
                     Font = new Font("Consolas", 9.75f),
                     Dock = DockStyle.Fill,
                     BorderStyle = BorderStyle.Fixed3D,
                     VirtualSpace = true,
-                    LeftPadding = 10,
+                    LeftPadding = 9,
                     Language = Language.Custom
                 };
                 //tb.ContextMenuStrip = cmMain;
@@ -167,7 +176,9 @@ namespace ASMgenerator8080
                 if (fileName != null)
                     tb.Text = File.ReadAllText(fileName);
                 else
-                    tb.Text = "\n"; //bug? 
+                    tb.Text = "\n";
+                //else
+                //    tb.Text = "\n"; //bug? 
                 tb.ClearUndo();
                 tb.Tag = new TbInfo();
                 tb.IsChanged = false;
@@ -176,8 +187,11 @@ namespace ASMgenerator8080
                 tb.Focus();
                 tb.DelayedTextChangedInterval = 1000;
                 tb.DelayedEventsInterval = 1000;
+                //tb.SizeChanged += TbOnSizeChanged;
+                tb.HintClick += tb_HintClick;
+                //tb.LineInserted += tb_LineInserted;
                 //tb.TextChangedDelayed += new EventHandler<TextChangedEventArgs>(tb_TextChangedDelayed);
-                //tb.SelectionChangedDelayed += new EventHandler(tb_SelectionChangedDelayed);
+                tb.SelectionChangedDelayed += new EventHandler(tb_SelectionChangedDelayed);
                 //tb.KeyDown += new KeyEventHandler(tb_KeyDown);
                 //tb.MouseMove += new MouseEventHandler(tb_MouseMove);
                 //tb.ChangedLineColor = changedLineColor;
@@ -203,6 +217,55 @@ namespace ASMgenerator8080
             }
         }
 
+        private void tb_SelectionChangedDelayed(object sender, EventArgs e)
+        {
+            var tb = sender as FastColoredTextBox;
+            //highlight same words
+            tb.VisibleRange.ClearStyle(tb.Styles[0]);
+            if (!tb.Selection.IsEmpty)
+                return;//user selected diapason
+            //get fragment around caret
+            var fragment = tb.Selection.GetFragment(@"\w");
+            string text = fragment.Text;
+            if (text.Length == 0)
+                return;
+            //highlight same words
+            Range[] ranges = tb.VisibleRange.GetRanges("\\b" + text + "\\b").ToArray();
+
+            if (ranges.Length > 1)
+                foreach (var r in ranges)
+                    r.SetStyle(tb.Styles[0]);
+        }
+
+        void tb_HintClick(object sender, HintClickEventArgs e)
+        {
+            CurrentTB.Hints.Clear();
+        }
+
+        private void Form1_SizeChanged(object sender, EventArgs e)
+        {
+            //tsFiles.Width = Width - 15;
+            //tsFiles.Height = Height - 15;
+        }
+
+        private void TbOnSizeChanged(object sender, EventArgs eventArgs)
+        {
+            //throw new NotImplementedException();
+            tsFiles.Width = (sender as FastColoredTextBox).Width;
+            //MessageBox.Show(Convert.ToString((sender as FastColoredTextBox).LinesCount));
+            tsFiles.Height = (sender as FastColoredTextBox).LinesCount*15;
+            //Width = CurrentTB.Width;
+            //if (tsFiles.Height < Screen.PrimaryScreen.WorkingArea.Height)
+            CurrentTB.Height = 400;
+            Height = CurrentTB.Height + 100;
+        }
+
+        private void tb_LineInserted(object sender, LineInsertedEventArgs e)
+        {
+            //if ((sender as FastColoredTextBox).LinesCount > 21)
+             //   tsFiles.Height = (sender as FastColoredTextBox).LinesCount*10;
+        }
+
         public class TbInfo
         {
             public AutocompleteMenu popupMenu;
@@ -222,18 +285,13 @@ namespace ASMgenerator8080
             KeyPreview = true;
 
             Top -= 100;
-            Height = 500;//Screen.PrimaryScreen.WorkingArea.Height;
+            Height = 500;//Screen.PrimaryScreen.WorkingArea.Height / 10;
             tsFiles.Left = menu.Left;
             tsFiles.Top = menu.Top + menu.Height + 2;
             tsFiles.Width = Width - 15;
-            tsFiles.Height = Height - 15;
+            tsFiles.Height = Height;
         }
 
-        private void Form1_SizeChanged(object sender, EventArgs e)
-        {
-            tsFiles.Width = Width - 15;
-            tsFiles.Height = Height - 15;
-        }
 
         private void mainField_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -322,11 +380,6 @@ namespace ASMgenerator8080
             CreateTab(null);
         }
 
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
-        {
-
-        }
-
         private void undoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (CurrentTB != null && CurrentTB.UndoEnabled)
@@ -341,8 +394,10 @@ namespace ASMgenerator8080
 
         private void cutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CurrentTB != null)
-                CurrentTB.Cut();
+            if (CurrentTB == null || (CurrentTB.LinesCount == 1 && CurrentTB.Text == "")) return;
+            CurrentTB.Cut();
+            //if (CurrentTB.LinesCount == 0)
+            //    CurrentTB.Text = "";
         }
 
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
@@ -386,11 +441,7 @@ namespace ASMgenerator8080
 
         private void compileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CurrentTB == null) return;
-            string source = CurrentTB.Text;
-            
-            var hexView = new HexDump();
-            hexView.viewBinaryDump(source);
+            GetBinary(CurrentTB.Text);
         }
 
         private void serialPortToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
@@ -420,28 +471,29 @@ namespace ASMgenerator8080
 
         private void sendToKR580ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (ComPort == "")
+            if (ComPort != "")
             {
                 MessageBox.Show("Choose an appropriate COM-Port first", "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 return;
             }
-            else
+            if (GetBinary(CurrentTB.Text) == null) return;
+            //var port = new SerialPort(ComPort, 4800, Parity.None, 8, StopBits.One);
+            try
             {
-                var port = new SerialPort(ComPort, 4800, Parity.None, 8, StopBits.One);
-                try
-                {
-                    port.Open();
+                //port.Open();
 
-                    //byte[] data = { 0, 1, 2, 1, 0 };
-                    //port.Write(data, 0, data.Length);
+                var data = new ArrayList(BinGen.getBinaryDump());
+                var startAddr = BinGen.getStartAddress();
 
-                    port.Close();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-                    throw;
-                }
+                //byte[] data = { 0, 1, 2, 1, 0 };
+                //port.Write(data, 0, data.Length);
+
+                //port.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                throw;
             }
         }
 
@@ -491,10 +543,63 @@ namespace ASMgenerator8080
             } 
         }
 
+        private BinaryGenerator GetBinary(string s)
+        {
+            
+            if (string.IsNullOrEmpty(CurrentTB.Text)) return null;
+            
+            s = s.Replace("?", "0x00");
+            //var nocomments = new Regex(@";(?:\S| )*", RegexOptions.Multiline);
+            //s = Regex.Replace(s, @";(?:\S| )*", "", RegexOptions.Multiline);
+            //s = Regex.Replace(s, @"\s+$[\r\n]*", "\r\n", RegexOptions.Multiline);
+            if (s[s.Length-2].Equals('\r') && s[s.Length-1].Equals('\n'))
+                s = s.Remove(s.Length - 2, 2);
+            if (BinGen == null)
+                BinGen = new BinaryGenerator();
+            try
+            {
+                BinGen.generateBinary(s);
+            }
+            catch (BinaryGeneratorException e)
+            {
+                BinGen = null;
+                var r = new Range(CurrentTB, 0, e.line, CurrentTB.Lines[e.line].Length, e.line);
+                var hint = new Hint(r, e.Message, true, true);
+                hint.BackColor = Color.Red;
+                CurrentTB.Hints.Add(hint);
+                CurrentTB.Navigate(e.line);
+            }
+            
+            return BinGen;
+        }
+
         private void fileToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
         {
             saveToolStripMenuItem.Enabled = (CurrentTB != null);
             saveAsToolStripMenuItem.Enabled = (CurrentTB != null);
+        }
+
+        private void viewHexToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (GetBinary(CurrentTB.Text) == null) return;
+            var hexView = new HexDump();
+            hexView.viewBinaryDump(BinGen);
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            var list = tsFiles.Items.Cast<FATabStripItem>().ToList();
+            foreach (var tab in list)
+            {
+                var args = new TabStripItemClosingEventArgs(tab);
+                tsFiles_TabStripItemClosing(args);
+                if (args.Cancel)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+                tsFiles.RemoveTab(tab);
+            }
         }
 
         

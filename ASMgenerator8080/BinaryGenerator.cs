@@ -8,7 +8,7 @@ using System.Collections;
 
 namespace ASMgenerator8080
 {
-    class BinaryGenerator
+    public class BinaryGenerator
     {
         private const int minAddr = 0x2100;
         private const int maxAddr = 0x10000;
@@ -145,7 +145,7 @@ namespace ASMgenerator8080
 
         public void generateBinary(string s, int addr = 0x2100)
         {
-            if (s == null) throw new BinaryGeneratorException();
+            if (s == null) throw new BinaryGeneratorException("The string is empty");
             setStartAddress(addr);
             Regex rgx = new Regex("\r\n");
             string[] lines = rgx.Split(s);
@@ -154,7 +154,8 @@ namespace ASMgenerator8080
             {
                 size = parseInstruction(lines[i], currentAddr, i);
                 currentAddr += size > 0 ? size : 0;
-                if (size < 0) throw new BinaryGeneratorException();
+                if (size < 0) 
+                    throw new BinaryGeneratorException("Something went wrong here:(", i);
             }
         }
 
@@ -207,7 +208,7 @@ namespace ASMgenerator8080
             {
                 startAddr = startAddress;
                 currentAddr = startAddr;
-            } else throw new BinaryGeneratorException();
+            } else throw new BinaryGeneratorException("Start adress is incorrect");
         }
 
         public int getStartAddress()
@@ -674,7 +675,7 @@ namespace ASMgenerator8080
                 try
                 {
                     opcs = opsRegReg[mnemonic];
-                    if (partsLen < 2) return -1;
+                    if (partsLen <= 2) return -1;
                     int reg1 = parseRegister(parts[1].Trim());
                     int reg2 = parseRegister(parts[2].Trim());
                     if (reg1 == -1 || reg2 == -1) return -1;
