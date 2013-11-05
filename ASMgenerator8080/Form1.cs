@@ -34,6 +34,7 @@ namespace ASMgenerator8080
         private SaveFileDialog SFD;
         private OpenFileDialog OFD;
         private BinaryGenerator BinGen;
+        public MarkerStyle MS = new MarkerStyle(new SolidBrush(Color.FromArgb(100, Color.Gray)));
 
         public Form1()
         {
@@ -168,15 +169,15 @@ namespace ASMgenerator8080
                     Language = Language.Custom
                 };
                 //tb.ContextMenuStrip = cmMain;
-                tb.AddStyle(new MarkerStyle(new SolidBrush(Color.FromArgb(50, Color.Gray))));//same words style
+                
                 var tab = new FATabStripItem(fileName != null ? Path.GetFileName(fileName) : "[new]", tb)
                 {
                     Tag = fileName
                 };
                 if (fileName != null)
                     tb.Text = File.ReadAllText(fileName);
-                else
-                    tb.Text = "\n";
+                //else
+                //    tb.Text = "\n";
                 //else
                 //    tb.Text = "\n"; //bug? 
                 tb.ClearUndo();
@@ -199,6 +200,7 @@ namespace ASMgenerator8080
                 //    tb.CurrentLineColor = currentLineColor;
                 //tb.ShowFoldingLines = btShowFoldingLines.Checked;
                 tb.DescriptionFile = DescFile;
+                
                 tb.HighlightingRangeType = HighlightingRangeType.VisibleRange;
                 var popupMenu = new AutocompleteMenu(tb) { MinFragmentLength = 1 };
                 popupMenu.Items.Width = 100;
@@ -221,20 +223,18 @@ namespace ASMgenerator8080
         {
             var tb = sender as FastColoredTextBox;
             //highlight same words
-            tb.VisibleRange.ClearStyle(tb.Styles[0]);
-            if (!tb.Selection.IsEmpty)
-                return;//user selected diapason
-            //get fragment around caret
+            tb.VisibleRange.ClearStyle(MS);
+            if (tb.Selection.IsEmpty)
+                return;
             var fragment = tb.Selection.GetFragment(@"\w");
             string text = fragment.Text;
             if (text.Length == 0)
                 return;
-            //highlight same words
             Range[] ranges = tb.VisibleRange.GetRanges("\\b" + text + "\\b").ToArray();
 
             if (ranges.Length > 1)
                 foreach (var r in ranges)
-                    r.SetStyle(tb.Styles[0]);
+                    r.SetStyle(MS);
         }
 
         void tb_HintClick(object sender, HintClickEventArgs e)
@@ -556,6 +556,7 @@ namespace ASMgenerator8080
                 s = s.Remove(s.Length - 2, 2);
             if (BinGen == null)
                 BinGen = new BinaryGenerator();
+            CurrentTB.Hints.Clear();
             try
             {
                 BinGen.generateBinary(s);
