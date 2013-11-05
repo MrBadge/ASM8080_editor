@@ -49,6 +49,8 @@ namespace ASMgenerator8080
             };
             BinGen = new BinaryGenerator();
             tsFiles.Dock = DockStyle.Fill;
+            panel1.Dock = DockStyle.Fill;
+
             //tsFiles.Height = Height - 100;
         }
 
@@ -149,11 +151,11 @@ namespace ASMgenerator8080
             try
             {
                 //tsFiles.Height = 400;
-                foreach (var item in tsFiles.Items)
-                {
-                    (item as FATabStripItem).Height = 400;
+                //foreach (var item in tsFiles.Items)
+                //{
+                //    (item as FATabStripItem).Height = 400;
 
-                }
+                //}
                 var tb = new FastColoredTextBox
                 {
                     Font = new Font("Consolas", 9.75f),
@@ -239,8 +241,7 @@ namespace ASMgenerator8080
 
         private void Form1_SizeChanged(object sender, EventArgs e)
         {
-            //tsFiles.Width = Width - 15;
-            //tsFiles.Height = Height - 15;
+            
         }
 
         private void TbOnSizeChanged(object sender, EventArgs eventArgs)
@@ -331,9 +332,11 @@ namespace ASMgenerator8080
         {
             var filename = OpenFile("Open file", "asm files (*.asm)|*.asm");
             if (filename == null) return;
+            stStrip.Text = "Opening " + filename + "...";
             CreateTab(filename);
             //CurrentTB.OpenBindingFile(filename, Encoding.Unicode);
             UpdateHighlighting();
+            stStrip.Text = "";
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -466,24 +469,43 @@ namespace ASMgenerator8080
 
         private void sendToKR580ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (ComPort != "")
+            if (ComPort == "")
             {
                 MessageBox.Show("Choose an appropriate COM-Port first", "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 return;
             }
             if (GetBinary(CurrentTB.Text) == null) return;
-            //var port = new SerialPort(ComPort, 4800, Parity.None, 8, StopBits.One);
+            var port = new SerialPort(ComPort, 4800, Parity.None, 8, StopBits.One);
             try
             {
-                //port.Open();
+                stStrip.Text = "Sending to KR580...";
+                Refresh();
+                port.Open();
 
-                var data = new ArrayList(BinGen.getBinaryDump());
-                var startAddr = BinGen.getStartAddress();
-
-                //byte[] data = { 0, 1, 2, 1, 0 };
-                //port.Write(data, 0, data.Length);
-
-                //port.Close();
+                var _data = new ArrayList(BinGen.getBinaryDump());
+                byte[] startAddr = BitConverter.GetBytes(BinGen.getStartAddress());
+                byte[] data = new byte[_data.Count * 2 + 3];
+                data[0] = 1;
+                data[1] = startAddr[0];
+                data[2] = startAddr[1];
+                int j = 0;
+                for (int i = 3; i < data.Count(); i++)
+                    if (i%2 == 1)
+                        data[i] = 2;
+                    else
+                    {
+                        data[i] = (_data[j] != null ? (byte)_data[j] : (byte)0);
+                        j += 1;
+                    }
+                        
+                
+                //byte[] data1 = { 0, 1, 2, 1, 0 };
+                Cursor.Current = Cursors.WaitCursor;
+                port.Write(data, 0, data.Length);
+                Cursor.Current = Cursors.Default;
+                port.Close();
+                stStrip.Text = "Done";
+                Refresh();
             }
             catch (Exception ex)
             {
@@ -501,7 +523,7 @@ namespace ASMgenerator8080
 
         private void tsFiles_TabStripItemClosing(TabStripItemClosingEventArgs e)
         {
-            if (!(e.Item.Controls[0] as FastColoredTextBox).IsChanged)
+            if (!((e.Item.Controls[0] as FastColoredTextBox).IsChanged || (e.Item.Controls[0] as FastColoredTextBox).Text != ""))
                 return;
             switch (MessageBox.Show("Do you want save " + e.Item.Title + " ?", "Save", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Asterisk))
             {
@@ -596,6 +618,11 @@ namespace ASMgenerator8080
                 }
                 tsFiles.RemoveTab(tab);
             }
+        }
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+
         }
 
         

@@ -30,7 +30,7 @@ programLoader:
 	CALL readByte
 	MOV A, B
 	ANA A
-	JZ DE; go to start of user's program if command zero
+	JZ Addr1; go to start of user's program if command zero
 	SUI 0x01
 	JZ programLoader_command_1
 	SUI 0x01
@@ -43,8 +43,7 @@ programLoader:
 	MOV A, Check
 	ANA A
 	JNZ programLoader
-	MOV D, H
-	MOV E, L
+	SHLD Addr1
 	MVI A, 0x01
 	ADD Check
 	JMP programLoader
@@ -54,6 +53,8 @@ programLoader:
 	INX H
 	JMP programLoader
 	Check DB 0x00
+	Addr1 DB ?
+	Addr2 DB ?
 
 ;read byte from terminal
 ;used registers: A, B
