@@ -21,5 +21,9 @@ namespace ASMgenerator8080
         {
             
         }
+
+        public BinaryGeneratorException()
+        {
+        }
     }
 }

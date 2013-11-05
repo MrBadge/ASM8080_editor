@@ -556,6 +556,8 @@ namespace ASMgenerator8080
                 s = s.Remove(s.Length - 2, 2);
             if (BinGen == null)
                 BinGen = new BinaryGenerator();
+
+            CurrentTB.Hints.Clear();
             try
             {
                 BinGen.generateBinary(s);

@@ -236,6 +236,8 @@ namespace ASMgenerator8080
 
         private string getExpr(string[] s, int index) {
                 string ex = String.Join(" ", s, index, s.Length-index);
+                if (ex.Length == 0) return null;
+
                 if (ex[0] == '"' || ex[0] == '\'') {
                     return ex;
                 }
@@ -244,6 +246,7 @@ namespace ASMgenerator8080
  
         private int useExpr(string[] s, int addr, int linenumber, int index = 1) {
             string expr = getExpr(s, index);
+            if (expr == null) throw new BinaryGeneratorException("Missing operand", linenumber);
             if (expr.Length == 0) return 0;
  
             int immediate = markLabel(expr, addr);
@@ -592,7 +595,7 @@ namespace ASMgenerator8080
 
             for (var i = 0; i < partsLen; i++)
             {
-                if (parts[i][0] == ';')
+                if (parts[i].Length > 0 && parts[i][0] == ';')
                 {
                     partsLen = i;
                     break;
