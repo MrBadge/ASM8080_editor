@@ -57,9 +57,10 @@
             this.serialPortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.comToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stStrip = new System.Windows.Forms.StatusStrip();
+            this.tsStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.tsFiles = new FarsiLibrary.Win.FATabStrip();
-            this.tsStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.serialPortSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menu.SuspendLayout();
             this.stStrip.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -270,7 +271,8 @@
             // 
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loadASMDescFileToolStripMenuItem,
-            this.serialPortToolStripMenuItem});
+            this.serialPortToolStripMenuItem,
+            this.serialPortSettingsToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.settingsToolStripMenuItem.Text = "Settings";
@@ -294,7 +296,7 @@
             // comToolStripMenuItem
             // 
             this.comToolStripMenuItem.Name = "comToolStripMenuItem";
-            this.comToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
+            this.comToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.comToolStripMenuItem.Text = "com";
             // 
             // stStrip
@@ -306,6 +308,12 @@
             this.stStrip.Size = new System.Drawing.Size(428, 22);
             this.stStrip.TabIndex = 4;
             this.stStrip.Text = "statusStrip1";
+            // 
+            // tsStatus
+            // 
+            this.tsStatus.Name = "tsStatus";
+            this.tsStatus.Size = new System.Drawing.Size(413, 17);
+            this.tsStatus.Spring = true;
             // 
             // panel1
             // 
@@ -324,11 +332,12 @@
             this.tsFiles.TabIndex = 4;
             this.tsFiles.Text = "faTabStrip1";
             // 
-            // tsStatus
+            // serialPortSettingsToolStripMenuItem
             // 
-            this.tsStatus.Name = "tsStatus";
-            this.tsStatus.Size = new System.Drawing.Size(413, 17);
-            this.tsStatus.Spring = true;
+            this.serialPortSettingsToolStripMenuItem.Name = "serialPortSettingsToolStripMenuItem";
+            this.serialPortSettingsToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+            this.serialPortSettingsToolStripMenuItem.Text = "Serial port settings";
+            this.serialPortSettingsToolStripMenuItem.Click += new System.EventHandler(this.serialPortSettingsToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -389,6 +398,7 @@
         private System.Windows.Forms.Panel panel1;
         private FarsiLibrary.Win.FATabStrip tsFiles;
         private System.Windows.Forms.ToolStripStatusLabel tsStatus;
+        private System.Windows.Forms.ToolStripMenuItem serialPortSettingsToolStripMenuItem;
     }
 }
 

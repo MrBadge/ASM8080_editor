@@ -3,13 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Diagnostics.Eventing.Reader;
+//using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+//using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using FarsiLibrary.Win;
@@ -17,7 +18,7 @@ using FastColoredTextBoxNS;
 using System.IO.Ports;
 
 namespace ASMgenerator8080
-{   
+{
     public partial class Form1 : Form
     {
         public List<string> labels = new List<string>();
@@ -25,15 +26,20 @@ namespace ASMgenerator8080
         //public List<FastColoredTextBox> fields = new List<FastColoredTextBox>(); 
         //public AutocompleteMenu popMenu;
         public string DescFile = "";
-        public string ComPort = "";
+        //public string ComPort = "";
         private readonly SaveFileDialog SFD;
         private readonly OpenFileDialog OFD;
+        public static ComPortSettings PS = new ComPortSettings();
         private BinaryGenerator BinGen;
         private readonly MarkerStyle MS = new MarkerStyle(new SolidBrush(Color.FromArgb(100, Color.Gray)));
 
         public Form1()
         {
             InitializeComponent();
+
+            PS = new ComPortSettings();
+            PS.SetPortSet();
+
             this.SFD = new SaveFileDialog
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
@@ -53,7 +59,6 @@ namespace ASMgenerator8080
 
             //tsFiles.Height = Height - 100;
         }
-
 
         private bool Save(FATabStripItem tab)
         {
@@ -94,26 +99,26 @@ namespace ASMgenerator8080
                 return filename;
             else
             {
-                MessageBox.Show(msg1, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                filename = OpenFile(capt, template);
-                if (filename != null)
-                    return filename;
-                else
-                {
-                    if (!mandatory)
-                    {
-                        var res = MessageBox.Show(msg2, "Information", MessageBoxButtons.OKCancel,
-                            MessageBoxIcon.Question);
-                        if (res == DialogResult.Cancel)
-                            Close();
+                //MessageBox.Show(msg1, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //filename = OpenFile(capt, template);
+                //if (filename != null)
+                //    return filename;
+                //else
+                //{
+                //    if (!mandatory)
+                //    {
+                //        var res = MessageBox.Show(msg2, "Information", MessageBoxButtons.OKCancel,
+                //            MessageBoxIcon.Question);
+                //        if (res == DialogResult.Cancel)
+                //            Close();
                         return null;
-                    }
-                    else
-                    {
-                        Close();
-                        return null;
-                    }
-                }
+                //    }
+                //    else
+                //    {
+                //        Close();
+                //        return null;
+                //    }
+                //}
             }
         }
 
@@ -287,6 +292,7 @@ namespace ASMgenerator8080
             tsFiles.Top = menu.Top + menu.Height + 2;
             tsFiles.Width = Width - 15;
             tsFiles.Height = Height;
+
         }
 
 
@@ -448,7 +454,7 @@ namespace ASMgenerator8080
         private void serialPortToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
         {
             string[] ports = SerialPort.GetPortNames();
-            var tmpComPort = ComPort;
+            var tmpComPort = PS.ComPortName;
             var portsArr = new ArrayList();
             portsArr.AddRange(ports);
             if (portsArr.Count == 0)
@@ -459,6 +465,7 @@ namespace ASMgenerator8080
             }
             else
             {
+                serialPortToolStripMenuItem.DropDownItems.Clear();
                 foreach (var port in ports)
                 {
                     var tmp = new ToolStripMenuItem {CheckState = CheckState.Unchecked, Checked = false, Text = port};
@@ -472,13 +479,13 @@ namespace ASMgenerator8080
 
         private void sendToKR580ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (ComPort == "")
+            if (PS.ComPortName == "")
             {
                 MessageBox.Show("Choose an appropriate COM-Port first", "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 return;
             }
             if (GetBinary(CurrentTB.Text) == null) return;
-            var port = new SerialPort(ComPort, 4800, Parity.None, 8, StopBits.One);
+            var port = new SerialPort(PS.ComPortName, PS.baud, PS.par, PS.databits, PS.sb);
             try
             {
                 stStrip.Text = "Sending to KR580...";
@@ -521,7 +528,7 @@ namespace ASMgenerator8080
         {
             //if ((sender as ToolStripMenuItem).Name != "No ports found")
             (sender as ToolStripMenuItem).Checked = !(sender as ToolStripMenuItem).Checked;
-            ComPort = (sender as ToolStripMenuItem).Text;
+            PS.ComPortName = (sender as ToolStripMenuItem).Text;
         }
 
         private void tsFiles_TabStripItemClosing(TabStripItemClosingEventArgs e)
@@ -622,6 +629,14 @@ namespace ASMgenerator8080
                 tsFiles.RemoveTab(tab);
             }
         }
+
+        private void serialPortSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var portsettings = new PortSettings(PS);
+            portsettings.ShowDialog(this);
+            
+        }
+
 
         
     }
