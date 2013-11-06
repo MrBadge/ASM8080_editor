@@ -14,10 +14,10 @@
 	<rule style="Gray" options="IgnoreCase">;(?:\S| )*</rule>
 	<rule style="Blue" options="IgnoreCase">\b(MOV|MVI|LXI|LDA|LHLD|LDAX|STA|SHLD|STAX|PUSH|POP|XTHL|IN|OUT)\b</rule> <!-- movements commands -->
 	<rule style="Maroon" options="IgnoreCase">\b(ADD|ADI|ADC|ACI|SUB|SUI|SBB|SBI|ANA|ANI|ORA|ORI|XRA|XRI|CMP|CPI|INR|INX|DCR|DCX|DAD|RLC|RRC|RAL|RAR|CMA)\b</rule> <!-- arithmetic and logical commands  -->
-	<rule style="BlueViolet" options="IgnoreCase">\b(JMP|CALL|PCHL|RET|NOP|HLT)\b</rule> <!-- control commands -->
+	<rule style="BlueViolet" options="IgnoreCase">\b(JMP|CALL|PCHL|RET|NOP|HLT|RST)\b</rule> <!-- control commands -->
 	<rule style="Red" options="IgnoreCase">\b(J|R|C)(NZ|NC|PO|P|Z|C|PE|M)\b</rule> <!-- conditions -->
 	<rule style="Green" options="IgnoreCase">\b0x[0-9a-fA-F]+\b</rule> <!-- hex numbers -->
-	<rule style="Green" options="IgnoreCase">\b\d*\b</rule> <!-- decimal numbers -->
+	<rule style="Green" options="IgnoreCase">\b\d*[dbqh]\b</rule> <!-- decimal numbers -->
 	<rule style="Green" options="IgnoreCase">;(.+)$</rule> <!-- comments -->
 	<rule style="Green" options="IgnoreCase">\b(B|C|D|E|H|L|M|A|DC|DE|HL|AF|PSW)\b</rule> <!-- registers -->
 	<rule style="LightSeaGreen" options="IgnoreCase">\b[a-fA-f][a-fA-f0-9]*:?\s</rule> <!-- labels -->

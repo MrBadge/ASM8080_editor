@@ -293,7 +293,7 @@ namespace ASMgenerator8080
 
             identifier = rgx1.Replace(identifier, "0x$1");
             identifier = rgx2.Replace(identifier, " "+address+" ");
-            var number = resolveNumber(identifier.Trim(), linenumber);
+            var number = resolveNumber(identifier.Trim(), codeLine);
             int instAddr = address;
 
             if (number != -1) return number;
@@ -619,7 +619,7 @@ namespace ASMgenerator8080
         }
 
         private int parseRegister(string s) {
-            if (s.Length == 0) return -1;
+            if (s.Length == 0 || s.Length > 1) return -1;
                 s = s.ToLower();
             return "bcdehlma".IndexOf(s[0]);
         }
@@ -672,7 +672,8 @@ namespace ASMgenerator8080
                     continue;
                 }
 
-                if (mem.Count <= addr - startAddr) fillArray(mem, addr - startAddr);
+                if (mem.Count <= addr - startAddr) 
+                    fillArray(mem, addr - startAddr);
 
                 // no operands
                 try
@@ -853,7 +854,7 @@ namespace ASMgenerator8080
                 // nothing else works, it must be a label
                 if (labelTag == "")
                 {
-                    if (partsLen > 1) throw new BinaryGeneratorException(incorrect_label, linenumber);
+                    //if (partsLen > 1) throw new BinaryGeneratorException(incorrect_label, linenumber);
                     string[] splat = mnemonic.Split(':');
                     labelTag = splat[0];
                     if (labelTag.Length > 0 && Char.IsDigit(labelTag[0])) throw new BinaryGeneratorException(incorrect_label, linenumber);
