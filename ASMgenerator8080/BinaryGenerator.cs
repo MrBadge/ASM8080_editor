@@ -15,8 +15,8 @@ namespace ASMgenerator8080
 
         private const string incorrect_ops = "Incorrect operands";
         private const string miss_ops = "Missing operands";
-        private const string to_much_ops = "To much operands";
-        private const string incorrect_cmd = "Incorrect command";
+        private const string to_much_ops = "To many operands";
+        private const string incorrect_cmd = "Unknown command";
         private const string unres_label = "Unresolved label";
         private const string unused_labels = "Unused labels";
 
