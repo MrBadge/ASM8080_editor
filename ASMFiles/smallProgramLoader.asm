@@ -42,18 +42,17 @@ smallProgramLoader:
 		INX H
 		JMP smallProgramLoader_mainLoop
 
-
 ;read byte from terminal 
 ;used registers: A, B 
 ;input: none 
 ;output: read byte in register B 
 readByte: 
-    IN 0xFB 
-    ANI 0x02 
-    JZ readByte 
-    IN 0xFA 
-    MOV B, A 
-    IN 0xFB 
-    ANI 0x28 ; (0010 1000) 
-    JNZ readByte 
-    RET 
+    IN 0xFB
+    ANI 0x02
+    JZ readByte
+    IN 0xFA
+    MOV B, A
+    IN 0xFB
+    ANI 0x28 ; (0010 1000)
+    JNZ readByte
+    RET

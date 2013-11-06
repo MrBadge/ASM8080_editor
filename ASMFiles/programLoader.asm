@@ -1,30 +1,30 @@
 ;init timer and uart
-;used registers: A 
-;input: none 
-;output: none 
+;used registers: A
+;input: none
+;output: none
 init_timer_and_uart: 
     MVI A, 56 ; режим работы 
-    OUT 0xE3 
+    OUT 0xE3
     MVI A, 0x1A ; регистр сравнения 
-    OUT 0xE1 
+    OUT 0xE1
     MVI A, 0x7E ; (01 11 11 10) управляющее влово режима работы UART 
-    OUT 0xFB 
+    OUT 0xFB
     MVI A, 0x05 ; (00 00 01 01) включение приема / передачи 
-    OUT 0xFB 
-    XRA A 
-    OUT 0xFB 
-    OUT 0xFB 
-    OUT 0xFB 
+    OUT 0xFB
+    XRA A
+    OUT 0xFB
+    OUT 0xFB
+    OUT 0xFB
     MVI A, 0x40 ; сброс 
-    OUT 0xFB 
+    OUT 0xFB
  
-;load program from terminal 
-;used registers: A, B, C, HL, DE 
-;input: first byte from terminal is a command 
-;commands: 
-;   0 - exit program; 
-;   1 - next two bytes is starting address to write 
-;   2 - next byte is byte to write 
+;load program from terminal
+;used registers: A, B, C, HL, DE
+;input: first byte from terminal is a command
+;commands:
+;   0 - exit program
+;   1 - next two bytes is starting address to write
+;   2 - next byte is byte to write
 ;output: none 
 programLoader: 
     CALL readByte 
