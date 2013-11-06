@@ -1,9 +1,8 @@
- 
-;init timer 
+;init timer and uart
 ;used registers: A 
 ;input: none 
 ;output: none 
-init_timer: 
+init_timer_and_uart: 
     MVI A, 56 ; режим работы 
     OUT 0xE3 
     MVI A, 0x1A ; регистр сравнения 
@@ -37,17 +36,17 @@ programLoader:
     SUI 0x01 
     JZ programLoader_command_2 
     programLoader_command_1: 
-    CALL readByte 
-    MOV H, B 
-    CALL readByte 
-    MOV L, B 
-    SHLD Addr1
-    JMP programLoader
+        CALL readByte 
+        MOV H, B 
+        CALL readByte 
+        MOV L, B 
+        SHLD Addr1
+        JMP programLoader
     programLoader_command_2: 
-    CALL readByte 
-    mov M, B 
-    INX H 
-    JMP programLoader 
+        CALL readByte 
+        MOV M, B 
+        INX H
+        JMP programLoader 
     Addr1 DW 0x00
  
 ;read byte from terminal 
