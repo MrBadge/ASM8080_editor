@@ -1,3 +1,4 @@
+ 
 ;init timer 
 ;used registers: A 
 ;input: none 
@@ -40,22 +41,14 @@ programLoader:
     MOV H, B 
     CALL readByte 
     MOV L, B 
-    LHLD Check
-    MOV A, M  
-    ANA A 
-    JNZ programLoader 
-    SHLD Addr1 
-    MVI A, 0x01 
-    ADD Check 
-    JMP programLoader 
+    SHLD Addr1
+    JMP programLoader
     programLoader_command_2: 
     CALL readByte 
     mov M, B 
     INX H 
     JMP programLoader 
-    Check DB 0x00 
-    Addr1 DB 0x00 
-    Addr2 DB 0x00 
+    Addr1 DW 0x00
  
 ;read byte from terminal 
 ;used registers: A, B 
@@ -83,4 +76,3 @@ readByte:
 ;   MOV A, B 
 ;   OUT 0xFA 
 ;   RET 
-
