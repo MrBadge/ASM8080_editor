@@ -13,6 +13,13 @@ namespace ASMgenerator8080
         private const int minAddr = 0x2100;
         private const int maxAddr = 0x10000;
 
+        private const string incorrect_ops = "Incorrect operands";
+        private const string miss_ops = "Missing operands";
+        private const string to_much_ops = "To much operands";
+        private const string incorrect_cmd = "Incorrect command";
+        private const string unres_label = "Unresolved label";
+        private const string unused_labels = "Unused labels";
+
         private static readonly ArrayList opsRegDst = new ArrayList() { "inr", "dcr" };
         private static readonly Dictionary<string, byte> ops0 = new Dictionary<string, byte>()
         { 
@@ -127,24 +134,37 @@ namespace ASMgenerator8080
         private int startAddr = 0x2100;
         private int currentAddr = 0;
         private int LabelsCount = 0;
-        private ArrayList textlabels;
+        //private ArrayList textlabels;
         private Dictionary<string, int> labels;
-        private ArrayList references;
-        private ArrayList resolveTable;
-        private Dictionary<string, int> unresolvedLabels;
+        //private ArrayList references;
+        //private ArrayList resolveTable;
+        private Dictionary<string, ArrayList> unresolvedLabels;
+
+        private class locationCode
+        {
+            public int address { set; get; }
+            public int linenumber { set; get; }
+
+            public locationCode(int addr, int lineNum)
+            {
+                address = addr;
+                linenumber = lineNum;
+            }
+        }
 
         public BinaryGenerator()
         {
-            references = new ArrayList();
-            resolveTable = new ArrayList();
-            textlabels = new ArrayList();
+            //references = new ArrayList();
+            //resolveTable = new ArrayList();
+            //textlabels = new ArrayList();
             labels = new Dictionary<string,int>();
-            unresolvedLabels = new Dictionary<string, int>();
+            unresolvedLabels = new Dictionary<string, ArrayList>();
             mem = new ArrayList();
         }
 
         public void generateBinary(string s, int addr = 0x2100)
         {
+            clear();
             if (s == null) throw new BinaryGeneratorException("The string is empty");
             setStartAddress(addr);
             Regex rgx = new Regex("\r\n");
@@ -154,9 +174,15 @@ namespace ASMgenerator8080
             {
                 size = parseInstruction(lines[i], currentAddr, i);
                 currentAddr += size > 0 ? size : 0;
-                if (size < 0) 
-                    throw new BinaryGeneratorException("Something went wrong here:(", i);
+                //if (size < 0) 
+                //throw new BinaryGeneratorException("Something went wrong here:(", i);
             }
+            if (unresolvedLabels.Count != 0)
+            {
+                string label = unresolvedLabels.Keys.ElementAt(0);
+                throw new BinaryGeneratorException(unres_label + ": \"" + label + "\"" , ((locationCode)unresolvedLabels[label][0]).linenumber);
+            }
+
         }
 
         public string[] getBinaryDumpToString(int len = 0)
@@ -170,7 +196,7 @@ namespace ASMgenerator8080
                 if (mem[i] != null)
                 {
                     if (len > 0 && i > 0 && i % len == 0) ++j;
-                    res[j] += (byte)mem[i] < 10 ? "0" + (byte)mem[i]: ((byte)mem[i]).ToString("x");
+                    res[j] += (byte)mem[i] < 10 ? "0" + (byte)mem[i]: ((byte)mem[i]).ToString("X");
                     res[j] += " ";
                 }
             return res;
@@ -197,12 +223,18 @@ namespace ASMgenerator8080
             return mem;
         }
 
-        public void clearBinaryDump()
+        public void clear()
         {
-            mem.Clear();    
+            mem.Clear();
+            LabelsCount = 0;
+            //textlabels.Clear();
+            labels.Clear();
+            //references.Clear();
+            //resolveTable.Clear();
+            unresolvedLabels.Clear();
         }
 
-        public void setStartAddress(int startAddress)
+        private void setStartAddress(int startAddress)
         {
             if (startAddress >= minAddr && startAddress < maxAddr)
             {
@@ -246,15 +278,15 @@ namespace ASMgenerator8080
  
         private int useExpr(string[] s, int addr, int linenumber, int index = 1) {
             string expr = getExpr(s, index);
-            if (expr == null) throw new BinaryGeneratorException("Missing operand", linenumber);
+            if (expr == null) throw new BinaryGeneratorException(miss_ops, linenumber);
             if (expr.Length == 0) return 0;
  
-            int immediate = markLabel(expr, addr);
-            referencesLabel(expr, linenumber);
+            int immediate = markLabel(expr, addr, linenumber);
+            //referencesLabel(expr, linenumber);
             return immediate;
         }
 
-        private int markLabel(string identifier, int address, int linenumber = -1, bool _override = false) {
+        private int markLabel(string identifier, int address, int codeLine, int linenumber = -1, bool _override = false, bool isUseLabel = true) {
             Regex rgx1 = new Regex(@"/\$([0-9a-fA-F]+)/");
             Regex rgx2 = new Regex(@"/(^|[^'])(\$|\.)/");
 
@@ -275,48 +307,60 @@ namespace ASMgenerator8080
 
             try
             {
-                int found = labels[identifier];
-                if (address >= 0)
-                {
-                    if (resolveTable.Count <= -found) fillArray(resolveTable, -found);
-                        resolveTable[-found] = address;
+                address = labels[identifier];
+                //if (address >= 0)
+                //{
+                //    if (resolveTable.Count <= -found) fillArray(resolveTable, -found);
+                //        resolveTable[-found] = address;
 
-                        try
-                        {
-                            int addr = unresolvedLabels[identifier];
-                            setmem16(addr + 1, address);
-                        }
-                        catch (KeyNotFoundException) { };
-                }
-                else
-                {
-                    address = found;
-                }
+                //}
+                //else
+                //{
+                //    address = found;
+                //}
             }
             catch (KeyNotFoundException)
             {
-                unresolvedLabels.Add(identifier, instAddr);
-                labels.Add(identifier, address);
+                if (isUseLabel)
+                {
+                    if (unresolvedLabels.ContainsKey(identifier))
+                        unresolvedLabels[identifier].Add(new locationCode(instAddr, codeLine));
+                    else unresolvedLabels.Add(identifier, new ArrayList() { new locationCode(instAddr, codeLine) });
+                }
+                else
+                {
+                    labels.Add(identifier, address);
+                 
+                    try
+                    {
+                        ArrayList locations = unresolvedLabels[identifier];
+                        foreach (locationCode locs in locations) setmem16(locs.address + 1, address);
+                        unresolvedLabels.Remove(identifier);
+                    }
+                    catch (KeyNotFoundException) 
+                    {
+                    }
+                }
             };
 
-            if (linenumber >= 0)
-            {
-                if (textlabels.Count <= linenumber) fillArray(textlabels, linenumber);
-                textlabels[linenumber] = identifier;
-            }
+            //if (linenumber >= 0)
+            //{
+            //    if (textlabels.Count <= linenumber) fillArray(textlabels, linenumber);
+            //    textlabels[linenumber] = identifier;
+            //}
 
             return address;
         }
 
-        private void referencesLabel(string identifier, int linenumber) {
-            identifier = identifier.ToLower();
+        //private void referencesLabel(string identifier, int linenumber) {
+        //    identifier = identifier.ToLower();
 
-            if (references.Count <= linenumber)
-            {
-                fillArray(references, linenumber);
-                references[linenumber] = identifier;
-            }
-        }
+        //    if (references.Count <= linenumber)
+        //    {
+        //        fillArray(references, linenumber);
+        //        references[linenumber] = identifier;
+        //    }
+        //}
 
         private void fillArray(ArrayList arr, int index)
         {
@@ -405,8 +449,8 @@ namespace ASMgenerator8080
  
             if (s.Length == 0) return 0;
  
-            int n = markLabel(s, addr, 0);
-            referencesLabel(s, linenumber);
+            int n = markLabel(s, addr, linenumber, 0);
+            //referencesLabel(s, linenumber);
  
             //if (len == undefined) len = 1;
  
@@ -589,18 +633,20 @@ namespace ASMgenerator8080
             s = s.Trim();
             if (s.Length == 0) return 0;
 
+            s = Regex.Split(s, @"\s*;\s*", RegexOptions.None)[0];
+
             string pattern = "[ \t]*,[ \t]*|[ \t]+";
             string[] parts = Regex.Split(s, pattern, RegexOptions.None);
             int partsLen = parts.Length;
 
-            for (var i = 0; i < partsLen; i++)
-            {
-                if (parts[i].Length > 0 && parts[i][0] == ';')
-                {
-                    partsLen = i;
-                    break;
-                }
-            }
+            //for (var i = 0; i < partsLen; i++)
+            //{
+            //    if (parts[i].Length > 0 && parts[i][0] == ';')
+            //    {
+            //        partsLen = i;
+            //        break;
+            //    }
+            //}
 
             string labelTag = "";
             int immediate = 0;
@@ -622,6 +668,7 @@ namespace ASMgenerator8080
                 try
                 {
                     mem[addr - startAddr] =  ops0[mnemonic];
+                    if (partsLen > 1) throw new BinaryGeneratorException(to_much_ops, linenumber);
                     return 1;
                 }
                 catch (KeyNotFoundException) { }
@@ -630,6 +677,7 @@ namespace ASMgenerator8080
                 try
                 {
                     mem[addr - startAddr] = opsIm16[mnemonic];
+                    if (partsLen > 2) throw new BinaryGeneratorException(to_much_ops, linenumber);
                     immediate = useExpr(parts, addr, linenumber);
                     setmem16(addr + 1, immediate);
                     return 3;
@@ -640,9 +688,12 @@ namespace ASMgenerator8080
                 try
                 {
                     opcs = opsRpIm16[mnemonic];
-                    if (partsLen < 2) return -3;
+                    if (partsLen > 2) throw new BinaryGeneratorException(to_much_ops, linenumber);
+                    //if (partsLen < 2) return -3;
+                    if (partsLen < 2) throw new BinaryGeneratorException(miss_ops, linenumber);
                     int rp = parseRegisterPair(parts[1]);
-                    if (rp == -1) return -3;
+                    //if (rp == -1) return -3;
+                    if (rp == -1) throw new BinaryGeneratorException(incorrect_ops, linenumber);
                     mem[addr - startAddr] = (byte)(opcs | (rp << 4));
                     immediate = useExpr(parts, addr, linenumber, 2);
                     setmem16(addr + 1, immediate);
@@ -654,6 +705,7 @@ namespace ASMgenerator8080
                 try
                 {
                     mem[addr - startAddr] = opsIm8[mnemonic];
+                    if (partsLen > 2) throw new BinaryGeneratorException(to_much_ops, linenumber);
                     immediate = useExpr(parts, addr, linenumber);
                     setmem8(addr + 1, immediate);
                     return 2;
@@ -664,9 +716,12 @@ namespace ASMgenerator8080
                 try
                 {
                     opcs = opsRegIm8[mnemonic];
-                    if (partsLen < 2) return -2;
+                    if (partsLen > 3) throw new BinaryGeneratorException(to_much_ops, linenumber);
+                    //if (partsLen < 2) return -2;
+                    if (partsLen < 2) throw new BinaryGeneratorException(miss_ops, linenumber);
                     int reg = parseRegister(parts[1]);
-                    if (reg == -1) return -2;
+                    //if (reg == -1) return -2;
+                    if (reg == -1) throw new BinaryGeneratorException(incorrect_ops, linenumber);
                     mem[addr - startAddr] = (byte)(opcs | reg << 3);
                     immediate = useExpr(parts, addr, linenumber, 2);
                     setmem8(addr + 1, immediate);
@@ -678,10 +733,13 @@ namespace ASMgenerator8080
                 try
                 {
                     opcs = opsRegReg[mnemonic];
-                    if (partsLen <= 2) return -1;
+                    if (partsLen > 3) throw new BinaryGeneratorException(to_much_ops, linenumber);
+                    //if (partsLen <= 2) return -1;
+                    if (partsLen <= 2) throw new BinaryGeneratorException(miss_ops, linenumber);
                     int reg1 = parseRegister(parts[1].Trim());
                     int reg2 = parseRegister(parts[2].Trim());
-                    if (reg1 == -1 || reg2 == -1) return -1;
+                    //if (reg1 == -1 || reg2 == -1) return -1;
+                    if (reg1 == -1 || reg2 == -1) throw new BinaryGeneratorException(incorrect_ops, linenumber);
                     mem[addr - startAddr] = (byte)(opcs | reg1 << 3 | reg2);
                     return 1;
                 }
@@ -691,8 +749,10 @@ namespace ASMgenerator8080
                 try
                 {
                     opcs = opsReg[mnemonic];
+                    if (partsLen > 2) throw new BinaryGeneratorException(to_much_ops, linenumber);
                     int reg = parseRegister(parts[1]);
-                    if (reg == -1) return -1;
+                    //if (reg == -1) return -1;
+                    if (reg == -1) throw new BinaryGeneratorException(incorrect_ops, linenumber);
                     if (opsRegDst.IndexOf(mnemonic) != -1) reg <<= 3;
                     mem[addr - startAddr] = (byte)(opcs | reg);
                     return 1;
@@ -703,8 +763,10 @@ namespace ASMgenerator8080
                 try
                 {
                     opcs = opsRp[mnemonic];
+                    if (partsLen > 2) throw new BinaryGeneratorException(to_much_ops, linenumber);
                     int rp = parseRegisterPair(parts[1]);
-                    if (rp == -1) return -1;
+                    //if (rp == -1) return -1;
+                    if (rp == -1) throw new BinaryGeneratorException(incorrect_ops, linenumber);
                     mem[addr - startAddr] = (byte)(opcs | rp << 4);
                     return 1;
                 }
@@ -737,7 +799,7 @@ namespace ASMgenerator8080
                 /*if (mnemonic == ".equ" || mnemonic == "equ") {
                     if (labelTag == "") return -1;
                     var value = evaluateExpression(String.Join(" ", parts, 1, parts.Length-1), addr);
-                    markLabel(labelTag, value, linenumber, true);
+                    markLabel(labelTag, value, linenumber, linenumber, true);
                     return 0;
                 }*/
 
@@ -764,21 +826,22 @@ namespace ASMgenerator8080
                     return -1;
                 }*/
 
-                if (parts[0][0] == ';') return 0;
+                if (parts[0].Length > 0 && parts[0][0] == ';') return 0;
 
                 // nothing else works, it must be a label
                 if (labelTag == "")
                 {
                     string[] splat = mnemonic.Split(':');
                     labelTag = splat[0];
-                    markLabel(labelTag, addr, linenumber);
+                    markLabel(labelTag, addr, linenumber, linenumber, false, false);
 
                     parts[0] = String.Join(":", splat, 1, splat.Length - 1);
                     continue;
                 }
 
                 mem[addr - startAddr] = (byte)0xFE;
-                return -1; // error
+                //return -1; // error
+                throw new BinaryGeneratorException(incorrect_cmd, linenumber);
             }
             return 0;
         }

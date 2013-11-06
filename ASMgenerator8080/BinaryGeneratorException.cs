@@ -9,20 +9,20 @@ namespace ASMgenerator8080
     class BinaryGeneratorException: Exception
     {
         public int line { set; get; }
-        public string Message { get; set; }
+        public string message { get; set; }
 
-        public BinaryGeneratorException(string s, int lineNumb)
+        public BinaryGeneratorException(string s, int lineNumb): base(s)
         {
             line = lineNumb;
-            Message = s;
+            message = s;
         }
 
-        public BinaryGeneratorException(string s)
+        public BinaryGeneratorException(string s): base(s)
         {
             
         }
 
-        public BinaryGeneratorException()
+        public BinaryGeneratorException(): base()
         {
         }
     }
