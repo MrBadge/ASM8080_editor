@@ -16,6 +16,7 @@ namespace ASMgenerator8080
         private const string incorrect_ops = "Incorrect operands";
         private const string miss_ops = "Missing operands";
         private const string to_much_ops = "To much operands";
+        private const string incorrect_label = "Incorrect label";
         private const string incorrect_cmd = "Incorrect command";
         private const string unres_label = "Unresolved label";
         private const string unused_labels = "Unused labels";
@@ -292,7 +293,7 @@ namespace ASMgenerator8080
 
             identifier = rgx1.Replace(identifier, "0x$1");
             identifier = rgx2.Replace(identifier, " "+address+" ");
-            var number = resolveNumber(identifier.Trim());
+            var number = resolveNumber(identifier.Trim(), linenumber);
             int instAddr = address;
 
             if (number != -1) return number;
@@ -387,6 +388,7 @@ namespace ASMgenerator8080
         private int parseDeclDB(string[] args, int addr, int linenumber, int dw)
         {
             string text = String.Join(" ", args, 1, args.Length-1);
+            if (text.Length == 0) throw new BinaryGeneratorException(miss_ops, linenumber);
             string arg = "";
             int mode = 0;
             char cork = (char)0;
@@ -465,7 +467,7 @@ namespace ASMgenerator8080
             return size;
         }
 
-        private int resolveNumber(string identifier)
+        private int resolveNumber(string identifier, int linenumber)
         {
             if (identifier == "" || identifier.Length == 0) return -1;
 
@@ -479,7 +481,15 @@ namespace ASMgenerator8080
 
             if (identifier.Length > 2 && identifier[0] == '0' && (identifier[1] == 'x' || identifier[1] == 'X'))
             {
-                return Convert.ToInt32(identifier, 16);
+                try
+                {
+                    return Convert.ToInt32(identifier, 16);
+                }
+                catch (Exception)
+                {
+                    if (Regex.Split(identifier, "  *").Length > 1) throw new BinaryGeneratorException(to_much_ops, linenumber);
+                    else throw new BinaryGeneratorException(incorrect_ops, linenumber);
+                }
             }
 
             if (identifier[0] == '$')
@@ -735,7 +745,7 @@ namespace ASMgenerator8080
                     opcs = opsRegReg[mnemonic];
                     if (partsLen > 3) throw new BinaryGeneratorException(to_much_ops, linenumber);
                     //if (partsLen <= 2) return -1;
-                    if (partsLen <= 2) throw new BinaryGeneratorException(miss_ops, linenumber);
+                    if (partsLen < 3) throw new BinaryGeneratorException(miss_ops, linenumber);
                     int reg1 = parseRegister(parts[1].Trim());
                     int reg2 = parseRegister(parts[2].Trim());
                     //if (reg1 == -1 || reg2 == -1) return -1;
@@ -750,6 +760,7 @@ namespace ASMgenerator8080
                 {
                     opcs = opsReg[mnemonic];
                     if (partsLen > 2) throw new BinaryGeneratorException(to_much_ops, linenumber);
+                    if (partsLen < 2) throw new BinaryGeneratorException(miss_ops, linenumber);
                     int reg = parseRegister(parts[1]);
                     //if (reg == -1) return -1;
                     if (reg == -1) throw new BinaryGeneratorException(incorrect_ops, linenumber);
@@ -764,6 +775,7 @@ namespace ASMgenerator8080
                 {
                     opcs = opsRp[mnemonic];
                     if (partsLen > 2) throw new BinaryGeneratorException(to_much_ops, linenumber);
+                    if (partsLen < 2) throw new BinaryGeneratorException(miss_ops, linenumber);
                     int rp = parseRegisterPair(parts[1]);
                     //if (rp == -1) return -1;
                     if (rp == -1) throw new BinaryGeneratorException(incorrect_ops, linenumber);
@@ -775,23 +787,29 @@ namespace ASMgenerator8080
                 // rst
                 if (mnemonic == "rst")
                 {
-                    int n = resolveNumber(parts[1]);
+                    if (partsLen > 2) throw new BinaryGeneratorException(to_much_ops, linenumber);
+                    if (partsLen < 2) throw new BinaryGeneratorException(miss_ops, linenumber);
+                    int n = resolveNumber(parts[1], linenumber);
                     if (n >= 0 && n < 8)
                     {
                         mem[addr - startAddr] = (byte)(0xC7 | n << 3);
                         return 1;
                     }
-                    return -1;
+                    //return -1;
+                    throw new BinaryGeneratorException(incorrect_ops, linenumber);
                 }
 
                 if (mnemonic == ".org" || mnemonic == "org")
                 {
-                    int n = resolveNumber(parts[1]);
+                    if (partsLen > 2) throw new BinaryGeneratorException(to_much_ops, linenumber);
+                    if (partsLen < 2) throw new BinaryGeneratorException(miss_ops, linenumber);
+                    int n = resolveNumber(parts[1], linenumber);
                     if (n >= 0)
                     {
                         return -100000 - n;
                     }
-                    return -1;
+                    //return -1;
+                    throw new BinaryGeneratorException(incorrect_ops, linenumber);
                 }
 
 
@@ -809,11 +827,15 @@ namespace ASMgenerator8080
 
                 if (mnemonic == "db" || mnemonic == ".db" || mnemonic == "str")
                 {
-                    return parseDeclDB(parts, addr, linenumber, 1);
+                    int res = parseDeclDB(parts, addr, linenumber, 1);
+                    if (res == -1) throw new BinaryGeneratorException(incorrect_ops, linenumber);
+                    else return res;
                 }
                 if (mnemonic == "dw" || mnemonic == ".dw")
                 {
-                    return parseDeclDB(parts, addr, linenumber, 2);
+                    int res  = parseDeclDB(parts, addr, linenumber, 2);
+                    if (res == -1) throw new BinaryGeneratorException(incorrect_ops, linenumber);
+                    else return res;
                 }
                 /*if (mnemonic == "ds" || mnemonic == ".ds") {
                     var size = evaluateExpression(String.Join(" ", parts, 1, parts.Length-1), addr);
@@ -831,8 +853,10 @@ namespace ASMgenerator8080
                 // nothing else works, it must be a label
                 if (labelTag == "")
                 {
+                    if (partsLen > 1) throw new BinaryGeneratorException(incorrect_label, linenumber);
                     string[] splat = mnemonic.Split(':');
                     labelTag = splat[0];
+                    if (labelTag.Length > 0 && Char.IsDigit(labelTag[0])) throw new BinaryGeneratorException(incorrect_label, linenumber);
                     markLabel(labelTag, addr, linenumber, linenumber, false, false);
 
                     parts[0] = String.Join(":", splat, 1, splat.Length - 1);
