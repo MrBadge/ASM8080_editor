@@ -39,6 +39,7 @@ smallProgramLoader:
 		JZ programLoaderAddr
 		CALL readByte
 		MOV M, B
+		INX H
 		JMP smallProgramLoader_mainLoop
 
 
