@@ -51,13 +51,18 @@
             this.projectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.compileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendToKR580ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewHexToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadASMDescFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.serialPortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.comToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stStrip = new System.Windows.Forms.StatusStrip();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.tsFiles = new FarsiLibrary.Win.FATabStrip();
-            this.viewHexToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.menu.SuspendLayout();
+            this.stStrip.SuspendLayout();
+            this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tsFiles)).BeginInit();
             this.SuspendLayout();
             // 
@@ -70,7 +75,7 @@
             this.settingsToolStripMenuItem});
             this.menu.Location = new System.Drawing.Point(0, 0);
             this.menu.Name = "menu";
-            this.menu.Size = new System.Drawing.Size(396, 24);
+            this.menu.Size = new System.Drawing.Size(428, 24);
             this.menu.TabIndex = 1;
             this.menu.Text = "menu";
             // 
@@ -253,6 +258,14 @@
             this.sendToKR580ToolStripMenuItem.Text = "Send to KR580";
             this.sendToKR580ToolStripMenuItem.Click += new System.EventHandler(this.sendToKR580ToolStripMenuItem_Click);
             // 
+            // viewHexToolStripMenuItem
+            // 
+            this.viewHexToolStripMenuItem.Name = "viewHexToolStripMenuItem";
+            this.viewHexToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.H)));
+            this.viewHexToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
+            this.viewHexToolStripMenuItem.Text = "View Hex";
+            this.viewHexToolStripMenuItem.Click += new System.EventHandler(this.viewHexToolStripMenuItem_Click);
+            // 
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -284,30 +297,46 @@
             this.comToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
             this.comToolStripMenuItem.Text = "com";
             // 
+            // stStrip
+            // 
+            this.stStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsStatus});
+            this.stStrip.Location = new System.Drawing.Point(0, 306);
+            this.stStrip.Name = "stStrip";
+            this.stStrip.Size = new System.Drawing.Size(428, 22);
+            this.stStrip.TabIndex = 4;
+            this.stStrip.Text = "statusStrip1";
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.tsFiles);
+            this.panel1.Location = new System.Drawing.Point(12, 27);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(404, 276);
+            this.panel1.TabIndex = 5;
+            // 
             // tsFiles
             // 
             this.tsFiles.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.tsFiles.Location = new System.Drawing.Point(12, 27);
+            this.tsFiles.Location = new System.Drawing.Point(47, 25);
             this.tsFiles.Name = "tsFiles";
-            this.tsFiles.Size = new System.Drawing.Size(372, 241);
-            this.tsFiles.TabIndex = 3;
+            this.tsFiles.Size = new System.Drawing.Size(230, 174);
+            this.tsFiles.TabIndex = 4;
             this.tsFiles.Text = "faTabStrip1";
-            this.tsFiles.TabStripItemClosing += new FarsiLibrary.Win.TabStripItemClosingHandler(this.tsFiles_TabStripItemClosing);
             // 
-            // viewHexToolStripMenuItem
+            // tsStatus
             // 
-            this.viewHexToolStripMenuItem.Name = "viewHexToolStripMenuItem";
-            this.viewHexToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.H)));
-            this.viewHexToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
-            this.viewHexToolStripMenuItem.Text = "View Hex";
-            this.viewHexToolStripMenuItem.Click += new System.EventHandler(this.viewHexToolStripMenuItem_Click);
+            this.tsStatus.Name = "tsStatus";
+            this.tsStatus.Size = new System.Drawing.Size(413, 17);
+            this.tsStatus.Spring = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(396, 301);
-            this.Controls.Add(this.tsFiles);
+            this.ClientSize = new System.Drawing.Size(428, 328);
+            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.stStrip);
             this.Controls.Add(this.menu);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menu;
@@ -316,9 +345,11 @@
             this.Text = "Form1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
-            this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
             this.menu.ResumeLayout(false);
             this.menu.PerformLayout();
+            this.stStrip.ResumeLayout(false);
+            this.stStrip.PerformLayout();
+            this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.tsFiles)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -339,7 +370,6 @@
         private System.Windows.Forms.ToolStripMenuItem findToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem replaceToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
-        private FarsiLibrary.Win.FATabStrip tsFiles;
         private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cutToolStripMenuItem;
@@ -355,6 +385,10 @@
         private System.Windows.Forms.ToolStripMenuItem comToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem viewHexToolStripMenuItem;
+        private System.Windows.Forms.StatusStrip stStrip;
+        private System.Windows.Forms.Panel panel1;
+        private FarsiLibrary.Win.FATabStrip tsFiles;
+        private System.Windows.Forms.ToolStripStatusLabel tsStatus;
     }
 }
 

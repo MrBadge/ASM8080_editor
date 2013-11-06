@@ -7,7 +7,7 @@ init_timer:
     OUT 0xE3
     MVI A, 0x1A ; регистр сравнения
     OUT 0xE1
-    MVI A, 0x7A ; (01 11 10 10) управляющее влово режима работы UART
+    MVI A, 0x7E ; (01 11 11 10) управляющее влово режима работы UART
     OUT 0xFB
     MVI A, 0x05 ; (00 00 01 01) включение приема / передачи
     OUT 0xFB
@@ -18,19 +18,19 @@ init_timer:
     MVI A, 0x40 ; сброс
     OUT 0xFB
 
-;load programm from terminal
-;used registers: A, B, C, HL
+;load program from terminal
+;used registers: A, B, C, HL, DE
 ;input: first byte from terminal is a command
 ;commands:
 ;	0 - exit program;
-;	1 - next two bytes is starting adress to write
+;	1 - next two bytes is starting address to write
 ;	2 - next byte is byte to write
 ;output: none
 programLoader:
 	CALL readByte
 	MOV A, B
 	ANA A
-	RZ ; exit program if command zero
+	JZ Addr1; go to start of user's program if command zero
 	SUI 0x01
 	JZ programLoader_command_1
 	SUI 0x01
@@ -40,12 +40,21 @@ programLoader:
 	MOV H, B
 	CALL readByte
 	MOV L, B
+	MOV A, Check
+	ANA A
+	JNZ programLoader
+	SHLD Addr1
+	MVI A, 0x01
+	ADD Check
 	JMP programLoader
 	programLoader_command_2:
 	CALL readByte
 	mov M, B
 	INX H
 	JMP programLoader
+	Check DB 0x00
+	Addr1 DB ?
+	Addr2 DB ?
 
 ;read byte from terminal
 ;used registers: A, B
