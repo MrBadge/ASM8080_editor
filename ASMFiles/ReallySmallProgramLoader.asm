@@ -1,5 +1,5 @@
  
-;com port must be initialized with parameters: 4800 bit/s, 8 bit, parity even, two stop bits
+;com port must be initialized with parameters: 4800 baud, 8 bit, parity even, two stop bits
 JMP smallPrLoad
 readByte:
     IN 0FBh
