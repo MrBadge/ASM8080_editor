@@ -13,7 +13,7 @@ readByte:
     RET
 
 MVI H, 021h ;the address must reference to the end of this loader, where main loader will start
-MVI L, 020h
+MVI L, 023h
 smallPrLoad:
     call readByte
     MOV A, B
