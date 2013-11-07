@@ -11,8 +11,8 @@ readByte:
     JNZ readByte
     RET
 
-MOV H, 0x00 ;the address must reference to the end of this loader, where main loader will start
-MOV L, 0x21
+MOV H, 0x?? ;the address must reference to the end of this loader, where main loader will start
+MOV L, 0x??
 smallPrLoad:
     call readByte
     MOV A, B
