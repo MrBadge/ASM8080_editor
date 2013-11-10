@@ -1,5 +1,5 @@
 ;timer and uart can be initialized by programm in Monitor
-;with parameters 4800 bit/s, 8 bit, parity even, two stop bits
+;with parameters 4800 bit/s, 7 bit, parity even, two stop bits
 ;
 ;init timer and uart
 ;used registers: A 

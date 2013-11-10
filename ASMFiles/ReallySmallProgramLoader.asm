@@ -1,5 +1,7 @@
  
-;com port must be initialized with parameters: 4800 baud, 8 bit, parity even, two stop bits
+;com port must be initialized with parameters: 4800 baud, 7 bit, parity even, two stop bits
+MVI H, 021h ;the address must reference to the end of this loader, where main loader will start
+MVI L, 023h
 JMP smallPrLoad
 readByte:
     IN 0FBh
@@ -12,8 +14,6 @@ readByte:
     JNZ readByte
     RET
 
-MVI H, 021h ;the address must reference to the end of this loader, where main loader will start
-MVI L, 023h
 smallPrLoad:
     call readByte
     MOV A, B
