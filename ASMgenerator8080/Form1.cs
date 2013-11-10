@@ -61,6 +61,8 @@ namespace ASMgenerator8080
             panel1.Dock = DockStyle.Fill;
             stStrip.Items.Add("Start work with opening or creating new file");
             stStrip.Items.Add("");
+            //stStrip.Items.Add("          Current COM-Port: ");
+            //stStrip.Items[2].TextAlign = ContentAlignment.MiddleRight;
 
         }
 
@@ -281,14 +283,14 @@ namespace ASMgenerator8080
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            stStrip.Items[0].Text = "";
+            //stStrip.Items[0].Text = "";
             var filename = OpenFile("Open file", "All files (*.*)|*.*|Asm files (*.asm)|*.asm");
             if (filename == null) return;
-            stStrip.Text = "Opening " + filename + "...";
+            stStrip.Items[0].Text = "Opening " + filename + " ...";
             CreateTab(filename);
             //CurrentTB.OpenBindingFile(filename, Encoding.Unicode);
             UpdateHighlighting();
-            stStrip.Text = "";
+            stStrip.Items[0].Text = "";
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -387,7 +389,7 @@ namespace ASMgenerator8080
             stStrip.Items[0].Text = "Compiling ...";
             stStrip.Refresh();
             GetBinary(CurrentTB.Text, 0x2100 + 0x23 + Constants.BigProgramLoader.Length);
-            stStrip.Items[0].Text = "Done! No errors found";
+            stStrip.Items[0].Text = "Done";
         }
 
         private void serialPortToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
@@ -529,7 +531,7 @@ namespace ASMgenerator8080
 
                 var _data = new ArrayList(BinGen.getBinaryDump());
                 byte[] startAddr = BitConverter.GetBytes(BinGen.getStartAddress());
-                stStrip.Items[1].Text = "Start address of your program in memory = " + startAddr[0] + startAddr[1];
+                stStrip.Items[1].Text = "| Start address of your program in memory = " + startAddr[0] + startAddr[1];
                 byte[] data = new byte[_data.Count * 2 + 3];
                 data[0] = 1;
                 data[1] = startAddr[0];
@@ -561,6 +563,7 @@ namespace ASMgenerator8080
             //if ((sender as ToolStripMenuItem).Name != "No ports found")
             (sender as ToolStripMenuItem).Checked = !(sender as ToolStripMenuItem).Checked;
             PS.ComPortName = (sender as ToolStripMenuItem).Text;
+            //stStrip.Items[2].Text = "Current COM-Port: "+ PS.ComPortName;
         }
 
         private void tsFiles_TabStripItemClosing(TabStripItemClosingEventArgs e)
