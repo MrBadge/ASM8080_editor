@@ -59,5 +59,24 @@ namespace ASMgenerator8080.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Byte[].
+        /// </summary>
+        internal static byte[] asmDesc {
+            get {
+                object obj = ResourceManager.GetObject("asmDesc", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на C:\Users\Анатолий\Documents\GitHub\ASM8080_editor\ASMDesc.xml.
+        /// </summary>
+        internal static string ASMHighLightingDescFile {
+            get {
+                return ResourceManager.GetString("ASMHighLightingDescFile", resourceCulture);
+            }
+        }
     }
 }

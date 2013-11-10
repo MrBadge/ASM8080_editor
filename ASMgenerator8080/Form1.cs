@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 //using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
 //using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 using FarsiLibrary.Win;
 using FastColoredTextBoxNS;
 using System.IO.Ports;
@@ -22,11 +16,7 @@ namespace ASMgenerator8080
     public partial class Form1 : Form
     {
         public List<string> labels = new List<string>();
-        //public List<TabPage> pages = new List<TabPage>(); 
-        //public List<FastColoredTextBox> fields = new List<FastColoredTextBox>(); 
-        //public AutocompleteMenu popMenu;
-        public string DescFile = "";
-        //public string ComPort = "";
+        public string DescFile = null;
         private readonly SaveFileDialog SFD;
         private readonly OpenFileDialog OFD;
         public static ComPortSettings PS = new ComPortSettings();
@@ -35,6 +25,19 @@ namespace ASMgenerator8080
 
         public Form1()
         {
+            try
+            {
+                DescFile = Path.GetTempFileName();
+                byte[] tmpBytes = ASMgenerator8080.Properties.Resources.asmDesc;
+                var streamWithASMDesc = new FileStream(DescFile, FileMode.OpenOrCreate);
+                streamWithASMDesc.Write(tmpBytes, 0, tmpBytes.Length);
+                streamWithASMDesc.Close();
+            }
+            catch (Exception)
+            {
+                DescFile = null;
+            }
+
             InitializeComponent();
 
             PS = new ComPortSettings();
@@ -57,7 +60,6 @@ namespace ASMgenerator8080
             tsFiles.Dock = DockStyle.Fill;
             panel1.Dock = DockStyle.Fill;
 
-            //tsFiles.Height = Height - 100;
         }
 
         private bool Save(FATabStripItem tab)
@@ -93,12 +95,12 @@ namespace ASMgenerator8080
             return OFD.ShowDialog() == DialogResult.OK ? OFD.FileName : null;
         }
 
-        private string LocateFile(string filename, string msg1, string msg2, string template, bool mandatory, string capt)
-        {
-            if (File.Exists(filename))
-                return filename;
-            else
-            {
+        //private string LocateFile(string filename, string msg1, string msg2, string template, bool mandatory, string capt)
+        //{
+        //    if (File.Exists(filename))
+        //        return filename;
+        //    else
+        //    {
                 //MessageBox.Show(msg1, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 //filename = OpenFile(capt, template);
                 //if (filename != null)
@@ -111,7 +113,7 @@ namespace ASMgenerator8080
                 //            MessageBoxIcon.Question);
                 //        if (res == DialogResult.Cancel)
                 //            Close();
-                        return null;
+                //        return null;
                 //    }
                 //    else
                 //    {
@@ -119,22 +121,8 @@ namespace ASMgenerator8080
                 //        return null;
                 //    }
                 //}
-            }
-        }
-
-        /*private void LoadCMDs(string filename)
-        {
-            if (filename == null) return;
-            using (var r = new StreamReader(filename))
-            {
-                string line;
-                commands.Clear();
-                while ((line = r.ReadLine()) != null)
-                {
-                    commands.Add(line);
-                }
-            }
-        } */
+            //}
+        //}
 
         FastColoredTextBox CurrentTB
         {
@@ -156,12 +144,6 @@ namespace ASMgenerator8080
         {
             try
             {
-                //tsFiles.Height = 400;
-                //foreach (var item in tsFiles.Items)
-                //{
-                //    (item as FATabStripItem).Height = 400;
-
-                //}
                 var tb = new FastColoredTextBox
                 {
                     Font = new Font("Consolas", 9.75f),
@@ -171,7 +153,6 @@ namespace ASMgenerator8080
                     LeftPadding = 9,
                     Language = Language.Custom
                 };
-                //tb.ContextMenuStrip = cmMain;
                 
                 var tab = new FATabStripItem(fileName != null ? Path.GetFileName(fileName) : "[new]", tb)
                 {
@@ -245,29 +226,6 @@ namespace ASMgenerator8080
             CurrentTB.Hints.Clear();
         }
 
-        private void Form1_SizeChanged(object sender, EventArgs e)
-        {
-            
-        }
-
-        private void TbOnSizeChanged(object sender, EventArgs eventArgs)
-        {
-            //throw new NotImplementedException();
-            tsFiles.Width = (sender as FastColoredTextBox).Width;
-            //MessageBox.Show(Convert.ToString((sender as FastColoredTextBox).LinesCount));
-            tsFiles.Height = (sender as FastColoredTextBox).LinesCount*15;
-            //Width = CurrentTB.Width;
-            //if (tsFiles.Height < Screen.PrimaryScreen.WorkingArea.Height)
-            CurrentTB.Height = 400;
-            Height = CurrentTB.Height + 100;
-        }
-
-        private void tb_LineInserted(object sender, LineInsertedEventArgs e)
-        {
-            //if ((sender as FastColoredTextBox).LinesCount > 21)
-             //   tsFiles.Height = (sender as FastColoredTextBox).LinesCount*10;
-        }
-
         public class TbInfo
         {
             public AutocompleteMenu popupMenu;
@@ -275,15 +233,16 @@ namespace ASMgenerator8080
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Text = "ASM editor for KR580";
+            Text = "ASM editor and loader for KR580";
             //mainField.AutoIndentNeeded += fctb_AutoIndentNeeded;
             //mainField.AutoIndent = true;
             //var list = new List<string>();
-            DescFile = LocateFile("asmDesc.xml", "Please, locate the XML file for ASM",
-                "Continue without code highlighting?", "xml files (*.xml)|*.xml", false, "ASM description file");
+            //DescFile = LocateFile("asmDesc.xml", "Please, locate the XML file for ASM",
+            //    "Continue without code highlighting?", "xml files (*.xml)|*.xml", false, "ASM description file");
+            //DescFile = pathToASMDesc;//"ASMHighLightingDescFile";
+            //CurrentTB.SyntaxHighlighter.HighlightSyntax(Language.Custom, new Range(CurrentTB, ));
             //var cmds = LocateFile("cmds.txt", "Please, locate file with asm commands",
             //    "Continue without autocomplete?", "txt files (*.txt)|*.txt", false, "ASM commands file");
-            //LoadCMDs(cmds);
             KeyPreview = true;
 
             Top -= 100;
@@ -295,33 +254,17 @@ namespace ASMgenerator8080
 
         }
 
-
-        private void mainField_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            //var s = mainField.Text.Substring(e.ChangedRange.Bounds.iStartChar,
-            //    e.ChangedRange.Bounds.iEndChar - e.ChangedRange.Bounds.iStartChar);
-            //MessageBox.Show(s);
-        }
-
         private void loadASMDescFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var filename = OpenFile("ASM description file", "xml files (*.xml)|*.xml");
             if (filename != null)
+                DescFile = filename;
+            if (CurrentTB != null)
             {
                 CurrentTB.DescriptionFile = filename;
+                CurrentTB.SyntaxHighlighter.HighlightSyntax(CurrentTB.DescriptionFile, CurrentTB.Range);
             }
         }
-
-        /*private void loadASMCommandsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var filename = OpenFile("ASM commands file", "txt files (*.txt)|*.txt");
-            if (filename == null) return;
-            LoadCMDs(filename);
-            if (popMenu != null)
-            {
-                popMenu.Items.SetAutocompleteItems(commands);
-            }
-        }*/
 
         private void UpdateHighlighting()
         {
@@ -337,7 +280,7 @@ namespace ASMgenerator8080
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var filename = OpenFile("Open file", "asm files (*.asm)|*.asm");
+            var filename = OpenFile("Open file", "Asm files (*.asm)|*.asm|All files (*.*)|*.*");
             if (filename == null) return;
             stStrip.Text = "Opening " + filename + "...";
             CreateTab(filename);
@@ -358,16 +301,6 @@ namespace ASMgenerator8080
             //if (CurrentTB != null)
             //    CurrentTB.SaveToFile(filename, Encoding.Unicode);
             //(CurrentTB.Parent as FATabStripItem).Title = Path.GetFileName(filename);
-        }
-
-        private void mainField_TextChanging(object sender, TextChangingEventArgs e)
-        {
-                
-        }
-
-        private void mainField_VisibleRangeChanged(object sender, EventArgs e)
-        {
-            
         }
 
         private void findToolStripMenuItem_Click(object sender, EventArgs e)
@@ -459,20 +392,20 @@ namespace ASMgenerator8080
             portsArr.AddRange(ports);
             if (portsArr.Count == 0)
             {
-                serialPortToolStripMenuItem.DropDownItems.Clear();
+                serialPortToolStripMenuItem1.DropDownItems.Clear();
                 var tmp = new ToolStripMenuItem {CheckState = CheckState.Unchecked, Text = "No ports found"};
-                serialPortToolStripMenuItem.DropDownItems.Add(tmp);
+                serialPortToolStripMenuItem1.DropDownItems.Add(tmp);
             }
             else
             {
-                serialPortToolStripMenuItem.DropDownItems.Clear();
+                serialPortToolStripMenuItem1.DropDownItems.Clear();
                 foreach (var port in ports)
                 {
                     var tmp = new ToolStripMenuItem {CheckState = CheckState.Unchecked, Checked = false, Text = port};
                     if (tmp.Text == tmpComPort)
                         tmp.Checked = true;
                     tmp.Click += comToolStripMenuItem_Click;
-                    serialPortToolStripMenuItem.DropDownItems.Add(tmp);
+                    serialPortToolStripMenuItem1.DropDownItems.Add(tmp);
                 }
             }
         }
@@ -489,7 +422,7 @@ namespace ASMgenerator8080
             try
             {
                 stStrip.Text = "Sending to KR580...";
-                Refresh();
+                stStrip.Refresh();
                 port.Open();
 
                 var _data = new ArrayList(BinGen.getBinaryDump());
@@ -508,14 +441,12 @@ namespace ASMgenerator8080
                         j += 1;
                     }
                         
-                
-                //byte[] data1 = { 0, 1, 2, 1, 0 };
                 Cursor.Current = Cursors.WaitCursor;
                 port.Write(data, 0, data.Length);
                 Cursor.Current = Cursors.Default;
                 port.Close();
                 stStrip.Text = "Done";
-                Refresh();
+                stStrip.Refresh();
             }
             catch (Exception ex)
             {
@@ -553,7 +484,7 @@ namespace ASMgenerator8080
 
         private void editToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
         {
-            foreach (var dropDownItem in editToolStripMenuItem.DropDownItems)
+            foreach (var dropDownItem in editToolStripMenuItem1.DropDownItems)
             {
                 if (!(dropDownItem is ToolStripSeparator))
                     (dropDownItem as ToolStripMenuItem).Enabled = (CurrentTB != null && tsFiles.Items.Count > 0);
@@ -562,7 +493,7 @@ namespace ASMgenerator8080
 
         private void projectToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
         {
-            foreach (var dropDownItem in projectToolStripMenuItem.DropDownItems)
+            foreach (var dropDownItem in projectToolStripMenuItem1.DropDownItems)
             {
 
                 if (!(dropDownItem is ToolStripSeparator))
@@ -603,8 +534,8 @@ namespace ASMgenerator8080
 
         private void fileToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
         {
-            saveToolStripMenuItem.Enabled = (CurrentTB != null && tsFiles.Items.Count > 0);
-            saveAsToolStripMenuItem.Enabled = (CurrentTB != null && tsFiles.Items.Count > 0);
+            saveToolStripMenuItem1.Enabled = (CurrentTB != null && tsFiles.Items.Count > 0);
+            saveAsToolStripMenuItem1.Enabled = (CurrentTB != null && tsFiles.Items.Count > 0);
         }
 
         private void viewHexToolStripMenuItem_Click(object sender, EventArgs e)
@@ -634,10 +565,8 @@ namespace ASMgenerator8080
         {
             var portsettings = new PortSettings(PS);
             portsettings.ShowDialog(this);
-            
+
         }
-
-
         
     }
 }

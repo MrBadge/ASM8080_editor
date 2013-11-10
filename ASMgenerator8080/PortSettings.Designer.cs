@@ -135,7 +135,7 @@
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(94, 21);
             this.button1.TabIndex = 8;
-            this.button1.Text = "OK";
+            this.button1.Text = "Apply";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -156,7 +156,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "PortSettings";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "PortSettings";
+            this.Text = "COM-Port Settings";
             ((System.ComponentModel.ISupportInitialize)(this.dataNumb)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
