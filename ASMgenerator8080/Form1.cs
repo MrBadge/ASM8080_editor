@@ -409,11 +409,87 @@ namespace ASMgenerator8080
             }
         }
 
-        private void SendSmallLoader(byte[] SmallLoaderHex, int startAddr = 0x2100)
+        private byte[] GetNewSettings(ComPortSettings PS)
+        {
+            var timerSet = "";
+            byte USARTSet = 0;
+            switch (PS.sb)
+            {
+                case StopBits.None:
+                    timerSet += "00";
+                    break;
+                case StopBits.One:
+                    timerSet += "01";
+                    break;
+                case StopBits.Two:
+                    timerSet += "11";
+                    break;
+                case StopBits.OnePointFive:
+                    timerSet += "10";
+                    break;
+            }
+            switch (PS.par)
+            {
+                case Parity.None:
+                    timerSet += "00";
+                    break;
+                case Parity.Odd:
+                    timerSet += "01";
+                    break;
+                case Parity.Even:
+                    timerSet += "11";
+                    break;
+            }
+            switch (PS.databits)
+            {
+                case 5:
+                    timerSet += "00";
+                    break;
+                case 6:
+                    timerSet += "01";
+                    break;
+                case 7:
+                    timerSet += "10";
+                    break;
+                case 8:
+                    timerSet += "11";
+                    break;
+            }
+            if (PS.baud == 19200)
+                timerSet += "11";
+            else
+                timerSet += "10";
+
+            switch (PS.baud)
+            {
+                case 2400:
+                    USARTSet = 0x34;
+                    break;
+                case 4800:
+                    USARTSet = 0x1A;
+                    break;
+                case 9600:
+                    USARTSet = 0x0D;
+                    break;
+                case 19200:
+                    USARTSet = 0x68;
+                    break;
+            }
+            //0x34 - 2400
+            //0x1A - 4800
+            //0x0D - 9600
+            //0x68 - 19200 + 7E -> 7D
+            byte [] temp = new byte[2];
+            temp[0] = Convert.ToByte(timerSet);
+            temp[1] = USARTSet;
+            return temp;
+        }
+
+        private void SendBigLoader(byte[] BigLoaderHex, int startAddr = 0x2100)
         {
             var port = new SerialPort(PS.ComPortName, 4800, Parity.Even, 7, StopBits.Two);
             port.Open();
-            port.Write(SmallLoaderHex, 0, SmallLoaderHex.Length);
+            port.Write(BigLoaderHex, 0, BigLoaderHex.Length);
             port.Close();
         }
 
@@ -424,17 +500,21 @@ namespace ASMgenerator8080
                 MessageBox.Show("Choose an appropriate COM-Port first", "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 return;
             }
-            if (GetBinary(CurrentTB.Text) == null) return;
-            SendSmallLoader();
+            if (GetBinary(CurrentTB.Text, 0x2100 + Constants.BigProgramLoader.Length) == null) return;
+            var tmp = GetNewSettings(PS);
+            Constants.BigProgramLoader[5] = tmp[0];
+            Constants.BigProgramLoader[9] = tmp[1];
+            SendBigLoader(Constants.BigProgramLoader);
             var port = new SerialPort(PS.ComPortName, PS.baud, PS.par, PS.databits, PS.sb);
             try
             {
-                stStrip.Text = "Sending to KR580...";
+                //stStrip.Text = "Sending to KR580...";
                 stStrip.Refresh();
                 port.Open();
 
                 var _data = new ArrayList(BinGen.getBinaryDump());
                 byte[] startAddr = BitConverter.GetBytes(BinGen.getStartAddress());
+                stStrip.Text = "Start address of your program in memory = " + startAddr[0] + startAddr[1];
                 byte[] data = new byte[_data.Count * 2 + 3];
                 data[0] = 1;
                 data[1] = startAddr[0];
@@ -453,8 +533,8 @@ namespace ASMgenerator8080
                 port.Write(data, 0, data.Length);
                 Cursor.Current = Cursors.Default;
                 port.Close();
-                stStrip.Text = "Done";
-                stStrip.Refresh();
+                //stStrip.Text = "Done";
+                //stStrip.Refresh();
             }
             catch (Exception ex)
             {
@@ -509,7 +589,7 @@ namespace ASMgenerator8080
             } 
         }
 
-        private BinaryGenerator GetBinary(string s)
+        private BinaryGenerator GetBinary(string s, int startAddr = 0x2100)
         {
             
             if (string.IsNullOrEmpty(CurrentTB.Text)) return null;
@@ -525,7 +605,7 @@ namespace ASMgenerator8080
             CurrentTB.Hints.Clear();
             try
             {
-                BinGen.generateBinary(s);
+                BinGen.generateBinary(s, startAddr);
             }
             catch (BinaryGeneratorException e)
             {

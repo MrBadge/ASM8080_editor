@@ -16,10 +16,10 @@ namespace ASMgenerator8080
         {
             InitializeComponent();
             parity.Items.Add(Parity.Even);
-            parity.Items.Add(Parity.Mark);
+            //parity.Items.Add(Parity.Mark);
             parity.Items.Add(Parity.None);
             parity.Items.Add(Parity.Odd);
-            parity.Items.Add(Parity.Space);
+            //parity.Items.Add(Parity.Space);
             parity.SelectedItem = tmp.par;
             parity.DropDownStyle = ComboBoxStyle.DropDownList;
 

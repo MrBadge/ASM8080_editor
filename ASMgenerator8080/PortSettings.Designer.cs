@@ -92,12 +92,12 @@
             // 
             this.dataNumb.Location = new System.Drawing.Point(155, 102);
             this.dataNumb.Maximum = new decimal(new int[] {
-            256,
+            8,
             0,
             0,
             0});
             this.dataNumb.Minimum = new decimal(new int[] {
-            1,
+            5,
             0,
             0,
             0});
@@ -105,7 +105,7 @@
             this.dataNumb.Size = new System.Drawing.Size(48, 20);
             this.dataNumb.TabIndex = 5;
             this.dataNumb.Value = new decimal(new int[] {
-            1,
+            5,
             0,
             0,
             0});
