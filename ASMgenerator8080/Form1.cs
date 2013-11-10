@@ -487,10 +487,17 @@ namespace ASMgenerator8080
 
         private void SendBigLoader(byte[] BigLoaderHex, int startAddr = 0x2100)
         {
-            var port = new SerialPort(PS.ComPortName, 4800, Parity.Even, 7, StopBits.Two);
-            port.Open();
-            port.Write(BigLoaderHex, 0, BigLoaderHex.Length);
-            port.Close();
+            try
+            {
+                var port = new SerialPort(PS.ComPortName, 4800, Parity.Even, 7, StopBits.Two);
+                port.Open();
+                port.Write(BigLoaderHex, 0, BigLoaderHex.Length);
+                port.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            }
         }
 
         private void sendToKR580ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -540,7 +547,6 @@ namespace ASMgenerator8080
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-                throw;
             }
         }
 
