@@ -500,7 +500,8 @@ namespace ASMgenerator8080
                 MessageBox.Show("Choose an appropriate COM-Port first", "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 return;
             }
-            if (GetBinary(CurrentTB.Text, 0x2100 + Constants.BigProgramLoader.Length) == null) return;
+            if (GetBinary(CurrentTB.Text, 0x2100 + 0x23 + Constants.BigProgramLoader.Length) == null) return; 
+            // start address = 0x2100 + small loader size + big loader size
             var tmp = GetNewSettings(PS);
             Constants.BigProgramLoader[5] = tmp[0];
             Constants.BigProgramLoader[9] = tmp[1];
