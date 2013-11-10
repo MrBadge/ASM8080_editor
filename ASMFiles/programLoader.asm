@@ -3,20 +3,20 @@
 ;input: none
 ;output: none
 init_timer_and_uart: 
-    MVI A, 56 ; режим работы 
-    OUT 0xE3
-    MVI A, 0x1A ; регистр сравнения 
-    OUT 0xE1
-    MVI A, 0x7E ; (01 11 11 10) управляющее влово режима работы UART 
-    OUT 0xFB
-    MVI A, 0x05 ; (00 00 01 01) включение приема / передачи 
-    OUT 0xFB
+    MVI A, 56h ; режим работы 
+    OUT 0E3h
+    MVI A, 1Ah ; регистр сравнения 
+    OUT 0E1h
+    MVI A, 7Eh ; (01 11 11 10) управляющее влово режима работы UART 
+    OUT 0FBh
+    MVI A, 05h ; (00 00 01 01) включение приема / передачи 
+    OUT 0FBh
     XRA A
-    OUT 0xFB
-    OUT 0xFB
-    OUT 0xFB
-    MVI A, 0x40 ; сброс 
-    OUT 0xFB
+    OUT 0FBh
+    OUT 0FBh
+    OUT 0FBh
+    MVI A, 40h ; сброс 
+    OUT 0FBh
  
 ;load program from terminal
 ;used registers: A, B, C, HL, DE
@@ -32,11 +32,11 @@ programLoader:
     MOV A, B 
     ANA A 
     JZ Addr1; go to start of user''s program if command zero 
-    SUI 0x01 
+    SUI 01h 
     JZ programLoader_command_1 
-    SUI 0x01 
+    SUI 01h 
     JZ programLoader_command_2 
-    SUI 0x01 
+    SUI 01h 
     JZ programLoader_command_3 
     JMP programLoader
     programLoader_command_1: 
@@ -56,20 +56,20 @@ programLoader:
         INX H
         CALL writeByte
         JMP programLoader
-    Addr1 DW 0x01
+    Addr1 DW 2101h
  
 ;read byte from terminal 
 ;used registers: A, B 
 ;input: none 
 ;output: read byte in register B 
 readByte: 
-    IN 0xFB 
-    ANI 0x02 
+    IN 0FBh 
+    ANI 02h 
     JZ readByte 
-    IN 0xFA 
+    IN 0FAh 
     MOV B, A 
-    IN 0xFB 
-    ANI 0x28 ; (0010 1000) 
+    IN 0FBh 
+    ANI 28h ; (0010 1000) 
     JNZ readByte 
     RET 
  
@@ -78,9 +78,9 @@ readByte:
 ;input: byte to write in register B 
 ;output: none 
 writeByte: 
-    IN 0xFB 
-    ANI 0x01 
+    IN 0FBh 
+    ANI 01h 
     JZ writeByte 
     MOV A, B 
-    OUT 0xFA 
+    OUT 0FAh 
     RET 
