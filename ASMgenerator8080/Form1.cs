@@ -409,6 +409,14 @@ namespace ASMgenerator8080
             }
         }
 
+        private void SendSmallLoader(byte[] SmallLoaderHex, int startAddr = 0x2100)
+        {
+            var port = new SerialPort(PS.ComPortName, 4800, Parity.Even, 7, StopBits.Two);
+            port.Open();
+            port.Write(SmallLoaderHex, 0, SmallLoaderHex.Length);
+            port.Close();
+        }
+
         private void sendToKR580ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (PS.ComPortName == "")
@@ -417,6 +425,7 @@ namespace ASMgenerator8080
                 return;
             }
             if (GetBinary(CurrentTB.Text) == null) return;
+            SendSmallLoader();
             var port = new SerialPort(PS.ComPortName, PS.baud, PS.par, PS.databits, PS.sb);
             try
             {
