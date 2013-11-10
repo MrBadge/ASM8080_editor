@@ -22,9 +22,10 @@ init_timer_and_uart:
 ;used registers: A, B, C, HL, DE
 ;input: first byte from terminal is a command
 ;commands:
-;   0 - exit program
-;   1 - next two bytes is starting address to write
+;   0 - jump to the latest starting adress
+;   1 - next two bytes is starting address to write or read
 ;   2 - next byte is byte to write
+;   3 - read current byte end send to terminal
 ;output: none 
 programLoader: 
     CALL readByte 
@@ -35,6 +36,8 @@ programLoader:
     JZ programLoader_command_1 
     SUI 0x01 
     JZ programLoader_command_2 
+    SUI 0x01 
+    JZ programLoader_command_3 
     programLoader_command_1: 
         CALL readByte 
         MOV H, B 
@@ -47,7 +50,12 @@ programLoader:
         MOV M, B 
         INX H
         JMP programLoader 
-    Addr1 DW 0x00
+    programLoader_command_3:
+        MOV B, M
+        INX H
+        CALL writeByte
+        JMP programLoader
+    Addr1 DW 0x01
  
 ;read byte from terminal 
 ;used registers: A, B 
@@ -68,10 +76,10 @@ readByte:
 ;used registers: A, B 
 ;input: byte to write in register B 
 ;output: none 
-;writeByte: 
-;   IN 0xFB 
-;   ANI 0x01 
-;   JZ writeByte 
-;   MOV A, B 
-;   OUT 0xFA 
-;   RET 
+writeByte: 
+    IN 0xFB 
+    ANI 0x01 
+    JZ writeByte 
+    MOV A, B 
+    OUT 0xFA 
+    RET 
