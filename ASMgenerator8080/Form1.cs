@@ -59,6 +59,8 @@ namespace ASMgenerator8080
             BinGen = new BinaryGenerator();
             tsFiles.Dock = DockStyle.Fill;
             panel1.Dock = DockStyle.Fill;
+            stStrip.Items.Add("Start work with opening or creating new file");
+            stStrip.Items.Add("");
 
         }
 
@@ -279,6 +281,7 @@ namespace ASMgenerator8080
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            stStrip.Items[0].Text = "";
             var filename = OpenFile("Open file", "All files (*.*)|*.*|Asm files (*.asm)|*.asm");
             if (filename == null) return;
             stStrip.Text = "Opening " + filename + "...";
@@ -316,6 +319,7 @@ namespace ASMgenerator8080
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            stStrip.Items[0].Text = "";
             CreateTab(null);
         }
 
@@ -380,7 +384,10 @@ namespace ASMgenerator8080
 
         private void compileToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            stStrip.Items[0].Text = "Compiling ...";
+            stStrip.Refresh();
             GetBinary(CurrentTB.Text, 0x2100 + 0x23 + Constants.BigProgramLoader.Length);
+            stStrip.Items[0].Text = "Done! No errors found";
         }
 
         private void serialPortToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
@@ -502,7 +509,7 @@ namespace ASMgenerator8080
 
         private void sendToKR580ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (PS.ComPortName == "")
+            if (string.IsNullOrEmpty(PS.ComPortName))
             {
                 MessageBox.Show("Choose an appropriate COM-Port first", "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 return;
@@ -516,13 +523,13 @@ namespace ASMgenerator8080
             var port = new SerialPort(PS.ComPortName, PS.baud, PS.par, PS.databits, PS.sb);
             try
             {
-                //stStrip.Text = "Sending to KR580...";
-                //stStrip.Refresh();
+                stStrip.Items[0].Text = "Sending to KR580...";
+                stStrip.Refresh();
                 port.Open();
 
                 var _data = new ArrayList(BinGen.getBinaryDump());
                 byte[] startAddr = BitConverter.GetBytes(BinGen.getStartAddress());
-                stStrip.Text = "Start address of your program in memory = " + startAddr[0] + startAddr[1];
+                stStrip.Items[1].Text = "Start address of your program in memory = " + startAddr[0] + startAddr[1];
                 byte[] data = new byte[_data.Count * 2 + 3];
                 data[0] = 1;
                 data[1] = startAddr[0];
@@ -541,8 +548,7 @@ namespace ASMgenerator8080
                 port.Write(data, 0, data.Length);
                 Cursor.Current = Cursors.Default;
                 port.Close();
-                //stStrip.Text = "Done";
-                //stStrip.Refresh();
+                stStrip.Items[0].Text = "Sending seccesfully comleted";
             }
             catch (Exception ex)
             {
