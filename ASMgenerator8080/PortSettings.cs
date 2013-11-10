@@ -37,12 +37,17 @@ namespace ASMgenerator8080
             stopbits.SelectedItem = tmp.sb;
             stopbits.DropDownStyle = ComboBoxStyle.DropDownList;
 
-            dataNumb.Value = tmp.databits;
+            databits.Items.Add(5);
+            databits.Items.Add(6);
+            databits.Items.Add(7);
+            databits.Items.Add(8);
+            databits.SelectedItem = tmp.databits;
+            databits.DropDownStyle = ComboBoxStyle.DropDownList;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Form1.PS.databits = (int) dataNumb.Value;
+            Form1.PS.databits = (int) databits.SelectedItem;
             Form1.PS.baud = (int) baud.SelectedItem;
             Form1.PS.par = (Parity) parity.SelectedItem;
             Form1.PS.sb = (StopBits) stopbits.SelectedItem;

@@ -380,7 +380,7 @@ namespace ASMgenerator8080
 
         private void compileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GetBinary(CurrentTB.Text);
+            GetBinary(CurrentTB.Text, 0x2100 + 0x23 + Constants.BigProgramLoader.Length);
         }
 
         private void serialPortToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
@@ -411,68 +411,68 @@ namespace ASMgenerator8080
 
         private byte[] GetNewSettings(ComPortSettings PS)
         {
-            var timerSet = "";
-            byte USARTSet = 0;
+            var USARTSet = "";
+            byte timerSet = 0;
             switch (PS.sb)
             {
                 case StopBits.None:
-                    timerSet += "00";
+                    USARTSet += "00";
                     break;
                 case StopBits.One:
-                    timerSet += "01";
+                    USARTSet += "01";
                     break;
                 case StopBits.Two:
-                    timerSet += "11";
+                    USARTSet += "11";
                     break;
                 case StopBits.OnePointFive:
-                    timerSet += "10";
+                    USARTSet += "10";
                     break;
             }
             switch (PS.par)
             {
                 case Parity.None:
-                    timerSet += "00";
+                    USARTSet += "00";
                     break;
                 case Parity.Odd:
-                    timerSet += "01";
+                    USARTSet += "01";
                     break;
                 case Parity.Even:
-                    timerSet += "11";
+                    USARTSet += "11";
                     break;
             }
             switch (PS.databits)
             {
                 case 5:
-                    timerSet += "00";
+                    USARTSet += "00";
                     break;
                 case 6:
-                    timerSet += "01";
+                    USARTSet += "01";
                     break;
                 case 7:
-                    timerSet += "10";
+                    USARTSet += "10";
                     break;
                 case 8:
-                    timerSet += "11";
+                    USARTSet += "11";
                     break;
             }
             if (PS.baud == 19200)
-                timerSet += "11";
+                USARTSet += "01";
             else
-                timerSet += "10";
+                USARTSet += "10";
 
             switch (PS.baud)
             {
                 case 2400:
-                    USARTSet = 0x34;
+                    timerSet = 0x34;
                     break;
                 case 4800:
-                    USARTSet = 0x1A;
+                    timerSet = 0x1A;
                     break;
                 case 9600:
-                    USARTSet = 0x0D;
+                    timerSet = 0x0D;
                     break;
                 case 19200:
-                    USARTSet = 0x68;
+                    timerSet = 0x68;
                     break;
             }
             //0x34 - 2400
@@ -480,8 +480,8 @@ namespace ASMgenerator8080
             //0x0D - 9600
             //0x68 - 19200 + 7E -> 7D
             byte [] temp = new byte[2];
-            temp[0] = Convert.ToByte(timerSet);
-            temp[1] = USARTSet;
+            temp[0] = timerSet;
+            temp[1] = Convert.ToByte(USARTSet);
             return temp;
         }
 
@@ -510,7 +510,7 @@ namespace ASMgenerator8080
             try
             {
                 //stStrip.Text = "Sending to KR580...";
-                stStrip.Refresh();
+                //stStrip.Refresh();
                 port.Open();
 
                 var _data = new ArrayList(BinGen.getBinaryDump());
@@ -590,7 +590,7 @@ namespace ASMgenerator8080
             } 
         }
 
-        private BinaryGenerator GetBinary(string s, int startAddr = 0x2100)
+        private BinaryGenerator GetBinary(string s, int startAddr)
         {
             
             if (string.IsNullOrEmpty(CurrentTB.Text)) return null;
@@ -629,7 +629,7 @@ namespace ASMgenerator8080
 
         private void viewHexToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (GetBinary(CurrentTB.Text) == null) return;
+            if (GetBinary(CurrentTB.Text, 0x2100 + 0x23 + Constants.BigProgramLoader.Length) == null) return;
             var hexView = new HexDump();
             hexView.viewBinaryDump(BinGen);
         }

@@ -33,11 +33,10 @@
             this.label2 = new System.Windows.Forms.Label();
             this.parity = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.dataNumb = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
             this.stopbits = new System.Windows.Forms.ComboBox();
             this.button1 = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.dataNumb)).BeginInit();
+            this.databits = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // label1
@@ -88,28 +87,6 @@
             this.label3.TabIndex = 4;
             this.label3.Text = "Data bits:";
             // 
-            // dataNumb
-            // 
-            this.dataNumb.Location = new System.Drawing.Point(155, 102);
-            this.dataNumb.Maximum = new decimal(new int[] {
-            8,
-            0,
-            0,
-            0});
-            this.dataNumb.Minimum = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.dataNumb.Name = "dataNumb";
-            this.dataNumb.Size = new System.Drawing.Size(48, 20);
-            this.dataNumb.TabIndex = 5;
-            this.dataNumb.Value = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -139,15 +116,24 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // databits
+            // 
+            this.databits.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.databits.FormattingEnabled = true;
+            this.databits.Location = new System.Drawing.Point(101, 102);
+            this.databits.Name = "databits";
+            this.databits.Size = new System.Drawing.Size(103, 21);
+            this.databits.TabIndex = 9;
+            // 
             // PortSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(220, 215);
+            this.Controls.Add(this.databits);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.stopbits);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.dataNumb);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.parity);
             this.Controls.Add(this.label2);
@@ -157,7 +143,6 @@
             this.Name = "PortSettings";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "COM-Port Settings";
-            ((System.ComponentModel.ISupportInitialize)(this.dataNumb)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -170,9 +155,9 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox parity;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.NumericUpDown dataNumb;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ComboBox stopbits;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.ComboBox databits;
     }
 }
