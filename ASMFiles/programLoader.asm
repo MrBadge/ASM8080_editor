@@ -1,3 +1,4 @@
+;settings 4800 baud, 8 bit, parity even, one stop bit 
 ;init timer and uart
 ;used registers: A
 ;input: none
@@ -7,7 +8,7 @@ init_timer_and_uart:
     OUT 0E3h
     MVI A, 1Ah ; регистр сравнения 
     OUT 0E1h
-    MVI A, 7Eh ; (01 11 11 10) управляющее влово режима работы UART 
+    MVI A, 7Eh ; (01 11 11 10) управляющее слово режима работы UART 
     OUT 0FBh
     MVI A, 05h ; (00 00 01 01) включение приема / передачи 
     OUT 0FBh
