@@ -38,6 +38,7 @@ programLoader:
     JZ programLoader_command_2 
     SUI 0x01 
     JZ programLoader_command_3 
+    JMP programLoader
     programLoader_command_1: 
         CALL readByte 
         MOV H, B 
