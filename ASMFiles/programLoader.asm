@@ -1,3 +1,4 @@
+;settings 4800 baud, 8 bit, parity even, one stop bit 
 ;init timer and uart
 ;used registers: A
 ;input: none
