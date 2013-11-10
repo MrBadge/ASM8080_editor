@@ -279,7 +279,7 @@ namespace ASMgenerator8080
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var filename = OpenFile("Open file", "Asm files (*.asm)|*.asm|All files (*.*)|*.*");
+            var filename = OpenFile("Open file", "All files (*.*)|*.*|Asm files (*.asm)|*.asm");
             if (filename == null) return;
             stStrip.Text = "Opening " + filename + "...";
             CreateTab(filename);
