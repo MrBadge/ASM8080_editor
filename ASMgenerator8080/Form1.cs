@@ -257,13 +257,12 @@ namespace ASMgenerator8080
         private void loadASMDescFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var filename = OpenFile("ASM description file", "xml files (*.xml)|*.xml");
-            if (filename != null)
-                DescFile = filename;
-            if (CurrentTB != null)
-            {
-                CurrentTB.DescriptionFile = filename;
-                CurrentTB.SyntaxHighlighter.HighlightSyntax(CurrentTB.DescriptionFile, CurrentTB.Range);
-            }
+            if (filename == null) return;
+            DescFile = filename;
+            CurrentTB.DescriptionFile = DescFile;
+            if (CurrentTB == null) return;
+            CurrentTB.DescriptionFile = filename;
+            CurrentTB.SyntaxHighlighter.HighlightSyntax(CurrentTB.DescriptionFile, CurrentTB.Range);
         }
 
         private void UpdateHighlighting()

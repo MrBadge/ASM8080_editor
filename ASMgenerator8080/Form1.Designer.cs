@@ -547,6 +547,7 @@
             this.loadCustomASMDescFileToolStripMenuItem.Name = "loadCustomASMDescFileToolStripMenuItem";
             this.loadCustomASMDescFileToolStripMenuItem.Size = new System.Drawing.Size(217, 22);
             this.loadCustomASMDescFileToolStripMenuItem.Text = "Load custom ASM desc file";
+            this.loadCustomASMDescFileToolStripMenuItem.Click += new System.EventHandler(this.loadASMDescFileToolStripMenuItem_Click);
             // 
             // serialPortToolStripMenuItem1
             // 
