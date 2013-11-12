@@ -18,7 +18,7 @@
 	<rule style="Red" options="IgnoreCase">\b(J|R|C)(NZ|NC|PO|P|Z|C|PE|M)\b</rule> <!-- conditions -->
 	<rule style="numbers" options="IgnoreCase">\b0x[0-9a-fA-F]+\b</rule> <!-- hex (0x) numbers -->
 	<rule style="numbers" options="IgnoreCase">\b[0-1]+b\b</rule> <!-- bin numbers -->
-	<rule style="numbers" options="IgnoreCase">\b[0-9]+d?\b</rule> <!-- dec numbers -->
+	<rule style="numbers" options="IgnoreCase">\b[0-9]+d?\b</rule> <!-- dec numbers (+ default) -->
 	<rule style="numbers" options="IgnoreCase">\b[0-7]+q\b</rule> <!-- oct numbers -->
 	<rule style="numbers" options="IgnoreCase">\b[0-9a-fA-F]+h\b</rule> <!-- hex numbers -->
 	<!-- <rule style="Green" options="IgnoreCase">;(.+)$</rule> --> <!-- comments -->
