@@ -1,9 +1,4 @@
-;settings 4800 baud, 8 bit, parity even, one stop bit 
-;init timer and uart
-;used registers: A
-;input: none
-;output: none
-init_timer_and_uart: 
+ init_timer_and_uart: 
     MVI A, 56h ; (01 01 011 0) режим работы 
     OUT 0E3h
     MVI A, 1Ah ; регистр сравнения 
@@ -29,7 +24,7 @@ init_timer_and_uart:
 ;   3 - read current byte end send to terminal
 ;output: none 
 programLoader: 
-    CALL readByte 
+    CALL 2107h;readByte 
     MOV A, B 
     ANA A 
     JZ Addr1; go to start of user''s program if command zero 
@@ -41,14 +36,14 @@ programLoader:
     JZ programLoader_command_3 
     JMP programLoader
     programLoader_command_1: 
-        CALL readByte 
+        CALL 2107h;readByte 
         MOV H, B 
-        CALL readByte 
+        CALL 2107h;readByte 
         MOV L, B 
         SHLD Addr1
         JMP programLoader
     programLoader_command_2: 
-        CALL readByte 
+        CALL 2107h;readByte 
         MOV M, B 
         INX H
         JMP programLoader 
@@ -57,22 +52,22 @@ programLoader:
         INX H
         CALL writeByte
         JMP programLoader
-    Addr1 DW 2101h
+    Addr1 DW 2123h
  
 ;read byte from terminal 
 ;used registers: A, B 
 ;input: none 
 ;output: read byte in register B 
-readByte: 
-    IN 0FBh 
-    ANI 02h 
-    JZ readByte 
-    IN 0FAh 
-    MOV B, A 
-    IN 0FBh 
-    ANI 28h ; (0010 1000) 
-    JNZ readByte 
-    RET 
+;readByte: 
+;    IN 0FBh 
+;    ANI 02h 
+;    JZ readByte 
+;    IN 0FAh 
+;    MOV B, A 
+;    IN 0FBh 
+;    ANI 28h ; (0010 1000) 
+;    JNZ readByte 
+;    RET 
  
 ;write byte to terminal 
 ;used registers: A, B 
