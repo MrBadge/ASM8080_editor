@@ -1,34 +1,35 @@
-﻿using System;
+﻿//using System.Diagnostics.Eventing.Reader;
+//using System.Threading.Tasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-//using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.IO;
+using System.IO.Ports;
 using System.Linq;
-//using System.Threading.Tasks;
 using System.Windows.Forms;
+using ASMgenerator8080.Properties;
 using FarsiLibrary.Win;
 using FastColoredTextBoxNS;
-using System.IO.Ports;
 
 namespace ASMgenerator8080
 {
     public partial class Form1 : Form
     {
-        public List<string> labels = new List<string>();
-        public string DescFile = null;
-        private readonly SaveFileDialog SFD;
-        private readonly OpenFileDialog OFD;
         public static ComPortSettings PS = new ComPortSettings();
-        private BinaryGenerator BinGen;
         private readonly MarkerStyle MS = new MarkerStyle(new SolidBrush(Color.FromArgb(100, Color.Gray)));
+        private readonly OpenFileDialog OFD;
+        private readonly SaveFileDialog SFD;
+        private BinaryGenerator BinGen;
+        public string DescFile = null;
+        public List<string> labels = new List<string>();
 
         public Form1()
         {
             try
             {
                 DescFile = Path.GetTempFileName();
-                byte[] tmpBytes = ASMgenerator8080.Properties.Resources.asmDesc;
+                byte[] tmpBytes = Resources.asmDesc;
                 var streamWithASMDesc = new FileStream(DescFile, FileMode.OpenOrCreate);
                 streamWithASMDesc.Write(tmpBytes, 0, tmpBytes.Length);
                 streamWithASMDesc.Close();
@@ -43,14 +44,14 @@ namespace ASMgenerator8080
             PS = new ComPortSettings();
             PS.SetPortSet();
 
-            this.SFD = new SaveFileDialog
+            SFD = new SaveFileDialog
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
                 Filter = "asm files (*.asm)|*.asm",
                 FilterIndex = 2,
                 RestoreDirectory = true,
             };
-            this.OFD = new OpenFileDialog
+            OFD = new OpenFileDialog
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
                 FilterIndex = 2,
@@ -63,19 +64,34 @@ namespace ASMgenerator8080
             stStrip.Items.Add("");
             //stStrip.Items.Add("          Current COM-Port: ");
             //stStrip.Items[2].TextAlign = ContentAlignment.MiddleRight;
+        }
 
+        private FastColoredTextBox CurrentTB
+        {
+            get
+            {
+                if (tsFiles.SelectedItem == null)
+                    return null;
+                return (tsFiles.SelectedItem.Controls[0] as FastColoredTextBox);
+            }
+
+            set
+            {
+                tsFiles.SelectedItem = (value.Parent as FATabStripItem);
+                value.Focus();
+            }
         }
 
         private bool Save(FATabStripItem tab)
         {
-            FastColoredTextBox fastColoredTextBox = tab.Controls[0] as FastColoredTextBox;
-            
+            var fastColoredTextBox = tab.Controls[0] as FastColoredTextBox;
+
             if (tab.Tag == null)
             {
-                if (this.SFD.ShowDialog() != DialogResult.OK)
+                if (SFD.ShowDialog() != DialogResult.OK)
                     return false;
                 tab.Title = Path.GetFileName(SFD.FileName);
-                tab.Tag = (object)SFD.FileName;
+                tab.Tag = SFD.FileName;
             }
             try
             {
@@ -85,7 +101,7 @@ namespace ASMgenerator8080
             catch (Exception ex)
             {
                 return MessageBox.Show(ex.Message, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Hand) ==
-                       DialogResult.Retry && this.Save(tab);
+                       DialogResult.Retry && Save(tab);
             }
             fastColoredTextBox.Invalidate();
             tsFiles.TabStripItemClosing += tsFiles_TabStripItemClosing;
@@ -105,44 +121,28 @@ namespace ASMgenerator8080
         //        return filename;
         //    else
         //    {
-                //MessageBox.Show(msg1, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                //filename = OpenFile(capt, template);
-                //if (filename != null)
-                //    return filename;
-                //else
-                //{
-                //    if (!mandatory)
-                //    {
-                //        var res = MessageBox.Show(msg2, "Information", MessageBoxButtons.OKCancel,
-                //            MessageBoxIcon.Question);
-                //        if (res == DialogResult.Cancel)
-                //            Close();
-                //        return null;
-                //    }
-                //    else
-                //    {
-                //        Close();
-                //        return null;
-                //    }
-                //}
-            //}
+        //MessageBox.Show(msg1, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //filename = OpenFile(capt, template);
+        //if (filename != null)
+        //    return filename;
+        //else
+        //{
+        //    if (!mandatory)
+        //    {
+        //        var res = MessageBox.Show(msg2, "Information", MessageBoxButtons.OKCancel,
+        //            MessageBoxIcon.Question);
+        //        if (res == DialogResult.Cancel)
+        //            Close();
+        //        return null;
+        //    }
+        //    else
+        //    {
+        //        Close();
+        //        return null;
+        //    }
         //}
-
-        FastColoredTextBox CurrentTB
-        {
-            get
-            {
-                if (tsFiles.SelectedItem == null)
-                    return null;
-                return (tsFiles.SelectedItem.Controls[0] as FastColoredTextBox);
-            }
-
-            set
-            {
-                tsFiles.SelectedItem = (value.Parent as FATabStripItem);
-                value.Focus();
-            }
-        }
+        //}
+        //}
 
         private void CreateTab(string fileName)
         {
@@ -157,7 +157,7 @@ namespace ASMgenerator8080
                     LeftPadding = 9,
                     Language = Language.Custom
                 };
-                
+
                 var tab = new FATabStripItem(fileName != null ? Path.GetFileName(fileName) : "[new]", tb)
                 {
                     Tag = fileName
@@ -174,13 +174,13 @@ namespace ASMgenerator8080
                 tsFiles.AddTab(tab);
                 tsFiles.SelectedItem = tab;
                 tb.Focus();
-                tb.DelayedTextChangedInterval = 1000;
-                tb.DelayedEventsInterval = 1000;
+                tb.DelayedTextChangedInterval = 500;
+                tb.DelayedEventsInterval = 500;
                 //tb.SizeChanged += TbOnSizeChanged;
                 tb.HintClick += tb_HintClick;
                 //tb.LineInserted += tb_LineInserted;
                 //tb.TextChangedDelayed += new EventHandler<TextChangedEventArgs>(tb_TextChangedDelayed);
-                tb.SelectionChangedDelayed += new EventHandler(tb_SelectionChangedDelayed);
+                tb.SelectionChangedDelayed += tb_SelectionChangedDelayed;
                 //tb.KeyDown += new KeyEventHandler(tb_KeyDown);
                 //tb.MouseMove += new MouseEventHandler(tb_MouseMove);
                 //tb.ChangedLineColor = changedLineColor;
@@ -188,9 +188,9 @@ namespace ASMgenerator8080
                 //    tb.CurrentLineColor = currentLineColor;
                 //tb.ShowFoldingLines = btShowFoldingLines.Checked;
                 tb.DescriptionFile = DescFile;
-                
+
                 tb.HighlightingRangeType = HighlightingRangeType.VisibleRange;
-                var popupMenu = new AutocompleteMenu(tb) { MinFragmentLength = 1 };
+                var popupMenu = new AutocompleteMenu(tb) {MinFragmentLength = 1};
                 popupMenu.Items.Width = 100;
                 popupMenu.Items.SetAutocompleteItems(Constants.Commands);
                 //create autocomplete popup menu
@@ -202,7 +202,8 @@ namespace ASMgenerator8080
             }
             catch (Exception ex)
             {
-                if (MessageBox.Show(ex.Message, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error) == System.Windows.Forms.DialogResult.Retry)
+                if (MessageBox.Show(ex.Message, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error) ==
+                    DialogResult.Retry)
                     CreateTab(fileName);
             }
         }
@@ -214,25 +215,20 @@ namespace ASMgenerator8080
             tb.VisibleRange.ClearStyle(MS);
             if (tb.Selection.IsEmpty)
                 return;
-            var fragment = tb.Selection.GetFragment(@"\w");
+            Range fragment = tb.Selection.GetFragment(@"\w");
             string text = fragment.Text;
             if (text.Length == 0)
                 return;
             Range[] ranges = tb.VisibleRange.GetRanges("\\b" + text + "\\b").ToArray();
 
             if (ranges.Length > 1)
-                foreach (var r in ranges)
+                foreach (Range r in ranges)
                     r.SetStyle(MS);
         }
 
-        void tb_HintClick(object sender, HintClickEventArgs e)
+        private void tb_HintClick(object sender, HintClickEventArgs e)
         {
             CurrentTB.Hints.Clear();
-        }
-
-        public class TbInfo
-        {
-            public AutocompleteMenu popupMenu;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -250,46 +246,46 @@ namespace ASMgenerator8080
             KeyPreview = true;
 
             Top -= 100;
-            Height = 500;//Screen.PrimaryScreen.WorkingArea.Height / 10;
+            Height = 500; //Screen.PrimaryScreen.WorkingArea.Height / 10;
             tsFiles.Left = menu.Left;
             tsFiles.Top = menu.Top + menu.Height + 2;
             tsFiles.Width = Width - 15;
             tsFiles.Height = Height;
-
         }
 
         private void loadASMDescFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var filename = OpenFile("ASM description file", "xml files (*.xml)|*.xml");
+            string filename = OpenFile("ASM description file", "xml files (*.xml)|*.xml");
             if (filename == null) return;
             DescFile = filename;
             CurrentTB.DescriptionFile = DescFile;
             if (CurrentTB == null) return;
             CurrentTB.DescriptionFile = filename;
-            CurrentTB.SyntaxHighlighter.HighlightSyntax(CurrentTB.DescriptionFile, CurrentTB.Range);
+            UpdateHighlighting(CurrentTB, CurrentTB.Range);
         }
 
-        private void UpdateHighlighting()
+        private void UpdateHighlighting(FastColoredTextBox e, Range rng)
         {
-            var lines = new List<string>(CurrentTB.Lines);
+            e.SyntaxHighlighter.HighlightSyntax(e.DescriptionFile, rng);
+            /*var lines = new List<string>(CurrentTB.Lines);
             string s = "";
             for (int i = 0; i < lines.Count; i++)
             {
                 lines[i] = lines[i] + " ";
                 s += lines[i] + "\n";
             }
-            CurrentTB.Text = s;   
+            CurrentTB.Text = s;   */
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //stStrip.Items[0].Text = "";
-            var filename = OpenFile("Open file", "All files (*.*)|*.*|Asm files (*.asm)|*.asm");
+            string filename = OpenFile("Open file", "All files (*.*)|*.*|Asm files (*.asm)|*.asm");
             if (filename == null) return;
             stStrip.Items[0].Text = "Opening " + filename + " ...";
             CreateTab(filename);
             //CurrentTB.OpenBindingFile(filename, Encoding.Unicode);
-            UpdateHighlighting();
+            UpdateHighlighting(CurrentTB, CurrentTB.Range);
             stStrip.Items[0].Text = "";
         }
 
@@ -347,7 +343,7 @@ namespace ASMgenerator8080
 
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CurrentTB != null && tsFiles.Items.Count > 0)    
+            if (CurrentTB != null && tsFiles.Items.Count > 0)
                 CurrentTB.Paste();
         }
 
@@ -366,14 +362,14 @@ namespace ASMgenerator8080
             //if (newFile == null) return;
             //tsFiles.SelectedItem.Tag = newFile;
             //tsFiles.SelectedItem.Title = Path.GetFileName(newFile);
-            if (this.tsFiles.SelectedItem == null)
+            if (tsFiles.SelectedItem == null)
                 return;
-            string path = this.tsFiles.SelectedItem.Tag as string;
-            this.tsFiles.SelectedItem.Tag = (object)null;
-            if (!this.Save(this.tsFiles.SelectedItem) && path != null)
+            var path = tsFiles.SelectedItem.Tag as string;
+            tsFiles.SelectedItem.Tag = null;
+            if (!Save(tsFiles.SelectedItem) && path != null)
             {
-                this.tsFiles.SelectedItem.Tag = (object)path;
-                this.tsFiles.SelectedItem.Title = Path.GetFileName(path);
+                tsFiles.SelectedItem.Tag = path;
+                tsFiles.SelectedItem.Title = Path.GetFileName(path);
             }
         }
 
@@ -386,16 +382,24 @@ namespace ASMgenerator8080
 
         private void compileToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (CurrentTB == null)
+            {
+                //MessageBox.Show("Nothing to compile yet", "Error", MessageBoxButtons.OK,
+                    //MessageBoxIcon.Exclamation);
+                return;
+            }
             stStrip.Items[0].Text = "Compiling ...";
+            Cursor.Current = Cursors.WaitCursor;
             stStrip.Refresh();
             GetBinary(CurrentTB.Text, 0x2100 + 0x23 + Constants.BigProgramLoader.Length);
             stStrip.Items[0].Text = "Done";
+            Cursor.Current = Cursors.Default;
         }
 
         private void serialPortToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
         {
             string[] ports = SerialPort.GetPortNames();
-            var tmpComPort = PS.ComPortName;
+            string tmpComPort = PS.ComPortName;
             var portsArr = new ArrayList();
             portsArr.AddRange(ports);
             if (portsArr.Count == 0)
@@ -407,7 +411,7 @@ namespace ASMgenerator8080
             else
             {
                 serialPortToolStripMenuItem1.DropDownItems.Clear();
-                foreach (var port in ports)
+                foreach (string port in ports)
                 {
                     var tmp = new ToolStripMenuItem {CheckState = CheckState.Unchecked, Checked = false, Text = port};
                     if (tmp.Text == tmpComPort)
@@ -420,7 +424,7 @@ namespace ASMgenerator8080
 
         private byte[] GetNewSettings(ComPortSettings PS)
         {
-            var USARTSet = "";
+            string USARTSet = "";
             byte timerSet = 0;
             switch (PS.sb)
             {
@@ -488,7 +492,7 @@ namespace ASMgenerator8080
             //0x1A - 4800
             //0x0D - 9600
             //0x68 - 19200 + 7E -> 7D
-            byte [] temp = new byte[2];
+            var temp = new byte[2];
             temp[0] = timerSet;
             temp[1] = Convert.ToByte(USARTSet);
             return temp;
@@ -511,15 +515,22 @@ namespace ASMgenerator8080
 
         private void sendToKR580ToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (CurrentTB == null)
+            {
+                //MessageBox.Show("Nothing to send yet", "Error", MessageBoxButtons.OK,
+                    //MessageBoxIcon.Exclamation);
+                return;    
+            }
             if (string.IsNullOrEmpty(PS.ComPortName))
             {
-                MessageBox.Show("Choose an appropriate COM-Port first", "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                MessageBox.Show("Choose an appropriate COM-Port first", "Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Exclamation);
                 return;
             }
-            if (GetBinary(CurrentTB.Text, 0x2100 + 0x23 + Constants.BigProgramLoader.Length) == null) 
-                return; 
+            if (GetBinary(CurrentTB.Text, 0x2100 + 0x23 + Constants.BigProgramLoader.Length) == null)
+                return;
             // start address = 0x2100 + small loader size + big loader size
-            var tmp = GetNewSettings(PS);
+            byte[] tmp = GetNewSettings(PS);
             Constants.BigProgramLoader[5] = tmp[0];
             Constants.BigProgramLoader[9] = tmp[1];
             SendBigLoader(Constants.BigProgramLoader);
@@ -533,7 +544,7 @@ namespace ASMgenerator8080
                 var _data = new ArrayList(BinGen.getBinaryDump());
                 byte[] startAddr = BitConverter.GetBytes(BinGen.getStartAddress());
                 stStrip.Items[1].Text = "| Start address of your program in memory = " + startAddr[0] + startAddr[1];
-                byte[] data = new byte[_data.Count * 2 + 3];
+                var data = new byte[_data.Count*2 + 3];
                 data[0] = 1;
                 data[1] = startAddr[0];
                 data[2] = startAddr[1];
@@ -543,10 +554,10 @@ namespace ASMgenerator8080
                         data[i] = 2;
                     else
                     {
-                        data[i] = (_data[j] != null ? (byte)_data[j] : (byte)0);
+                        data[i] = (_data[j] != null ? (byte) _data[j] : (byte) 0);
                         j += 1;
                     }
-                        
+
                 Cursor.Current = Cursors.WaitCursor;
                 port.Write(data, 0, data.Length);
                 Cursor.Current = Cursors.Default;
@@ -571,51 +582,50 @@ namespace ASMgenerator8080
         {
             if (!(e.Item.Controls[0] as FastColoredTextBox).IsChanged)
                 return;
-            switch (MessageBox.Show("Do you want save " + e.Item.Title + " ?", "Save", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Asterisk))
+            switch (
+                MessageBox.Show("Do you want save " + e.Item.Title + " ?", "Save", MessageBoxButtons.YesNoCancel,
+                    MessageBoxIcon.Asterisk))
             {
                 case DialogResult.Cancel:
                     e.Cancel = true;
                     break;
                 case DialogResult.Yes:
-                    if (!this.Save(e.Item))
+                    if (!Save(e.Item))
                     {
                         e.Cancel = true;
                         break;
                     }
-                    else
-                        break;
+                    break;
             }
         }
 
         private void editToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
         {
-            foreach (var dropDownItem in editToolStripMenuItem1.DropDownItems)
+            foreach (object dropDownItem in editToolStripMenuItem1.DropDownItems)
             {
                 if (!(dropDownItem is ToolStripSeparator))
                     (dropDownItem as ToolStripMenuItem).Enabled = (CurrentTB != null && tsFiles.Items.Count > 0);
-            }  
+            }
         }
 
         private void projectToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
         {
-            foreach (var dropDownItem in projectToolStripMenuItem1.DropDownItems)
+            foreach (object dropDownItem in projectToolStripMenuItem1.DropDownItems)
             {
-
                 if (!(dropDownItem is ToolStripSeparator))
                     (dropDownItem as ToolStripMenuItem).Enabled = (CurrentTB != null && tsFiles.Items.Count > 0);
-            } 
+            }
         }
 
         private BinaryGenerator GetBinary(string s, int startAddr)
         {
-            
             if (string.IsNullOrEmpty(CurrentTB.Text)) return null;
-            
+
             s = s.Replace("?", "0x00");
             //var nocomments = new Regex(@";(?:\S| )*", RegexOptions.Multiline);
             //s = Regex.Replace(s, @";(?:\S| )*", "", RegexOptions.Multiline);
             //s = Regex.Replace(s, @"\s+$[\r\n]*", "\r\n", RegexOptions.Multiline);
-            if (s[s.Length-2].Equals('\r') && s[s.Length-1].Equals('\n'))
+            if (s[s.Length - 2].Equals('\r') && s[s.Length - 1].Equals('\n'))
                 s = s.Remove(s.Length - 2, 2);
             if (BinGen == null)
                 BinGen = new BinaryGenerator();
@@ -633,7 +643,7 @@ namespace ASMgenerator8080
                 CurrentTB.Hints.Add(hint);
                 CurrentTB.Navigate(e.line);
             }
-            
+
             return BinGen;
         }
 
@@ -645,6 +655,8 @@ namespace ASMgenerator8080
 
         private void viewHexToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (CurrentTB == null) 
+                return;
             if (GetBinary(CurrentTB.Text, 0x2100 + 0x23 + Constants.BigProgramLoader.Length) == null) return;
             var hexView = new HexDump();
             hexView.viewBinaryDump(BinGen);
@@ -652,8 +664,8 @@ namespace ASMgenerator8080
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            var list = tsFiles.Items.Cast<FATabStripItem>().ToList();
-            foreach (var tab in list)
+            List<FATabStripItem> list = tsFiles.Items.Cast<FATabStripItem>().ToList();
+            foreach (FATabStripItem tab in list)
             {
                 var args = new TabStripItemClosingEventArgs(tab);
                 tsFiles_TabStripItemClosing(args);
@@ -670,8 +682,11 @@ namespace ASMgenerator8080
         {
             var portsettings = new PortSettings(PS);
             portsettings.ShowDialog(this);
-
         }
-        
+
+        public class TbInfo
+        {
+            public AutocompleteMenu popupMenu;
+        }
     }
 }
