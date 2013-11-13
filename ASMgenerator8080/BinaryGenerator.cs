@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -530,9 +531,32 @@ namespace ASMgenerator8080
 
             if (identifier.Length > 2 && identifier[0] == '0')
             {
+                if ("qhbd".IndexOf(identifier[identifier.Length - 1]) == -1)
+                    for (int i = identifier.Length; --i >= 0;)
+                    {
+                        if (identifier[i] == 'a' || identifier[i] == 'b' || identifier[i] == 'c' || identifier[i] == 'd' ||
+                            identifier[i] == 'e') 
+                            return -1;
+                        return Convert.ToInt32(identifier, 10);
+                    } 
                 try
                 {
-                    num = Convert.ToInt32(identifier, 8);
+                    switch (identifier[identifier.Length - 1])
+                    {
+                        case 'q':
+                            num = Convert.ToInt32(identifier.Substring(0, identifier.Length - 1), 8);
+                            break;
+                        case 'h':
+                            num = Convert.ToInt32(identifier.Substring(0, identifier.Length - 1), 16);
+                            break;
+                        case 'b':
+                            num = Convert.ToInt32(identifier.Substring(0, identifier.Length - 1), 2);
+                            break;
+                        case 'd':
+                            num = Convert.ToInt32(identifier.Substring(0, identifier.Length - 1), 10);
+                            break;
+                    }
+
                 }
                 catch (Exception)
                 {
