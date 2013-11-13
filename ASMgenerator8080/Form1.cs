@@ -594,7 +594,7 @@ namespace ASMgenerator8080
                 port.Write(data, 0, data.Length);
                 Cursor.Current = Cursors.Default;
                 port.Close();
-                stStrip.Items[0].Text = "Sending seccesfully comleted";
+                stStrip.Items[0].Text = "Sending succesfully comleted";
             }
             catch (Exception ex)
             {
