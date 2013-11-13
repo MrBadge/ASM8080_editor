@@ -24,7 +24,7 @@
 ;   3 - read current byte end send to terminal
 ;output: none 
 programLoader: 
-    CALL 2107h;readByte 
+    CALL 2113h;readByte 
     MOV A, B 
     ANA A 
     JZ Addr1; go to start of user''s program if command zero 
@@ -36,14 +36,14 @@ programLoader:
     JZ programLoader_command_3 
     JMP programLoader
     programLoader_command_1: 
-        CALL 2107h;readByte 
+        CALL 2113h;readByte 
         MOV H, B 
-        CALL 2107h;readByte 
+        CALL 2113h;readByte 
         MOV L, B 
         SHLD Addr1
         JMP programLoader
     programLoader_command_2: 
-        CALL 2107h;readByte 
+        CALL 2113h;readByte 
         MOV M, B 
         INX H
         JMP programLoader 

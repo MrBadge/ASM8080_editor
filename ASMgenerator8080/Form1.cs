@@ -534,7 +534,7 @@ namespace ASMgenerator8080
         {
             try
             {
-                var port = new SerialPort(PS.ComPortName, 4800, Parity.Even, 7, StopBits.Two);
+                var port = new SerialPort(PS.ComPortName, 4800, Parity.Even, 8, StopBits.Two);
                 port.Open();
                 port.Write(BigLoaderHex, 0, BigLoaderHex.Length);
                 port.Close();
