@@ -8,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 using ASMgenerator8080.Properties;
 using FarsiLibrary.Win;
@@ -559,7 +560,7 @@ namespace ASMgenerator8080
                     MessageBoxIcon.Exclamation);
                 return;
             }
-            if (GetBinary(CurrentTB.Text, 0x2100 + 0x23 + Constants.BigProgramLoader.Length) == null)
+            if (GetBinary(CurrentTB.Text, 0x2100 + 0x2F + Constants.BigProgramLoader.Length + 1) == null)
                 return;
             // start address = 0x2100 + small loader size + big loader size
             byte[] tmp = GetNewSettings(PS);
@@ -578,8 +579,8 @@ namespace ASMgenerator8080
                 stStrip.Items[1].Text = "| Start address of your program in memory = " + startAddr[0] + startAddr[1];
                 var data = new byte[_data.Count*2 + 3];
                 data[0] = 1;
-                data[1] = startAddr[0];
-                data[2] = startAddr[1];
+                data[1] = startAddr[1];
+                data[2] = startAddr[0];
                 int j = 0;
                 for (int i = 3; i < data.Count(); i++)
                     if (i%2 == 1)
