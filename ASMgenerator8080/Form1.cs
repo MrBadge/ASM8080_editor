@@ -493,8 +493,8 @@ namespace ASMgenerator8080
             //0x0D - 9600
             //0x68 - 19200 + 7E -> 7D
             var temp = new byte[2];
-            temp[0] = timerSet;
-            temp[1] = Convert.ToByte(USARTSet);
+            temp[0] = timerSet; 
+            temp[1] = Convert.ToByte(USARTSet, 2);
             return temp;
         }
 
