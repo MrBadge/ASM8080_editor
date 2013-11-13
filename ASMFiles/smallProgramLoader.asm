@@ -6,8 +6,8 @@
 ;input: none 
 ;output: none 
 init_timer_and_uart: 
-    MVI A, 56h ; режим работы 
-    OUT 0E3h 
+    MVI A, 40h ; режим работы 
+    OUT 0E3h
     MVI A, 1Ah ; регистр сравнения 
     OUT 0E1h 
     MVI A, 7Eh ; (01 11 11 10) управляющее влово режима работы UART 
