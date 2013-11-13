@@ -6,20 +6,20 @@
 ;input: none 
 ;output: none 
 init_timer_and_uart: 
-    MVI A, 56 ; режим работы 
-    OUT 0xE3 
-    MVI A, 0x1A ; регистр сравнения 
-    OUT 0xE1 
-    MVI A, 0x7E ; (01 11 11 10) управляющее влово режима работы UART 
-    OUT 0xFB 
-    MVI A, 0x05 ; (00 00 01 01) включение приема / передачи 
-    OUT 0xFB 
+    MVI A, 56h ; режим работы 
+    OUT 0E3h 
+    MVI A, 1Ah ; регистр сравнения 
+    OUT 0E1h 
+    MVI A, 7Eh ; (01 11 11 10) управляющее влово режима работы UART 
+    OUT 0FBh 
+    MVI A, 05h ; (00 00 01 01) включение приема / передачи 
+    OUT 0FBh 
     XRA A 
-    OUT 0xFB 
-    OUT 0xFB 
-    OUT 0xFB 
-    MVI A, 0x40 ; сброс 
-    OUT 0xFB
+    OUT 0FBh 
+    OUT 0FBh 
+    OUT 0FBh 
+    MVI A, 40h ; сброс 
+    OUT 0FBh
 
 ;loader for programLoader
 ;used registers: A, B, H, L
@@ -50,12 +50,12 @@ smallProgramLoader:
 ;input: none 
 ;output: read byte in register B 
 readByte: 
-    IN 0xFB
-    ANI 0x02
+    IN 0FBh
+    ANI 02h
     JZ readByte
-    IN 0xFA
+    IN 0FAh
     MOV B, A
-    IN 0xFB
-    ANI 0x28 ; (0010 1000)
+    IN 0FBh
+    ANI 28h ; (0010 1000)
     JNZ readByte
     RET
