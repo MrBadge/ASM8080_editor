@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.IO.Ports;
@@ -23,6 +24,7 @@ namespace ASMgenerator8080
         private BinaryGenerator BinGen;
         public string DescFile = null;
         public List<string> labels = new List<string>();
+        Color currentLineColor = Color.FromArgb(100, 210, 210, 255);
 
         public Form1()
         {
@@ -181,7 +183,7 @@ namespace ASMgenerator8080
                 //tb.LineInserted += tb_LineInserted;
                 //tb.TextChangedDelayed += new EventHandler<TextChangedEventArgs>(tb_TextChangedDelayed);
                 tb.SelectionChangedDelayed += tb_SelectionChangedDelayed;
-                //tb.KeyDown += new KeyEventHandler(tb_KeyDown);
+                tb.KeyDown += new KeyEventHandler(tb_KeyDown);
                 //tb.MouseMove += new MouseEventHandler(tb_MouseMove);
                 //tb.ChangedLineColor = changedLineColor;
                 //if (btHighlightCurrentLine.Checked)
@@ -190,13 +192,13 @@ namespace ASMgenerator8080
                 tb.DescriptionFile = DescFile;
 
                 tb.HighlightingRangeType = HighlightingRangeType.VisibleRange;
-                var popupMenu = new AutocompleteMenu(tb) {MinFragmentLength = 1};
+                var popupMenu = new AutocompleteMenu(tb) {MinFragmentLength = 2};
                 popupMenu.Items.Width = 100;
                 popupMenu.Items.SetAutocompleteItems(Constants.Commands);
                 //create autocomplete popup menu
                 //AutocompleteMenu popupMenu = new AutocompleteMenu(tb);
                 //popupMenu.Items.ImageList = ilAutocomplete;
-                //popupMenu.Opening += new EventHandler<CancelEventArgs>(popupMenu_Opening);
+                popupMenu.Opening += new EventHandler<CancelEventArgs>(popupMenu_Opening);
                 //BuildAutocompleteMenu(popupMenu);
                 (tb.Tag as TbInfo).popupMenu = popupMenu;
             }
@@ -205,6 +207,33 @@ namespace ASMgenerator8080
                 if (MessageBox.Show(ex.Message, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error) ==
                     DialogResult.Retry)
                     CreateTab(fileName);
+            }
+        }
+
+        private void popupMenu_Opening(object sender, CancelEventArgs e)
+        {
+            //---block autocomplete menu for comments
+            //get index of gray style (used for comments)
+            var iGrayStyle = 0;//CurrentTB.GetStyleIndex(CurrentTB.SyntaxHighlighter.GrayStyle);
+            if (iGrayStyle >= 0)
+                if (CurrentTB.Selection.Start.iChar > 0)
+                {
+                    //current char (before caret)
+                    var c = CurrentTB[CurrentTB.Selection.Start.iLine][CurrentTB.Selection.Start.iChar - 1];
+                    var grayStyleIndex = Range.ToStyleIndex(iGrayStyle);
+                    //if char contains green style then block popup menu
+                    if ((c.style & grayStyleIndex) != 0)
+                        e.Cancel = true;
+                }
+        }
+
+        private void tb_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyData == (Keys.Control | Keys.Space))
+            {
+                //forced show (MinFragmentLength will be ignored)
+                (CurrentTB.Tag as TbInfo).popupMenu.Show(true);
+                e.Handled = true;
             }
         }
 
@@ -286,7 +315,10 @@ namespace ASMgenerator8080
             CreateTab(filename);
             //CurrentTB.OpenBindingFile(filename, Encoding.Unicode);
             UpdateHighlighting(CurrentTB, CurrentTB.Range);
+            //CurrentTB.AutoIndent = true;
+            //CurrentTB.AutoIndentExistingLines = true;
             stStrip.Items[0].Text = "";
+
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -633,6 +665,19 @@ namespace ASMgenerator8080
             try
             {
                 BinGen.generateBinary(s, startAddr);
+                Dictionary<int, string> warnings = new Dictionary<int, string>();
+                warnings = BinGen.getWarnings();
+                if (warnings.Count > 0)
+                {
+                    foreach (var warning in warnings)
+                    {
+                        var r = new Range(CurrentTB, 0, warning.Key, CurrentTB.Lines[warning.Key].Length, warning.Key);
+                        var hint = new Hint(r, warning.Value, true, true);
+                        hint.BackColor = Color.Yellow;
+                        CurrentTB.Hints.Add(hint);
+                        CurrentTB.Navigate(warning.Key);   
+                    }    
+                }
             }
             catch (BinaryGeneratorException e)
             {
@@ -687,6 +732,20 @@ namespace ASMgenerator8080
         public class TbInfo
         {
             public AutocompleteMenu popupMenu;
+        }
+
+        private void highlightCurrentLineToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            highlightCurrentLineToolStripMenuItem.Checked = !highlightCurrentLineToolStripMenuItem.Checked;
+            foreach (FATabStripItem tab in tsFiles.Items)
+            {
+                if (highlightCurrentLineToolStripMenuItem.Checked)
+                    (tab.Controls[0] as FastColoredTextBox).CurrentLineColor = currentLineColor;
+                else
+                    (tab.Controls[0] as FastColoredTextBox).CurrentLineColor = Color.Transparent;
+            }
+            if (CurrentTB != null)
+                CurrentTB.Invalidate();
         }
     }
 }

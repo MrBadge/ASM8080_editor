@@ -36,14 +36,12 @@
             this.tsFiles = new FarsiLibrary.Win.FATabStrip();
             this.menu = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.editToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.projectToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.settingsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             this.openToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.editToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.copyToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.pasteToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.cutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -55,13 +53,16 @@
             this.redoToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator12 = new System.Windows.Forms.ToolStripSeparator();
             this.commUncommToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.projectToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.compileToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.sendToKR580ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.viewHexToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.loadCustomASMDescFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.serialPortToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.comToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.serialPortSettingsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.highlightCurrentLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tsFiles)).BeginInit();
             this.menu.SuspendLayout();
@@ -131,46 +132,6 @@
             this.fileToolStripMenuItem1.Text = "File";
             this.fileToolStripMenuItem1.DropDownOpening += new System.EventHandler(this.fileToolStripMenuItem_DropDownOpening);
             // 
-            // editToolStripMenuItem1
-            // 
-            this.editToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.copyToolStripMenuItem1,
-            this.pasteToolStripMenuItem1,
-            this.cutToolStripMenuItem1,
-            this.toolStripSeparator10,
-            this.findToolStripMenuItem1,
-            this.replaceToolStripMenuItem1,
-            this.toolStripSeparator11,
-            this.undoToolStripMenuItem1,
-            this.redoToolStripMenuItem1,
-            this.toolStripSeparator12,
-            this.commUncommToolStripMenuItem});
-            this.editToolStripMenuItem1.Name = "editToolStripMenuItem1";
-            this.editToolStripMenuItem1.Size = new System.Drawing.Size(39, 20);
-            this.editToolStripMenuItem1.Text = "Edit";
-            this.editToolStripMenuItem1.DropDownOpening += new System.EventHandler(this.editToolStripMenuItem_DropDownOpening);
-            // 
-            // projectToolStripMenuItem1
-            // 
-            this.projectToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.compileToolStripMenuItem1,
-            this.sendToKR580ToolStripMenuItem1,
-            this.viewHexToolStripMenuItem1});
-            this.projectToolStripMenuItem1.Name = "projectToolStripMenuItem1";
-            this.projectToolStripMenuItem1.Size = new System.Drawing.Size(56, 20);
-            this.projectToolStripMenuItem1.Text = "Project";
-            this.projectToolStripMenuItem1.DropDownOpening += new System.EventHandler(this.projectToolStripMenuItem_DropDownOpening);
-            // 
-            // settingsToolStripMenuItem1
-            // 
-            this.settingsToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.loadCustomASMDescFileToolStripMenuItem,
-            this.serialPortToolStripMenuItem1,
-            this.serialPortSettingsToolStripMenuItem1});
-            this.settingsToolStripMenuItem1.Name = "settingsToolStripMenuItem1";
-            this.settingsToolStripMenuItem1.Size = new System.Drawing.Size(61, 20);
-            this.settingsToolStripMenuItem1.Text = "Settings";
-            // 
             // newToolStripMenuItem1
             // 
             this.newToolStripMenuItem1.Name = "newToolStripMenuItem1";
@@ -208,6 +169,26 @@
             this.saveAsToolStripMenuItem1.Size = new System.Drawing.Size(184, 22);
             this.saveAsToolStripMenuItem1.Text = "Save as";
             this.saveAsToolStripMenuItem1.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
+            // 
+            // editToolStripMenuItem1
+            // 
+            this.editToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.copyToolStripMenuItem1,
+            this.pasteToolStripMenuItem1,
+            this.cutToolStripMenuItem1,
+            this.toolStripSeparator10,
+            this.findToolStripMenuItem1,
+            this.replaceToolStripMenuItem1,
+            this.toolStripSeparator11,
+            this.undoToolStripMenuItem1,
+            this.redoToolStripMenuItem1,
+            this.toolStripSeparator12,
+            this.commUncommToolStripMenuItem,
+            this.highlightCurrentLineToolStripMenuItem});
+            this.editToolStripMenuItem1.Name = "editToolStripMenuItem1";
+            this.editToolStripMenuItem1.Size = new System.Drawing.Size(39, 20);
+            this.editToolStripMenuItem1.Text = "Edit";
+            this.editToolStripMenuItem1.DropDownOpening += new System.EventHandler(this.editToolStripMenuItem_DropDownOpening);
             // 
             // copyToolStripMenuItem1
             // 
@@ -288,6 +269,17 @@
             this.commUncommToolStripMenuItem.Text = "Comm/Uncomm";
             this.commUncommToolStripMenuItem.Click += new System.EventHandler(this.commentSelectedToolStripMenuItem_Click);
             // 
+            // projectToolStripMenuItem1
+            // 
+            this.projectToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.compileToolStripMenuItem1,
+            this.sendToKR580ToolStripMenuItem1,
+            this.viewHexToolStripMenuItem1});
+            this.projectToolStripMenuItem1.Name = "projectToolStripMenuItem1";
+            this.projectToolStripMenuItem1.Size = new System.Drawing.Size(56, 20);
+            this.projectToolStripMenuItem1.Text = "Project";
+            this.projectToolStripMenuItem1.DropDownOpening += new System.EventHandler(this.projectToolStripMenuItem_DropDownOpening);
+            // 
             // compileToolStripMenuItem1
             // 
             this.compileToolStripMenuItem1.Name = "compileToolStripMenuItem1";
@@ -313,6 +305,16 @@
             this.viewHexToolStripMenuItem1.Text = "View hex";
             this.viewHexToolStripMenuItem1.Click += new System.EventHandler(this.viewHexToolStripMenuItem_Click);
             // 
+            // settingsToolStripMenuItem1
+            // 
+            this.settingsToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.loadCustomASMDescFileToolStripMenuItem,
+            this.serialPortToolStripMenuItem1,
+            this.serialPortSettingsToolStripMenuItem1});
+            this.settingsToolStripMenuItem1.Name = "settingsToolStripMenuItem1";
+            this.settingsToolStripMenuItem1.Size = new System.Drawing.Size(61, 20);
+            this.settingsToolStripMenuItem1.Text = "Settings";
+            // 
             // loadCustomASMDescFileToolStripMenuItem
             // 
             this.loadCustomASMDescFileToolStripMenuItem.Name = "loadCustomASMDescFileToolStripMenuItem";
@@ -332,7 +334,7 @@
             // comToolStripMenuItem1
             // 
             this.comToolStripMenuItem1.Name = "comToolStripMenuItem1";
-            this.comToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.comToolStripMenuItem1.Size = new System.Drawing.Size(98, 22);
             this.comToolStripMenuItem1.Text = "com";
             // 
             // serialPortSettingsToolStripMenuItem1
@@ -341,6 +343,13 @@
             this.serialPortSettingsToolStripMenuItem1.Size = new System.Drawing.Size(217, 22);
             this.serialPortSettingsToolStripMenuItem1.Text = "Serial port settings";
             this.serialPortSettingsToolStripMenuItem1.Click += new System.EventHandler(this.serialPortSettingsToolStripMenuItem_Click);
+            // 
+            // highlightCurrentLineToolStripMenuItem
+            // 
+            this.highlightCurrentLineToolStripMenuItem.Name = "highlightCurrentLineToolStripMenuItem";
+            this.highlightCurrentLineToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.highlightCurrentLineToolStripMenuItem.Text = "Highlight current line";
+            this.highlightCurrentLineToolStripMenuItem.Click += new System.EventHandler(this.highlightCurrentLineToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -400,6 +409,7 @@
         private System.Windows.Forms.ToolStripMenuItem serialPortToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem comToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem serialPortSettingsToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem highlightCurrentLineToolStripMenuItem;
     }
 }
 

@@ -21,7 +21,7 @@ namespace ASMgenerator8080
         private const string unres_label = "Unresolved label";
         private const string unused_labels = "Unused labels";
 
-        private const string long_num = "is more than 0xFF";
+        private const string long_num = "One register can't store value more than 0xFF";
 
         private static readonly ArrayList opsRegDst = new ArrayList {"inr", "dcr"};
 
@@ -140,7 +140,7 @@ namespace ASMgenerator8080
         //private ArrayList references;
         //private ArrayList resolveTable;
         private readonly Dictionary<string, ArrayList> unresolvedLabels;
-        private Dictionary<string, int> warnings;
+        private Dictionary<int, string> warnings;
         private int LabelsCount;
         private int currentAddr;
         private int startAddr = 0x2100;
@@ -151,7 +151,7 @@ namespace ASMgenerator8080
             //resolveTable = new ArrayList();
             //textlabels = new ArrayList();
             labels = new Dictionary<string, int>();
-            warnings = new Dictionary<string, int>();
+            warnings = new Dictionary<int, string>();
             unresolvedLabels = new Dictionary<string, ArrayList>();
             mem = new ArrayList();
         }
@@ -219,7 +219,7 @@ namespace ASMgenerator8080
             return mem;
         }
 
-        public Dictionary<string, int> getWarning()
+        public Dictionary<int, string> getWarnings()
         {
             return warnings;
         }
@@ -584,7 +584,7 @@ namespace ASMgenerator8080
                 }
             }
 
-            if (num > 0xFF) warnings.Add("Number " + "\"" + identifier + "\" " + long_num, linenumber);
+            if (num > 0xFF) warnings.Add(linenumber, /*"Number " + "\"" + identifier + "\" " + */long_num);
             return num;
         }
 
