@@ -13,12 +13,15 @@ namespace ASMgenerator8080
         private const int maxAddr = 0x10000;
 
         private const string incorrect_ops = "Incorrect operands";
+        private const string incorrect_const = "Incorrect constant";
         private const string miss_ops = "Missing operands";
         private const string to_much_ops = "To many operands";
         private const string incorrect_cmd = "Unknown command";
         private const string incorrect_label = "Incorrect label";
         private const string unres_label = "Unresolved label";
         private const string unused_labels = "Unused labels";
+
+        private const string long_num = "is more than 0xFF";
 
         private static readonly ArrayList opsRegDst = new ArrayList {"inr", "dcr"};
 
@@ -137,6 +140,7 @@ namespace ASMgenerator8080
         //private ArrayList references;
         //private ArrayList resolveTable;
         private readonly Dictionary<string, ArrayList> unresolvedLabels;
+        private Dictionary<string, int> warnings;
         private int LabelsCount;
         private int currentAddr;
         private int startAddr = 0x2100;
@@ -147,6 +151,7 @@ namespace ASMgenerator8080
             //resolveTable = new ArrayList();
             //textlabels = new ArrayList();
             labels = new Dictionary<string, int>();
+            warnings = new Dictionary<string, int>();
             unresolvedLabels = new Dictionary<string, ArrayList>();
             mem = new ArrayList();
         }
@@ -169,7 +174,9 @@ namespace ASMgenerator8080
             if (unresolvedLabels.Count != 0)
             {
                 string label = unresolvedLabels.Keys.ElementAt(0);
-                throw new BinaryGeneratorException(unres_label + ": \"" + label + "\"",
+                if (Char.IsDigit(label[0])) throw new BinaryGeneratorException(incorrect_const + ": \"" + label + "\"",
+                    ((locationCode)unresolvedLabels[label][0]).linenumber);
+                else throw new BinaryGeneratorException(unres_label + ": \"" + label + "\"",
                     ((locationCode) unresolvedLabels[label][0]).linenumber);
             }
         }
@@ -185,7 +192,7 @@ namespace ASMgenerator8080
                 if (mem[i] != null)
                 {
                     if (len > 0 && i > 0 && i%len == 0) ++j;
-                    res[j] += (byte) mem[i] < 10 ? "0" + (byte) mem[i] : ((byte) mem[i]).ToString("X");
+                    res[j] += (byte)mem[i] < 0xf ? "0" + ((byte)mem[i]).ToString("X") : ((byte)mem[i]).ToString("X");
                     res[j] += " ";
                 }
             return res;
@@ -212,12 +219,18 @@ namespace ASMgenerator8080
             return mem;
         }
 
+        public Dictionary<string, int> getWarning()
+        {
+            return warnings;
+        }
+
         public void clear()
         {
             mem.Clear();
             LabelsCount = 0;
             //textlabels.Clear();
             labels.Clear();
+            warnings.Clear();
             //references.Clear();
             //resolveTable.Clear();
             unresolvedLabels.Clear();
@@ -495,34 +508,48 @@ namespace ASMgenerator8080
                 return (0xff & identifier[1]);
             }
 
+            int num = -1;
             // support 0x numbers
 
             if (identifier.Length > 2 && identifier[0] == '0' && (identifier[1] == 'x' || identifier[1] == 'X'))
             {
                 try
                 {
-                    return Convert.ToInt32(identifier, 16);
+                    num = Convert.ToInt32(identifier, 16);
                 }
                 catch (Exception)
                 {
-                    if (Regex.Split(identifier, "  *").Length > 1)
-                        throw new BinaryGeneratorException(to_much_ops, linenumber);
-                    throw new BinaryGeneratorException(incorrect_ops, linenumber);
+                    //if (Regex.Split(identifier, "  *").Length > 1)
+                    //    throw new BinaryGeneratorException(to_much_ops, linenumber);
+                    //throw new BinaryGeneratorException(incorrect_ops, linenumber);
+                    return -1;
                 }
-            }
+            } else 
+
+            // support 0 numbers 
+
+            if (identifier.Length > 2 && identifier[0] == '0')
+            {
+                try
+                {
+                    num = Convert.ToInt32(identifier, 8);
+                }
+                catch (Exception)
+                {
+                    return -1;
+                }
+            } else 
 
             if (identifier[0] == '$')
             {
                 identifier = "0x" + identifier.Substring(1, identifier.Length - 1);
-            }
+            } else
 
             if ("0123456789".IndexOf(identifier[0]) != -1)
             {
-                int test = 0;
                 try
                 {
-                    test = Convert.ToInt32(identifier);
-                    return test;
+                    num = Convert.ToInt32(identifier);
                 }
                 catch (Exception)
                 {
@@ -532,13 +559,13 @@ namespace ASMgenerator8080
                         switch (suffix)
                         {
                             case "d":
-                                test = Convert.ToInt32(identifier.Substring(0, identifier.Length - 1));
+                                num = Convert.ToInt32(identifier.Substring(0, identifier.Length - 1));
                                 break;
                             case "h":
-                                test = Convert.ToInt32("0x" + identifier.Substring(0, identifier.Length - 1), 16);
+                                num = Convert.ToInt32("0x" + identifier.Substring(0, identifier.Length - 1), 16);
                                 break;
                             case "b":
-                                test = Convert.ToInt32(identifier.Substring(0, identifier.Length - 1), 2);
+                                num = Convert.ToInt32(identifier.Substring(0, identifier.Length - 1), 2);
                                 break;
                             case "q":
                                 string oct = identifier.Substring(0, identifier.Length - 1);
@@ -546,9 +573,9 @@ namespace ASMgenerator8080
                                 {
                                     if (oct[i] == '8' || oct[i] == '9') return -1;
                                 }
-                                return Convert.ToInt32(identifier.Substring(0, identifier.Length - 1), 8);
+                                num = Convert.ToInt32(identifier.Substring(0, identifier.Length - 1), 8);
+                                break;
                         }
-                        return test;
                     }
                     catch (Exception)
                     {
@@ -556,7 +583,9 @@ namespace ASMgenerator8080
                     ;
                 }
             }
-            return -1;
+
+            if (num > 0xFF) warnings.Add("Number " + "\"" + identifier + "\" " + long_num, linenumber);
+            return num;
         }
 
         /*private int evaluateExpression(string input, int addr) {
