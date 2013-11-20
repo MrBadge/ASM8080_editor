@@ -6,7 +6,7 @@
 ;input: none 
 ;output: none 
 init_timer_and_uart: 
-    MVI A, 40h ; режим работы 
+    MVI A, 40h ; сброс
     OUT 0E3h
     MVI A, 1Ah ; регистр сравнения 
     OUT 0E1h 
