@@ -53,6 +53,7 @@
             this.redoToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator12 = new System.Windows.Forms.ToolStripSeparator();
             this.commUncommToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.highlightCurrentLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.projectToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.compileToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.sendToKR580ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -62,7 +63,7 @@
             this.serialPortToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.comToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.serialPortSettingsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.highlightCurrentLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.decompileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tsFiles)).BeginInit();
             this.menu.SuspendLayout();
@@ -112,7 +113,8 @@
             this.fileToolStripMenuItem1,
             this.editToolStripMenuItem1,
             this.projectToolStripMenuItem1,
-            this.settingsToolStripMenuItem1});
+            this.settingsToolStripMenuItem1,
+            this.decompileToolStripMenuItem});
             this.menu.Location = new System.Drawing.Point(0, 0);
             this.menu.Name = "menu";
             this.menu.Size = new System.Drawing.Size(428, 24);
@@ -269,6 +271,13 @@
             this.commUncommToolStripMenuItem.Text = "Comm/Uncomm";
             this.commUncommToolStripMenuItem.Click += new System.EventHandler(this.commentSelectedToolStripMenuItem_Click);
             // 
+            // highlightCurrentLineToolStripMenuItem
+            // 
+            this.highlightCurrentLineToolStripMenuItem.Name = "highlightCurrentLineToolStripMenuItem";
+            this.highlightCurrentLineToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.highlightCurrentLineToolStripMenuItem.Text = "Highlight current line";
+            this.highlightCurrentLineToolStripMenuItem.Click += new System.EventHandler(this.highlightCurrentLineToolStripMenuItem_Click);
+            // 
             // projectToolStripMenuItem1
             // 
             this.projectToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -344,12 +353,12 @@
             this.serialPortSettingsToolStripMenuItem1.Text = "Serial port settings";
             this.serialPortSettingsToolStripMenuItem1.Click += new System.EventHandler(this.serialPortSettingsToolStripMenuItem_Click);
             // 
-            // highlightCurrentLineToolStripMenuItem
+            // decompileToolStripMenuItem
             // 
-            this.highlightCurrentLineToolStripMenuItem.Name = "highlightCurrentLineToolStripMenuItem";
-            this.highlightCurrentLineToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
-            this.highlightCurrentLineToolStripMenuItem.Text = "Highlight current line";
-            this.highlightCurrentLineToolStripMenuItem.Click += new System.EventHandler(this.highlightCurrentLineToolStripMenuItem_Click);
+            this.decompileToolStripMenuItem.Name = "decompileToolStripMenuItem";
+            this.decompileToolStripMenuItem.Size = new System.Drawing.Size(76, 20);
+            this.decompileToolStripMenuItem.Text = "Decompile";
+            this.decompileToolStripMenuItem.Click += new System.EventHandler(this.decompileToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -410,6 +419,7 @@
         private System.Windows.Forms.ToolStripMenuItem comToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem serialPortSettingsToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem highlightCurrentLineToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem decompileToolStripMenuItem;
     }
 }
 

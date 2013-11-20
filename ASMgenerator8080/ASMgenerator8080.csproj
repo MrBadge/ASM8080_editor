@@ -62,6 +62,7 @@
     <Compile Include="BinaryGeneratorWarning.cs" />
     <Compile Include="ComPortSettings.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="DisAssembler.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

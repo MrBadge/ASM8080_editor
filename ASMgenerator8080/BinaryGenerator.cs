@@ -126,7 +126,7 @@ namespace ASMgenerator8080
 
         private static readonly Dictionary<string, byte> opsRp = new Dictionary<string, byte>
         {
-            {"ldax", 0x0A},
+            {"ldax", 0x0a},
             {"stax", 0x02},
             {"dad", 0x09},
             {"inx", 0x03},

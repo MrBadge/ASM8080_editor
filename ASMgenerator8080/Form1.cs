@@ -748,5 +748,17 @@ namespace ASMgenerator8080
             if (CurrentTB != null)
                 CurrentTB.Invalidate();
         }
+
+        private void decompileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var dis = new DisAssembler();
+            ArrayList tmp = dis.GetAsmCode(Constants.BigProgramLoader);
+            string text = "";
+            foreach (var line in tmp)
+            {
+                text += (string)line + "\n";
+            }
+            CurrentTB.Text = text;
+        }
     }
 }
