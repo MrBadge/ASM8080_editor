@@ -161,9 +161,17 @@ namespace ASMgenerator8080
             return Convert.ToByte(b & mask);
         }
 
-        public ArrayList GetAsmCode(byte[] bytes)
+        public List<string> GetAsmCode(byte[] bytes, int startAddr = -1)
         {
-            var AsmCode = new ArrayList();
+            var AsmCode = new List<string>();
+            var LineAddress = new Dictionary<int, string>();
+            var AddrTmp = 0;
+            var CurLabel = -1;
+            if (startAddr != -1)
+            {
+                LineAddress.Add(startAddr, null);
+                CurLabel = 0;
+            }
             int CurPos = 0;
             var tmpString = "";
             var command = "";
@@ -173,17 +181,33 @@ namespace ASMgenerator8080
                 if (ops0.ContainsKey(bytes[CurPos]))
                 {
                     AsmCode.Add(ops0[bytes[CurPos]].ToUpper());
+                    LineAddress.Add(LineAddress.Keys.Last() + 1, null);
                     ++CurPos;
                 }
                 else if (opsIm16.ContainsKey(bytes[CurPos]))
                 {
-                    tmpString = opsIm16[bytes[CurPos]].ToUpper() + " 0x" + (bytes[CurPos + 2]).ToString("X") + (bytes[CurPos + 1]).ToString("X");
+                    AddrTmp = (bytes[CurPos + 2] << 8) | (bytes[CurPos + 1]);
+                    if (LineAddress.ContainsKey(AddrTmp))
+                    {
+                        LineAddress[AddrTmp] = "Label" + Convert.ToString(CurLabel);
+                        ++CurLabel;
+                        //tmpString = opsIm16[bytes[CurPos]].ToUpper() + " " + LineAddress[AddrTmp] + " ;0x" +
+                         //           (bytes[CurPos + 2]).ToString("X") + (bytes[CurPos + 1]).ToString("X");
+                    }
+                    //else
+                    //{
+                        
+                        tmpString = opsIm16[bytes[CurPos]].ToUpper() + " 0x" + (bytes[CurPos + 2]).ToString("X") +
+                                    (bytes[CurPos + 1]).ToString("X");
+                    //}
+                    LineAddress.Add(LineAddress.Keys.Last() + 3, null);
                     AsmCode.Add(tmpString);
                     CurPos += 3;
                 }
                 else if (opsIm8.ContainsKey(bytes[CurPos]))
                 {
                     tmpString = opsIm8[bytes[CurPos]].ToUpper() + " 0x" + (bytes[CurPos + 1]).ToString("X");
+                    LineAddress.Add(LineAddress.Keys.Last() + 2, null);
                     AsmCode.Add(tmpString);
                     CurPos += 2;
                 }
@@ -194,6 +218,7 @@ namespace ASMgenerator8080
                     if (Rnames.ContainsKey(reg))
                     {
                         tmpString = command + " " + Rnames[reg];
+                        LineAddress.Add(LineAddress.Keys.Last() + 1, null);
                         AsmCode.Add(tmpString);
                         CurPos += 1;
                     }
@@ -205,6 +230,7 @@ namespace ASMgenerator8080
                     if (Rnames.ContainsKey(reg))
                     {
                         tmpString = command + " " + Rnames[reg] + ", 0x" + (bytes[CurPos + 1]).ToString("X");
+                        LineAddress.Add(LineAddress.Keys.Last() + 2, null);
                         AsmCode.Add(tmpString);
                         CurPos += 2;
                     }   
@@ -212,12 +238,13 @@ namespace ASMgenerator8080
                 else if (opsRegReg.ContainsKey(Convert.ToByte(bytes[CurPos] & maskOpsRegReg))) //mov
                 {
                     command = opsRegReg[Convert.ToByte(bytes[CurPos] & maskOpsRegReg)].ToUpper();
-                    var regs = Convert.ToByte(bytes[CurPos] & ~maskOpsRegIm8);
+                    var regs = Convert.ToByte(bytes[CurPos] & ~maskOpsRegReg);
                     var reg1 = Convert.ToByte(regs >> 3);
                     var reg2 = Convert.ToByte(regs & 7);
                     if (Rnames.ContainsKey(reg1) && Rnames.ContainsKey(reg2))
                     {
                         tmpString = command + " " + Rnames[reg1] + ", " + Rnames[reg2];
+                        LineAddress.Add(LineAddress.Keys.Last() + 1, null);
                         AsmCode.Add(tmpString);
                         CurPos += 1;
                     }   
@@ -229,6 +256,7 @@ namespace ASMgenerator8080
                     if (RPnames.ContainsKey(reg))
                     {
                         tmpString = command + " " + RPnames[reg];
+                        LineAddress.Add(LineAddress.Keys.Last() + 1, null);
                         AsmCode.Add(tmpString);
                         CurPos += 1;
                     }    
@@ -241,6 +269,7 @@ namespace ASMgenerator8080
                     {
                         tmpString = command + " " + RPnames[reg] + ", 0x" +
                                     (bytes[CurPos + 2]).ToString("X") + (bytes[CurPos + 1]).ToString("X");
+                        LineAddress.Add(LineAddress.Keys.Last() + 3, null);
                         AsmCode.Add(tmpString);
                         CurPos += 3;
                     }
@@ -248,6 +277,17 @@ namespace ASMgenerator8080
             //tmpString = "";
             }
             //var tmp = new ArrayList();
+            var tmpByte = "";
+            foreach (var addr in LineAddress)
+            {
+                tmpByte = (Convert.ToByte((addr.Key & 0xff00) >> 8).ToString("X") +
+                           Convert.ToByte(addr.Key & 0xff).ToString("X"));
+                for (int i = 0; i < AsmCode.Count; ++i)
+                {
+                    AsmCode[i] = AsmCode[i].Replace("0x" + tmpByte,
+                        (addr.Value) + ";" + "0x" + tmpByte);
+                }
+            }
             return AsmCode;
         }
     }

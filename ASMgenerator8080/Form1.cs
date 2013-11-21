@@ -752,7 +752,7 @@ namespace ASMgenerator8080
         private void decompileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var dis = new DisAssembler();
-            ArrayList tmp = dis.GetAsmCode(Constants.BigProgramLoader);
+            List<string> tmp = dis.GetAsmCode(Constants.BigProgramLoader, 0x212F);
             string text = "";
             foreach (var line in tmp)
             {
