@@ -4,6 +4,7 @@ init_timer_and_uart:
     MVI A, 1Ah ; регистр сравнения 
     OUT 0E1h
 
+    ;сброс
     XRA A
     OUT 0FBh
     OUT 0FBh
