@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 
 namespace ASMgenerator8080
@@ -84,7 +85,7 @@ namespace ASMgenerator8080
 
         private static readonly Dictionary<byte, string> opsRegIm8 = new Dictionary<byte, string>
         {
-            {0x06   , "mvi"}
+            {0x06, "mvi"}
         };
 
         private static readonly Dictionary<byte, string> opsRegReg = new Dictionary<byte, string>
@@ -149,6 +150,10 @@ namespace ASMgenerator8080
             {7, "M"}
         };
 
+        private int lastDataIndex = 0;
+        private List<int> DBList = new List<int>(); 
+        private List<int> DWList = new List<int>(); 
+
         //private const byte maskOpsIm8 = 0xCC;
         private const byte maskOpsReg = 0xF8;
         private const byte maskOpsRegIm8 = 0xC7;
@@ -178,6 +183,25 @@ namespace ASMgenerator8080
             byte reg;
             while (CurPos < bytes.Length)
             {
+                if (startAddr != -1)
+                {
+                    if (DWList.Contains(startAddr + CurPos))
+                    {
+                        LineAddress.Add(LineAddress.Keys.Last() + 2, null);
+                        tmpString = "Data" + ++lastDataIndex  + " DW 0x" + bytes[CurPos].ToString("X") + bytes[CurPos + 1].ToString("X");
+                        AsmCode.Add(tmpString);
+                        CurPos += 2;
+                        continue;
+                    }
+                    if (DBList.Contains(startAddr + CurPos))
+                    {
+                        LineAddress.Add(LineAddress.Keys.Last() + 1, null);
+                        tmpString = "Data" + ++lastDataIndex + " DB 0x" + bytes[CurPos].ToString("X");
+                        AsmCode.Add(tmpString);
+                        CurPos += 1;
+                        continue;
+                    }
+                }
                 if (ops0.ContainsKey(bytes[CurPos]))
                 {
                     AsmCode.Add(ops0[bytes[CurPos]].ToUpper());
@@ -187,6 +211,14 @@ namespace ASMgenerator8080
                 else if (opsIm16.ContainsKey(bytes[CurPos]))
                 {
                     AddrTmp = (bytes[CurPos + 2] << 8) | (bytes[CurPos + 1]);
+                    if (startAddr != -1)
+                    {
+                        string opStr = opsIm16[bytes[CurPos]].ToLower();
+                        if (opStr == "sta")
+                            DBList.Add(AddrTmp);
+                        else if (opStr == "shld")
+                            DWList.Add(AddrTmp);
+                    }
                     if (LineAddress.ContainsKey(AddrTmp))
                     {
                         LineAddress[AddrTmp] = "Label" + Convert.ToString(CurLabel);
