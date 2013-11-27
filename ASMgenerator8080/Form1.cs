@@ -8,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using ASMgenerator8080.Properties;
@@ -754,11 +755,16 @@ namespace ASMgenerator8080
             var dis = new DisAssembler();
             List<string> tmp = dis.GetAsmCode(Constants.BigProgramLoader, 0x212F);
             string text = "";
+            var rg = new Regex(@"[a-fA-f][a-fA-f0-9]*:\s");
+            var folding = false;
             foreach (var line in tmp)
             {
+                //if (rg.IsMatch(line))
+                //    folding = true;
                 text += (string)line + "\n";
             }
             CurrentTB.Text = text;
+            CurrentTB.CollapseAllFoldingBlocks();
         }
     }
 }
