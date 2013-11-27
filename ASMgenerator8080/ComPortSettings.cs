@@ -17,7 +17,7 @@ namespace ASMgenerator8080
         public int databits { get; set; }
         public string ComPortName { get; set; }
 
-        public void SetPortSet(StopBits s = StopBits.One, Parity p = Parity.None, int b = 4800, int d = 8,
+        public void SetPortSet(StopBits s = StopBits.Two, Parity p = Parity.Even, int b = 4800, int d = 8,
             string name = "")
         {
             sb = s;

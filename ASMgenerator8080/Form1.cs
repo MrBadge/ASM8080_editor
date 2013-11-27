@@ -425,7 +425,7 @@ namespace ASMgenerator8080
             stStrip.Items[0].Text = "Compiling ...";
             Cursor.Current = Cursors.WaitCursor;
             stStrip.Refresh();
-            GetBinary(CurrentTB.Text, 0x2100 + 0x23 + Constants.BigProgramLoader.Length);
+            GetBinary(CurrentTB.Text, 0x2100 + 0x33 + Constants.BigProgramLoader.Length);
             stStrip.Items[0].Text = "Done";
             Cursor.Current = Cursors.Default;
         }
@@ -561,12 +561,12 @@ namespace ASMgenerator8080
                     MessageBoxIcon.Exclamation);
                 return;
             }
-            if (GetBinary(CurrentTB.Text, 0x2100 + 0x2F + Constants.BigProgramLoader.Length + 1) == null)
+            if (GetBinary(CurrentTB.Text, 0x2100 + 0x33 + Constants.BigProgramLoader.Length) == null)
                 return;
             // start address = 0x2100 + small loader size + big loader size
             byte[] tmp = GetNewSettings(PS);
             Constants.BigProgramLoader[5] = tmp[0];
-            Constants.BigProgramLoader[9] = tmp[1];
+            Constants.BigProgramLoader[20] = tmp[1]; //Constants.BigProgramLoader[9] = tmp[1];
             SendBigLoader(Constants.BigProgramLoader);
             var port = new SerialPort(PS.ComPortName, PS.baud, PS.par, PS.databits, PS.sb);
             try
@@ -578,7 +578,7 @@ namespace ASMgenerator8080
                 var _data = new ArrayList(BinGen.getBinaryDump());
                 byte[] startAddr = BitConverter.GetBytes(BinGen.getStartAddress());
                 stStrip.Items[1].Text = "| Start address of your program in memory = " + startAddr[0] + startAddr[1];
-                var data = new byte[_data.Count*2 + 3];
+                var data = new byte[_data.Count*2 + 4];
                 data[0] = 1;
                 data[1] = startAddr[1];
                 data[2] = startAddr[0];
@@ -704,7 +704,7 @@ namespace ASMgenerator8080
         {
             if (CurrentTB == null) 
                 return;
-            if (GetBinary(CurrentTB.Text, 0x2100 + 0x23 + Constants.BigProgramLoader.Length) == null) return;
+            if (GetBinary(CurrentTB.Text, 0x2100 + 0x33 + Constants.BigProgramLoader.Length) == null) return;
             var hexView = new HexDump();
             hexView.viewBinaryDump(BinGen);
         }
