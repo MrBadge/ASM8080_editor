@@ -608,7 +608,7 @@ namespace ASMgenerator8080
                 }
             }
 
-            if (num > 0xFF) warnings.Add(linenumber, /*"Number " + "\"" + identifier + "\" " + */long_num);
+            //if (num > 0xFF) warnings.Add(linenumber, /*"Number " + "\"" + identifier + "\" " + */long_num);
             return num;
         }
 
@@ -802,6 +802,7 @@ namespace ASMgenerator8080
                     mem[addr - startAddr] = opsIm8[mnemonic];
                     if (partsLen > 2) throw new BinaryGeneratorException(to_much_ops, linenumber);
                     immediate = useExpr(parts, addr, linenumber);
+                    if (immediate > 0xFF) warnings.Add(linenumber, /*"Number " + "\"" + identifier + "\" " + */long_num);
                     setmem8(addr + 1, immediate);
                     return 2;
                 }
@@ -821,6 +822,7 @@ namespace ASMgenerator8080
                     if (reg == -1) throw new BinaryGeneratorException(incorrect_ops, linenumber);
                     mem[addr - startAddr] = (byte) (opcs | reg << 3);
                     immediate = useExpr(parts, addr, linenumber, 2);
+                    if (immediate > 0xFF) warnings.Add(linenumber, /*"Number " + "\"" + identifier + "\" " + */long_num);
                     setmem8(addr + 1, immediate);
                     return 2;
                 }
