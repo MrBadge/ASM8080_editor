@@ -577,7 +577,7 @@ namespace ASMgenerator8080
                 var _data = new ArrayList(BinGen.getBinaryDump());
                 byte[] startAddr = BitConverter.GetBytes(BinGen.getStartAddress());
                 stStrip.Items[1].Text = "| Start address of your program in memory = " + startAddr[0] + startAddr[1];
-                var data = new byte[_data.Count*2 + 4];
+                var data = new byte[_data.Count*2 + 3];
                 data[0] = 1;
                 data[1] = startAddr[1];
                 data[2] = startAddr[0];
