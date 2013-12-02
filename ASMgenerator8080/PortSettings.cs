@@ -37,9 +37,9 @@ namespace ASMgenerator8080
             stopbits.SelectedItem = tmp.sb;
             stopbits.DropDownStyle = ComboBoxStyle.DropDownList;
 
-            databits.Items.Add(5);
-            databits.Items.Add(6);
-            databits.Items.Add(7);
+            //databits.Items.Add(5);
+            //databits.Items.Add(6);
+            //databits.Items.Add(7);
             databits.Items.Add(8);
             databits.SelectedItem = tmp.databits;
             databits.DropDownStyle = ComboBoxStyle.DropDownList;

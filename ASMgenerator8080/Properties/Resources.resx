@@ -124,4 +124,7 @@
   <data name="ASMHighLightingDescFile" xml:space="preserve">
     <value>C:\Users\Анатолий\Documents\GitHub\ASM8080_editor\ASMDesc.xml</value>
   </data>
+  <data name="ReallySmallProgramLoader" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ReallySmallProgramLoader.asm;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>

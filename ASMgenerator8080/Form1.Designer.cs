@@ -64,6 +64,7 @@
             this.comToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.serialPortSettingsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.decompileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showSmallLoaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tsFiles)).BeginInit();
             this.menu.SuspendLayout();
@@ -319,7 +320,8 @@
             this.settingsToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loadCustomASMDescFileToolStripMenuItem,
             this.serialPortToolStripMenuItem1,
-            this.serialPortSettingsToolStripMenuItem1});
+            this.serialPortSettingsToolStripMenuItem1,
+            this.showSmallLoaderToolStripMenuItem});
             this.settingsToolStripMenuItem1.Name = "settingsToolStripMenuItem1";
             this.settingsToolStripMenuItem1.Size = new System.Drawing.Size(61, 20);
             this.settingsToolStripMenuItem1.Text = "Settings";
@@ -359,6 +361,13 @@
             this.decompileToolStripMenuItem.Size = new System.Drawing.Size(76, 20);
             this.decompileToolStripMenuItem.Text = "Decompile";
             this.decompileToolStripMenuItem.Click += new System.EventHandler(this.decompileToolStripMenuItem_Click);
+            // 
+            // showSmallLoaderToolStripMenuItem
+            // 
+            this.showSmallLoaderToolStripMenuItem.Name = "showSmallLoaderToolStripMenuItem";
+            this.showSmallLoaderToolStripMenuItem.Size = new System.Drawing.Size(217, 22);
+            this.showSmallLoaderToolStripMenuItem.Text = "Show Small Loader";
+            this.showSmallLoaderToolStripMenuItem.Click += new System.EventHandler(this.showSmallLoaderToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -420,6 +429,7 @@
         private System.Windows.Forms.ToolStripMenuItem serialPortSettingsToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem highlightCurrentLineToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem decompileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem showSmallLoaderToolStripMenuItem;
     }
 }
 

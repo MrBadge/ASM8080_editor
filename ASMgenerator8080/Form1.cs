@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.IO;
 using System.IO.Ports;
@@ -25,6 +26,7 @@ namespace ASMgenerator8080
         private readonly SaveFileDialog SFD;
         private BinaryGenerator BinGen;
         public string DescFile = null;
+        public string SLoader = null;
         public List<string> labels = new List<string>();
         Color currentLineColor = Color.FromArgb(100, 210, 210, 255);
 
@@ -37,10 +39,24 @@ namespace ASMgenerator8080
                 var streamWithASMDesc = new FileStream(DescFile, FileMode.OpenOrCreate);
                 streamWithASMDesc.Write(tmpBytes, 0, tmpBytes.Length);
                 streamWithASMDesc.Close();
+
             }
             catch (Exception)
             {
                 DescFile = null;
+            }
+
+            try
+            {
+                SLoader = Path.GetTempFileName();
+                byte[] tmpBytes = Resources.ReallySmallProgramLoader;
+                var streamWithASMDesc = new FileStream(SLoader, FileMode.OpenOrCreate);
+                streamWithASMDesc.Write(tmpBytes, 0, tmpBytes.Length);
+                streamWithASMDesc.Close();
+            }
+            catch (Exception)
+            {
+                SLoader = null;
             }
 
             InitializeComponent();
@@ -148,7 +164,7 @@ namespace ASMgenerator8080
         //}
         //}
 
-        private void CreateTab(string fileName)
+        private void CreateTab(string fileName, string text = "")
         {
             try
             {
@@ -159,7 +175,8 @@ namespace ASMgenerator8080
                     BorderStyle = BorderStyle.Fixed3D,
                     VirtualSpace = true,
                     LeftPadding = 9,
-                    Language = Language.Custom
+                    Language = Language.Custom,
+                    Text = text
                 };
 
                 var tab = new FATabStripItem(fileName != null ? Path.GetFileName(fileName) : "[new]", tb)
@@ -208,7 +225,9 @@ namespace ASMgenerator8080
             {
                 if (MessageBox.Show(ex.Message, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error) ==
                     DialogResult.Retry)
+                {
                     CreateTab(fileName);
+                }
             }
         }
 
@@ -752,6 +771,7 @@ namespace ASMgenerator8080
 
         private void decompileToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (CurrentTB == null) return;
             var dis = new DisAssembler();
             List<string> tmp = dis.GetAsmCode(Constants.BigProgramLoader, 0x212F);
             string text = "";
@@ -765,6 +785,14 @@ namespace ASMgenerator8080
             }
             CurrentTB.Text = text;
             CurrentTB.CollapseAllFoldingBlocks();
+        }
+
+        private void showSmallLoaderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (SLoader == null) return;
+            string text = File.ReadAllText(SLoader);
+            CreateTab(null, text);
+            UpdateHighlighting(CurrentTB, CurrentTB.Range);
         }
     }
 }

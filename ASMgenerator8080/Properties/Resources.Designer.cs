@@ -78,5 +78,15 @@ namespace ASMgenerator8080.Properties {
                 return ResourceManager.GetString("ASMHighLightingDescFile", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Byte[].
+        /// </summary>
+        internal static byte[] ReallySmallProgramLoader {
+            get {
+                object obj = ResourceManager.GetObject("ReallySmallProgramLoader", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

@@ -117,6 +117,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="favicon.ico" />
+    <None Include="Resources\ReallySmallProgramLoader.asm" />
     <None Include="Resources\asmDesc.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
