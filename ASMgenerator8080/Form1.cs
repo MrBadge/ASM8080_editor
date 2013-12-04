@@ -444,7 +444,7 @@ namespace ASMgenerator8080
             stStrip.Items[0].Text = "Compiling ...";
             Cursor.Current = Cursors.WaitCursor;
             stStrip.Refresh();
-            GetBinary(CurrentTB.Text, 0x2100 + 0x33 + Constants.BigProgramLoader.Length);
+            GetBinary(CurrentTB.Text, Constants.defaultStartingAdress + Constants.smallProgramLoaderSize + Constants.BigProgramLoader.Length);
             stStrip.Items[0].Text = "Done";
             Cursor.Current = Cursors.Default;
         }
@@ -557,7 +557,14 @@ namespace ASMgenerator8080
             {
                 var port = new SerialPort(PS.ComPortName, 4800, Parity.Even, 8, StopBits.Two);
                 port.Open();
-                port.Write(BigLoaderHex, 0, BigLoaderHex.Length);
+                //port.Write(BigLoaderHex, 0, BigLoaderHex.Length)
+                byte[] ba = {0};
+                foreach (var b in BigLoaderHex)
+                {
+                    ba[0] = b;
+                    port.Write(ba, 0, 1);   
+                    Thread.Sleep(20);
+                }
                 port.Close();
             }
             catch (Exception ex)
@@ -580,11 +587,11 @@ namespace ASMgenerator8080
                     MessageBoxIcon.Exclamation);
                 return;
             }
-            if (GetBinary(CurrentTB.Text, 0x2100 + 0x33 + Constants.BigProgramLoader.Length) == null)
+            if (GetBinary(CurrentTB.Text, Constants.defaultStartingAdress + Constants.smallProgramLoaderSize + Constants.BigProgramLoader.Length) == null)
                 return;
             // start address = 0x2100 + small loader size + big loader size
             byte[] tmp = GetNewSettings(PS);
-            Constants.BigProgramLoader[5] = tmp[0];
+            Constants.BigProgramLoader[16] = tmp[0];
             Constants.BigProgramLoader[20] = tmp[1]; //Constants.BigProgramLoader[9] = tmp[1];
             SendBigLoader(Constants.BigProgramLoader);
             var port = new SerialPort(PS.ComPortName, PS.baud, PS.par, PS.databits, PS.sb);
@@ -612,7 +619,12 @@ namespace ASMgenerator8080
                     }
 
                 Cursor.Current = Cursors.WaitCursor;
-                port.Write(data, 0, data.Length);
+                //port.Write(data, 0, data.Length);
+                for (int i = 0; i < data.Length; ++i)
+                {
+                    port.Write(data, i, 1);
+                    Thread.Sleep(20);
+                }
                 Cursor.Current = Cursors.Default;
                 port.Close();
                 stStrip.Items[0].Text = "Sending succesfully comleted";
@@ -723,7 +735,7 @@ namespace ASMgenerator8080
         {
             if (CurrentTB == null) 
                 return;
-            if (GetBinary(CurrentTB.Text, 0x2100 + 0x33 + Constants.BigProgramLoader.Length) == null) return;
+            if (GetBinary(CurrentTB.Text, Constants.defaultStartingAdress + Constants.smallProgramLoaderSize + Constants.BigProgramLoader.Length) == null) return;
             var hexView = new HexDump();
             hexView.viewBinaryDump(BinGen);
         }
