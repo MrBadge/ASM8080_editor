@@ -30,6 +30,8 @@ namespace ASMgenerator8080
         public List<string> labels = new List<string>();
         Color currentLineColor = Color.FromArgb(100, 210, 210, 255);
 
+        private static byte recivedByte = 0;
+
         public Form1()
         {
             try
@@ -571,6 +573,60 @@ namespace ASMgenerator8080
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
+        }
+
+        private byte[] GetMemoryDump(int startAddr, int endAddr)
+        {
+            if (startAddr > endAddr)
+                throw new Exception("startAddr is greater than endAddr");
+            int arrLenght = endAddr - startAddr + 1;
+            byte[] byteArr = new byte[arrLenght];
+            var port = new SerialPort(PS.ComPortName, PS.baud, PS.par, PS.databits, PS.sb);
+            port.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+            try
+            {
+                byte[] ba = {0};
+                ba[0] = 0x01;
+                port.Write(ba, 0, 1);
+                Thread.Sleep(20);
+
+                ba[0] = (byte)((startAddr & 0x0000ff00) >> 8);
+                port.Write(ba, 0, 1);
+                Thread.Sleep(20);
+
+                ba[0] = (byte)((startAddr & 0x000000ff) >> 8);
+                port.Write(ba, 0, 1);
+                Thread.Sleep(20);
+
+                ba[0] = 0x03;
+                for (int i = 0; i < arrLenght; i++)
+                {
+                    port.Write(ba, 0, 1);
+                    byteArr[i] = recivedByte;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            
+        }
+
+        private static void DataReceivedHandler(
+            object sender,
+            SerialDataReceivedEventArgs e)
+        {
+            SerialPort port = (SerialPort)sender;
+            byte[] buffer = new byte[1];
+            try
+            {
+                port.Read(buffer, 0, 1);
+            }
+            catch (Exception)
+            {
+                throw new Exception("Something wrong with recieving data");
+            }
+            recivedByte = buffer[0];
         }
 
         private void sendToKR580ToolStripMenuItem_Click(object sender, EventArgs e)
