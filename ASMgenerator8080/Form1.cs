@@ -29,6 +29,7 @@ namespace ASMgenerator8080
         public string SLoader = null;
         public List<string> labels = new List<string>();
         Color currentLineColor = Color.FromArgb(100, 210, 210, 255);
+        public static int strtAddr = 0x2100;
 
         public Form1()
         {
@@ -771,12 +772,25 @@ namespace ASMgenerator8080
 
         private void decompileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CurrentTB == null) return;
+            
+        }
+
+        private void showSmallLoaderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (SLoader == null) return;
+            string text = File.ReadAllText(SLoader);
+            CreateTab(null, text);
+            UpdateHighlighting(CurrentTB, CurrentTB.Range);
+        }
+
+        private void DisAssembler(string filename, byte[] bytes, int staddr)
+        {
+            if (CurrentTB == null) CreateTab(filename);
             var dis = new DisAssembler();
-            List<string> tmp = dis.GetAsmCode(Constants.BigProgramLoader, 0x212F);
+            List<string> tmp = dis.GetAsmCode(bytes, staddr);
             string text = "";
-            var rg = new Regex(@"[a-fA-f][a-fA-f0-9]*:\s");
-            var folding = false;
+            //var rg = new Regex(@"[a-fA-f][a-fA-f0-9]*:\s");
+            //var folding = false;
             foreach (var line in tmp)
             {
                 //if (rg.IsMatch(line))
@@ -787,12 +801,18 @@ namespace ASMgenerator8080
             CurrentTB.CollapseAllFoldingBlocks();
         }
 
-        private void showSmallLoaderToolStripMenuItem_Click(object sender, EventArgs e)
+        private void fromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (SLoader == null) return;
-            string text = File.ReadAllText(SLoader);
-            CreateTab(null, text);
-            UpdateHighlighting(CurrentTB, CurrentTB.Range);
+            var filename = OpenFile("Choose file to decompile", "All files (*.*)|*.*");
+            if (filename == null) return;
+            var bytes = File.ReadAllBytes(filename);
+            DisAssembler(filename, bytes, 0x2100);
+        }
+
+        private void setStartAddresToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            var prsettings = new ProgramSet();
+            prsettings.ShowDialog(this);
         }
     }
 }

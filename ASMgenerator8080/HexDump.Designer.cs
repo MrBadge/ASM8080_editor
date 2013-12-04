@@ -1,4 +1,7 @@
-﻿namespace ASMgenerator8080
+﻿using System.Security.AccessControl;
+using System.Windows.Forms;
+
+namespace ASMgenerator8080
 {
     partial class HexDump
     {
@@ -41,6 +44,8 @@
             this.dumpView.RowHeadersVisible = false;
             this.dumpView.Size = new System.Drawing.Size(551, 237);
             this.dumpView.TabIndex = 0;
+            this.dumpView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dumpView_KeyDown);
+
             // 
             // HexDump
             // 
@@ -51,6 +56,7 @@
             this.Name = "HexDump";
             this.Text = "HexDump";
             this.Resize += new System.EventHandler(this.HexDump_Resize);
+           
             ((System.ComponentModel.ISupportInitialize)(this.dumpView)).EndInit();
             this.ResumeLayout(false);
 

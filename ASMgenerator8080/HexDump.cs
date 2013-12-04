@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 //using System.Linq;
+using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 //using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -15,17 +18,21 @@ namespace ASMgenerator8080
         private const int fontSize = 9;
         private string fontName = "Courier New";
         private Size padSize;
+        private BinaryGenerator binGen;
+        private readonly SaveFileDialog SFD;
    
         public HexDump()
         {
             InitializeComponent();
+            SFD = new SaveFileDialog();
+            SFD.Title = "Save";
             padSize = new Size(this.Size.Width - dumpView.Size.Width, this.Size.Height - dumpView.Size.Height);
         }
 
         public void viewBinaryDump(BinaryGenerator binGen)
         {
             //if (string.IsNullOrEmpty(source)) return;
-
+            this.binGen = binGen;
             int len = 16;
             string[] dump = binGen.getBinaryDumpToString(len);
             string[] ASCIDump = binGen.getACIIDumpToString(len);
@@ -106,6 +113,33 @@ namespace ASMgenerator8080
             Control control = (Control)sender;
             dumpView.Size = new Size(control.Size.Width - padSize.Width, control.Size.Height - padSize.Height);
             Size = new System.Drawing.Size(592, Height);
+        }
+
+        private void dumpView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyData == (Keys.Control | Keys.S))
+            {
+                Save();
+            }
+        }
+
+        private bool Save()
+        {
+            if (SFD.ShowDialog() != DialogResult.OK)
+                return false;
+
+            ArrayList mem = binGen.getBinaryDump();
+
+            try
+            {
+                File.WriteAllBytes(SFD.FileName, mem.OfType<byte>().ToArray());
+            }
+            catch (Exception ex)
+            {
+                return MessageBox.Show(ex.Message, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Hand) ==
+                       DialogResult.Retry && Save();
+            }
+            return true;
         }
 
     }
