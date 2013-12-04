@@ -21,7 +21,7 @@ init_timer_and_uart:
 ;used registers: A, B, C, HL, DE
 ;input: first byte from terminal is a command
 ;commands:
-;   0 - jump to the latest starting adress
+;   0 - nop
 ;   1 - next two bytes is starting address to write or read
 ;   2 - next byte is byte to write
 ;   3 - read current byte end send to terminal
@@ -30,7 +30,7 @@ programLoader:
     CALL 2117h;readByte 
     MOV A, B 
     ANA A 
-    JZ Addr1; go to start of user''s program if command zero 
+    JZ programLoader; nop 
     SUI 01h 
     JZ programLoader_command_1 
     SUI 01h 

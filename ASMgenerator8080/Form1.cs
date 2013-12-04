@@ -29,6 +29,9 @@ namespace ASMgenerator8080
         public string SLoader = null;
         public List<string> labels = new List<string>();
         Color currentLineColor = Color.FromArgb(100, 210, 210, 255);
+        public static int strtAddr = 0x2100;
+
+        private static byte recivedByte = 0;
 
         public Form1()
         {
@@ -444,7 +447,7 @@ namespace ASMgenerator8080
             stStrip.Items[0].Text = "Compiling ...";
             Cursor.Current = Cursors.WaitCursor;
             stStrip.Refresh();
-            GetBinary(CurrentTB.Text, 0x2100 + 0x33 + Constants.BigProgramLoader.Length);
+            GetBinary(CurrentTB.Text, Constants.defaultStartingAdress + Constants.smallProgramLoaderSize + Constants.BigProgramLoader.Length);
             stStrip.Items[0].Text = "Done";
             Cursor.Current = Cursors.Default;
         }
@@ -557,13 +560,74 @@ namespace ASMgenerator8080
             {
                 var port = new SerialPort(PS.ComPortName, 4800, Parity.Even, 8, StopBits.Two);
                 port.Open();
-                port.Write(BigLoaderHex, 0, BigLoaderHex.Length);
+                //port.Write(BigLoaderHex, 0, BigLoaderHex.Length)
+                byte[] ba = {0};
+                foreach (var b in BigLoaderHex)
+                {
+                    ba[0] = b;
+                    port.Write(ba, 0, 1);   
+                    Thread.Sleep(20);
+                }
                 port.Close();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
             }
+        }
+
+        private byte[] GetMemoryDump(int startAddr, int endAddr)
+        {
+            if (startAddr > endAddr)
+                throw new Exception("startAddr is greater than endAddr");
+            int arrLenght = endAddr - startAddr + 1;
+            byte[] byteArr = new byte[arrLenght];
+            var port = new SerialPort(PS.ComPortName, PS.baud, PS.par, PS.databits, PS.sb);
+            port.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+            try
+            {
+                byte[] ba = {0};
+                ba[0] = 0x01;
+                port.Write(ba, 0, 1);
+                Thread.Sleep(20);
+
+                ba[0] = (byte)((startAddr & 0x0000ff00) >> 8);
+                port.Write(ba, 0, 1);
+                Thread.Sleep(20);
+
+                ba[0] = (byte)((startAddr & 0x000000ff) >> 8);
+                port.Write(ba, 0, 1);
+                Thread.Sleep(20);
+
+                ba[0] = 0x03;
+                for (int i = 0; i < arrLenght; i++)
+                {
+                    port.Write(ba, 0, 1);
+                    byteArr[i] = recivedByte;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            
+        }
+
+        private static void DataReceivedHandler(
+            object sender,
+            SerialDataReceivedEventArgs e)
+        {
+            SerialPort port = (SerialPort)sender;
+            byte[] buffer = new byte[1];
+            try
+            {
+                port.Read(buffer, 0, 1);
+            }
+            catch (Exception)
+            {
+                throw new Exception("Something wrong with recieving data");
+            }
+            recivedByte = buffer[0];
         }
 
         private void sendToKR580ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -580,11 +644,11 @@ namespace ASMgenerator8080
                     MessageBoxIcon.Exclamation);
                 return;
             }
-            if (GetBinary(CurrentTB.Text, 0x2100 + 0x33 + Constants.BigProgramLoader.Length) == null)
+            if (GetBinary(CurrentTB.Text, Constants.defaultStartingAdress + Constants.smallProgramLoaderSize + Constants.BigProgramLoader.Length) == null)
                 return;
             // start address = 0x2100 + small loader size + big loader size
             byte[] tmp = GetNewSettings(PS);
-            Constants.BigProgramLoader[5] = tmp[0];
+            Constants.BigProgramLoader[16] = tmp[0];
             Constants.BigProgramLoader[20] = tmp[1]; //Constants.BigProgramLoader[9] = tmp[1];
             SendBigLoader(Constants.BigProgramLoader);
             var port = new SerialPort(PS.ComPortName, PS.baud, PS.par, PS.databits, PS.sb);
@@ -612,7 +676,12 @@ namespace ASMgenerator8080
                     }
 
                 Cursor.Current = Cursors.WaitCursor;
-                port.Write(data, 0, data.Length);
+                //port.Write(data, 0, data.Length);
+                for (int i = 0; i < data.Length; ++i)
+                {
+                    port.Write(data, i, 1);
+                    Thread.Sleep(20);
+                }
                 Cursor.Current = Cursors.Default;
                 port.Close();
                 stStrip.Items[0].Text = "Sending succesfully comleted";
@@ -723,7 +792,7 @@ namespace ASMgenerator8080
         {
             if (CurrentTB == null) 
                 return;
-            if (GetBinary(CurrentTB.Text, 0x2100 + 0x33 + Constants.BigProgramLoader.Length) == null) return;
+            if (GetBinary(CurrentTB.Text, Constants.defaultStartingAdress + Constants.smallProgramLoaderSize + Constants.BigProgramLoader.Length) == null) return;
             var hexView = new HexDump();
             hexView.viewBinaryDump(BinGen);
         }
@@ -771,6 +840,7 @@ namespace ASMgenerator8080
 
         private void decompileToolStripMenuItem_Click(object sender, EventArgs e)
         {
+<<<<<<< HEAD
             var binFile = OpenFile("Choose binary file to diassembler", "All files (*.*)|*.*");
             if (binFile == null) return;
             if (CurrentTB == null) CreateTab(null);
@@ -795,6 +865,8 @@ namespace ASMgenerator8080
             //{
             //    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Hand);
            //}
+=======
+            
         }
 
         private void showSmallLoaderToolStripMenuItem_Click(object sender, EventArgs e)
@@ -803,6 +875,39 @@ namespace ASMgenerator8080
             string text = File.ReadAllText(SLoader);
             CreateTab(null, text);
             UpdateHighlighting(CurrentTB, CurrentTB.Range);
+        }
+
+        private void DisAssembler(string filename, byte[] bytes, int staddr)
+        {
+            if (CurrentTB == null) CreateTab(filename);
+            var dis = new DisAssembler();
+            List<string> tmp = dis.GetAsmCode(bytes, staddr);
+            string text = "";
+            //var rg = new Regex(@"[a-fA-f][a-fA-f0-9]*:\s");
+            //var folding = false;
+            foreach (var line in tmp)
+            {
+                //if (rg.IsMatch(line))
+                //    folding = true;
+                text += (string)line + "\n";
+            }
+            CurrentTB.Text = text;
+            CurrentTB.CollapseAllFoldingBlocks();
+>>>>>>> 0ee0b5a56088cd24eb39f423d582ca2ac42cd51b
+        }
+
+        private void fromFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var filename = OpenFile("Choose file to decompile", "All files (*.*)|*.*");
+            if (filename == null) return;
+            var bytes = File.ReadAllBytes(filename);
+            DisAssembler(filename, bytes, 0x2100);
+        }
+
+        private void setStartAddresToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            var prsettings = new ProgramSet();
+            prsettings.ShowDialog(this);
         }
     }
 }
