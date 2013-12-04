@@ -153,6 +153,7 @@ namespace ASMgenerator8080
         private const byte maskOpsRegReg = 0xC0;
         private const byte maskOpsRp = 0xCF;
         private const byte maskOpsRpIm16 = 0xCF;
+        private int PosChecker;
 
         private byte GetClearCommand(byte b, byte mask)
         {
@@ -183,133 +184,148 @@ namespace ASMgenerator8080
             var tmpString = "";
             var command = "";
             byte reg;
-            //while (CurPos < bytes.Length)
-            //{
-                //if (ops0.ContainsKey(bytes[CurPos]))
-                    while (CurPos < bytes.Length)
+
+            try
+            {
+                while (CurPos < bytes.Length)
+                {
+                    PosChecker = CurPos;
+                    if (DWList.ContainsKey(startAddr + CurPos))
                     {
+                        LineAddres.Add(LineAddres.Keys.Last() + 2, null);
+                        tmpString = DWList[startAddr + CurPos] + " DW 0x" + bytes[CurPos].ToString("X") +
+                                    bytes[CurPos + 1].ToString("X");
+                        AsmCode.Add(tmpString);
+                        CurPos += 2;
+                    }
+                    else if (DBList.ContainsKey(startAddr + CurPos))
+                    {
+                        LineAddres.Add(LineAddres.Keys.Last() + 1, null);
+                        tmpString = DBList[startAddr + CurPos] + " DB 0x" + bytes[CurPos].ToString("X");
+                        AsmCode.Add(tmpString);
+                        CurPos += 1;
+                    }
+                    else if (ops0.ContainsKey(bytes[CurPos]))
+                    {
+                        AsmCode.Add(ops0[bytes[CurPos]].ToUpper());
+                        LineAddres.Add(LineAddres.Keys.Last() + 1, null);
+                        ++CurPos;
+                    }
+                    else if (opsIm16.ContainsKey(bytes[CurPos]))
+                    {
+                        AddrTmp = (bytes[CurPos + 2] << 8) | (bytes[CurPos + 1]);
+                        LineAddres.Add(LineAddres.Keys.Last() + 3, null);
+                        //if (LineAddresTmp.ContainsKey(AddrTmp))
+                        //AddrTmp = (bytes[CurPos + 2] << 8) | (bytes[CurPos + 1]);
+                        string opStr = opsIm16[bytes[CurPos]].ToLower();
                         if (startAddr != -1)
                         {
-                            if (DWList.ContainsKey(startAddr + CurPos))
-                            {
-                                LineAddres.Add(LineAddres.Keys.Last() + 2, null);
-                                tmpString = DWList[startAddr + CurPos] + " DW 0x" + bytes[CurPos].ToString("X") +
-                                            bytes[CurPos + 1].ToString("X");
-                                AsmCode.Add(tmpString);
-                                CurPos += 2;
-                                continue;
-                            }
-                            if (DBList.ContainsKey(startAddr + CurPos))
-                            {
-                                LineAddres.Add(LineAddres.Keys.Last() + 1, null);
-                                tmpString = DBList[startAddr + CurPos] + " DB 0x" + bytes[CurPos].ToString("X");
-                                AsmCode.Add(tmpString);
-                                CurPos += 1;
-                                continue;
-                            }
+                            if (opStr == "sta")
+                                DBList.Add(AddrTmp, "Data" + lastDataIndex++);
+                            else if (opStr == "shld")
+                                DWList.Add(AddrTmp, "Data" + lastDataIndex++);
                         }
-                        if (ops0.ContainsKey(bytes[CurPos]))
+                        if (LineAddresTmp.ContainsKey(AddrTmp) && LineAddresTmp[AddrTmp] == null)
                         {
-                            AsmCode.Add(ops0[bytes[CurPos]].ToUpper());
+                            LineAddresTmp[AddrTmp] = "Label" + Convert.ToString(CurLabel);
+                            ++CurLabel;
+                        }
+                        tmpString = opsIm16[bytes[CurPos]].ToUpper() + " 0x" + (bytes[CurPos + 2]).ToString("X") +
+                                    (bytes[CurPos + 1]).ToString("X");
+                        AsmCode.Add(tmpString);
+                        CurPos += 3;
+                    }
+                    else if (opsIm8.ContainsKey(bytes[CurPos]))
+                    {
+                        tmpString = opsIm8[bytes[CurPos]].ToUpper() + " 0x" + (bytes[CurPos + 1]).ToString("X");
+                        LineAddres.Add(LineAddres.Keys.Last() + 2, null);
+                        AsmCode.Add(tmpString);
+                        CurPos += 2;
+                    }
+                    else if (opsReg.ContainsKey(Convert.ToByte(bytes[CurPos] & maskOpsReg))) //add
+                    {
+                        command = opsReg[Convert.ToByte(bytes[CurPos] & maskOpsReg)].ToUpper();
+                        reg = Convert.ToByte(bytes[CurPos] & ~maskOpsReg);
+                        if (Rnames.ContainsKey(reg))
+                        {
+                            tmpString = command + " " + Rnames[reg];
                             LineAddres.Add(LineAddres.Keys.Last() + 1, null);
-                            ++CurPos;
-                        }
-                        else if (opsIm16.ContainsKey(bytes[CurPos]))
-                        {
-                            AddrTmp = (bytes[CurPos + 2] << 8) | (bytes[CurPos + 1]);
-                            LineAddres.Add(LineAddres.Keys.Last() + 3, null);
-                            //if (LineAddresTmp.ContainsKey(AddrTmp))
-                                //AddrTmp = (bytes[CurPos + 2] << 8) | (bytes[CurPos + 1]);
-                            string opStr = opsIm16[bytes[CurPos]].ToLower();
-                            if (startAddr != -1)
-                            {
-                                if (opStr == "sta")
-                                    DBList.Add(AddrTmp, "Data" + lastDataIndex++);
-                                else if (opStr == "shld")
-                                    DWList.Add(AddrTmp, "Data" + lastDataIndex++);
-                            }
-                            if (LineAddresTmp.ContainsKey(AddrTmp) && LineAddresTmp[AddrTmp] == null)
-                            {
-                                LineAddresTmp[AddrTmp] = "Label" + Convert.ToString(CurLabel);
-                                ++CurLabel;
-                            }
-                            tmpString = opsIm16[bytes[CurPos]].ToUpper() + " 0x" + (bytes[CurPos + 2]).ToString("X") +
-                                        (bytes[CurPos + 1]).ToString("X");
                             AsmCode.Add(tmpString);
-                            CurPos += 3;
+                            CurPos += 1;
                         }
-                        else if (opsIm8.ContainsKey(bytes[CurPos]))
+                    }
+                    else if (opsRegIm8.ContainsKey(Convert.ToByte(bytes[CurPos] & maskOpsRegIm8)))
+                    {
+                        command = opsRegIm8[Convert.ToByte(bytes[CurPos] & maskOpsRegIm8)].ToUpper();
+                        reg = Convert.ToByte((bytes[CurPos] & ~maskOpsRegIm8) >> 3);
+                        if (Rnames.ContainsKey(reg))
                         {
-                            tmpString = opsIm8[bytes[CurPos]].ToUpper() + " 0x" + (bytes[CurPos + 1]).ToString("X");
+                            tmpString = command + " " + Rnames[reg] + ", 0x" + (bytes[CurPos + 1]).ToString("X");
                             LineAddres.Add(LineAddres.Keys.Last() + 2, null);
                             AsmCode.Add(tmpString);
                             CurPos += 2;
                         }
-                        else if (opsReg.ContainsKey(Convert.ToByte(bytes[CurPos] & maskOpsReg))) //add
-                        {
-                            command = opsReg[Convert.ToByte(bytes[CurPos] & maskOpsReg)].ToUpper();
-                            reg = Convert.ToByte(bytes[CurPos] & ~maskOpsReg);
-                            if (Rnames.ContainsKey(reg))
-                            {
-                                tmpString = command + " " + Rnames[reg];
-                                LineAddres.Add(LineAddres.Keys.Last() + 1, null);
-                                AsmCode.Add(tmpString);
-                                CurPos += 1;
-                            }
-                        }
-                        else if (opsRegIm8.ContainsKey(Convert.ToByte(bytes[CurPos] & maskOpsRegIm8)))
-                        {
-                            command = opsRegIm8[Convert.ToByte(bytes[CurPos] & maskOpsRegIm8)].ToUpper();
-                            reg = Convert.ToByte((bytes[CurPos] & ~maskOpsRegIm8) >> 3);
-                            if (Rnames.ContainsKey(reg))
-                            {
-                                tmpString = command + " " + Rnames[reg] + ", 0x" + (bytes[CurPos + 1]).ToString("X");
-                                LineAddres.Add(LineAddres.Keys.Last() + 2, null);
-                                AsmCode.Add(tmpString);
-                                CurPos += 2;
-                            }
-                        }
-                        else if (opsRegReg.ContainsKey(Convert.ToByte(bytes[CurPos] & maskOpsRegReg))) //mov
-                        {
-                            command = opsRegReg[Convert.ToByte(bytes[CurPos] & maskOpsRegReg)].ToUpper();
-                            var regs = Convert.ToByte(bytes[CurPos] & ~maskOpsRegReg);
-                            var reg1 = Convert.ToByte(regs >> 3);
-                            var reg2 = Convert.ToByte(regs & 7);
-                            if (Rnames.ContainsKey(reg1) && Rnames.ContainsKey(reg2))
-                            {
-                                tmpString = command + " " + Rnames[reg1] + ", " + Rnames[reg2];
-                                LineAddres.Add(LineAddres.Keys.Last() + 1, null);
-                                AsmCode.Add(tmpString);
-                                CurPos += 1;
-                            }
-                        }
-                        else if (opsRp.ContainsKey(Convert.ToByte(bytes[CurPos] & maskOpsRp))) //push
-                        {
-                            command = opsRp[Convert.ToByte(bytes[CurPos] & maskOpsRp)].ToUpper();
-                            reg = Convert.ToByte((bytes[CurPos] & ~maskOpsRp) >> 4);
-                            if (RPnames.ContainsKey(reg))
-                            {
-                                tmpString = command + " " + RPnames[reg];
-                                LineAddres.Add(LineAddres.Keys.Last() + 1, null);
-                                AsmCode.Add(tmpString);
-                                CurPos += 1;
-                            }
-                        }
-                        else if (opsRpIm16.ContainsKey(Convert.ToByte(bytes[CurPos] & maskOpsRpIm16)))
-                        {
-                            command = opsRpIm16[Convert.ToByte(bytes[CurPos] & maskOpsRpIm16)].ToUpper();
-                            reg = Convert.ToByte(bytes[CurPos] & ~maskOpsRpIm16);
-                            if (RPnames.ContainsKey(reg))
-                            {
-                                tmpString = command + " " + RPnames[reg] + ", 0x" +
-                                            (bytes[CurPos + 2]).ToString("X") + (bytes[CurPos + 1]).ToString("X");
-                                LineAddres.Add(LineAddres.Keys.Last() + 3, null);
-                                AsmCode.Add(tmpString);
-                                CurPos += 3;
-                            }
-                        }
-                        //tmpString = "";
                     }
+                    else if (opsRegReg.ContainsKey(Convert.ToByte(bytes[CurPos] & maskOpsRegReg))) //mov
+                    {
+                        command = opsRegReg[Convert.ToByte(bytes[CurPos] & maskOpsRegReg)].ToUpper();
+                        var regs = Convert.ToByte(bytes[CurPos] & ~maskOpsRegReg);
+                        var reg1 = Convert.ToByte(regs >> 3);
+                        var reg2 = Convert.ToByte(regs & 7);
+                        if (Rnames.ContainsKey(reg1) && Rnames.ContainsKey(reg2))
+                        {
+                            tmpString = command + " " + Rnames[reg1] + ", " + Rnames[reg2];
+                            LineAddres.Add(LineAddres.Keys.Last() + 1, null);
+                            AsmCode.Add(tmpString);
+                            CurPos += 1;
+                        }
+                    }
+                    else if (opsRp.ContainsKey(Convert.ToByte(bytes[CurPos] & maskOpsRp))) //push
+                    {
+                        command = opsRp[Convert.ToByte(bytes[CurPos] & maskOpsRp)].ToUpper();
+                        reg = Convert.ToByte((bytes[CurPos] & ~maskOpsRp) >> 4);
+                        if (RPnames.ContainsKey(reg))
+                        {
+                            tmpString = command + " " + RPnames[reg];
+                            LineAddres.Add(LineAddres.Keys.Last() + 1, null);
+                            AsmCode.Add(tmpString);
+                            CurPos += 1;
+                        }
+                    }
+                    else if (opsRpIm16.ContainsKey(Convert.ToByte(bytes[CurPos] & maskOpsRpIm16)))
+                    {
+                        command = opsRpIm16[Convert.ToByte(bytes[CurPos] & maskOpsRpIm16)].ToUpper();
+                        reg = Convert.ToByte(bytes[CurPos] & ~maskOpsRpIm16);
+                        if (RPnames.ContainsKey(reg))
+                        {
+                            tmpString = command + " " + RPnames[reg] + ", 0x" +
+                                        (bytes[CurPos + 2]).ToString("X") + (bytes[CurPos + 1]).ToString("X");
+                            LineAddres.Add(LineAddres.Keys.Last() + 3, null);
+                            AsmCode.Add(tmpString);
+                            CurPos += 3;
+                        }
+                        else
+                        {
+                            throw new Exception("Invalid binary data");
+                        }
+                    }
+                    else
+                    {
+                        AddrTmp = (startAddr == -1) ? CurPos : startAddr + CurPos;
+                        DBList.Add(AddrTmp, "Data" + lastDataIndex++);
+                        LineAddres.Add(LineAddres.Keys.Last() + 1, null);
+                        tmpString = "Data" + (lastDataIndex - 1) + " DB 0x" + bytes[CurPos].ToString("X");
+                        AsmCode.Add(tmpString);
+                        ++CurPos;
+                    }
+                    //tmpString = "";
+                }
+            }
+            catch (IndexOutOfRangeException ex)
+            {
+
+            }
+                    
                 //var tmp = new ArrayList();
                 foreach (var addrTmp in LineAddresTmp)
                 {

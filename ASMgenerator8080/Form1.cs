@@ -771,20 +771,30 @@ namespace ASMgenerator8080
 
         private void decompileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CurrentTB == null) return;
+            var binFile = OpenFile("Choose binary file to diassembler", "All files (*.*)|*.*");
+            if (binFile == null) return;
+            if (CurrentTB == null) CreateTab(null);
+            var bytesArr = File.ReadAllBytes(binFile);
             var dis = new DisAssembler();
-            List<string> tmp = dis.GetAsmCode(Constants.BigProgramLoader, 0x212F);
-            string text = "";
-            var rg = new Regex(@"[a-fA-f][a-fA-f0-9]*:\s");
-            var folding = false;
-            foreach (var line in tmp)
-            {
-                //if (rg.IsMatch(line))
-                //    folding = true;
-                text += (string)line + "\n";
-            }
-            CurrentTB.Text = text;
-            CurrentTB.CollapseAllFoldingBlocks();
+            //try
+            //{
+                List<string> tmp = dis.GetAsmCode(bytesArr /*Constants.BigProgramLoader*/, 0x212F);
+                string text = "";
+                var rg = new Regex(@"[a-fA-f][a-fA-f0-9]*:\s");
+                var folding = false;
+                foreach (var line in tmp)
+                {
+                    //if (rg.IsMatch(line))
+                    //    folding = true;
+                    text += (string) line + "\n";
+                }
+                CurrentTB.Text = text;
+                CurrentTB.CollapseAllFoldingBlocks();
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Hand);
+           //}
         }
 
         private void showSmallLoaderToolStripMenuItem_Click(object sender, EventArgs e)
