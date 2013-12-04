@@ -565,8 +565,8 @@ namespace ASMgenerator8080
                 foreach (var b in BigLoaderHex)
                 {
                     ba[0] = b;
-                    port.Write(ba, 0, 1);   
-                    Thread.Sleep(20);
+                    port.Write(ba, 0, 1);
+                    Thread.Sleep(Constants.sleepDelay);
                 }
                 port.Close();
             }
@@ -578,42 +578,40 @@ namespace ASMgenerator8080
 
         private byte[] GetMemoryDump(int startAddr, int endAddr)
         {
-            if (startAddr > endAddr)
-                throw new Exception("startAddr is greater than endAddr");
+            if (endAddr < startAddr)
+                throw new Exception("Ending adress is less than starting Adress");
+
             int arrLenght = endAddr - startAddr + 1;
             byte[] byteArr = new byte[arrLenght];
+
             var port = new SerialPort(PS.ComPortName, PS.baud, PS.par, PS.databits, PS.sb);
-            port.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
-            try
+            port.DataReceived += new SerialDataReceivedEventHandler(ByteRecievedHandler);
+
+            byte[] ba = {0};
+
+            ba[0] = 0x01;
+            port.Write(ba, 0, 1);
+            Thread.Sleep(Constants.sleepDelay);
+
+            ba[0] = (byte)((startAddr & 0x0000ff00) >> 8);
+            port.Write(ba, 0, 1);
+            Thread.Sleep(Constants.sleepDelay);
+
+            ba[0] = (byte)((startAddr & 0x000000ff) >> 8);
+            port.Write(ba, 0, 1);
+            Thread.Sleep(Constants.sleepDelay);
+
+            ba[0] = 0x03;
+            for (int i = 0; i < arrLenght; i++)
             {
-                byte[] ba = {0};
-                ba[0] = 0x01;
                 port.Write(ba, 0, 1);
-                Thread.Sleep(20);
-
-                ba[0] = (byte)((startAddr & 0x0000ff00) >> 8);
-                port.Write(ba, 0, 1);
-                Thread.Sleep(20);
-
-                ba[0] = (byte)((startAddr & 0x000000ff) >> 8);
-                port.Write(ba, 0, 1);
-                Thread.Sleep(20);
-
-                ba[0] = 0x03;
-                for (int i = 0; i < arrLenght; i++)
-                {
-                    port.Write(ba, 0, 1);
-                    byteArr[i] = recivedByte;
-                }
+                Thread.Sleep(Constants.sleepDelay);
+                byteArr[i] = recivedByte;
             }
-            catch (Exception ex)
-            {
-                throw;
-            }
-            
+            return byteArr;
         }
 
-        private static void DataReceivedHandler(
+        private static void ByteRecievedHandler(
             object sender,
             SerialDataReceivedEventArgs e)
         {
@@ -680,7 +678,7 @@ namespace ASMgenerator8080
                 for (int i = 0; i < data.Length; ++i)
                 {
                     port.Write(data, i, 1);
-                    Thread.Sleep(20);
+                    Thread.Sleep(Constants.sleepDelay);
                 }
                 Cursor.Current = Cursors.Default;
                 port.Close();
