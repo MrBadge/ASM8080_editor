@@ -605,6 +605,7 @@ namespace ASMgenerator8080
                     port.Write(ba, 0, 1);
                     byteArr[i] = recivedByte;
                 }
+                return byteArr;
             }
             catch (Exception ex)
             {
@@ -840,33 +841,7 @@ namespace ASMgenerator8080
 
         private void decompileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-<<<<<<< HEAD
-            var binFile = OpenFile("Choose binary file to diassembler", "All files (*.*)|*.*");
-            if (binFile == null) return;
-            if (CurrentTB == null) CreateTab(null);
-            var bytesArr = File.ReadAllBytes(binFile);
-            var dis = new DisAssembler();
-            //try
-            //{
-                List<string> tmp = dis.GetAsmCode(bytesArr /*Constants.BigProgramLoader*/, 0x212F);
-                string text = "";
-                var rg = new Regex(@"[a-fA-f][a-fA-f0-9]*:\s");
-                var folding = false;
-                foreach (var line in tmp)
-                {
-                    //if (rg.IsMatch(line))
-                    //    folding = true;
-                    text += (string) line + "\n";
-                }
-                CurrentTB.Text = text;
-                CurrentTB.CollapseAllFoldingBlocks();
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Hand);
-           //}
-=======
-            
+
         }
 
         private void showSmallLoaderToolStripMenuItem_Click(object sender, EventArgs e)
@@ -893,7 +868,6 @@ namespace ASMgenerator8080
             }
             CurrentTB.Text = text;
             CurrentTB.CollapseAllFoldingBlocks();
->>>>>>> 0ee0b5a56088cd24eb39f423d582ca2ac42cd51b
         }
 
         private void fromFileToolStripMenuItem_Click(object sender, EventArgs e)
