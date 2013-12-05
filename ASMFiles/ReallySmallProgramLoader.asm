@@ -30,4 +30,3 @@ smallPrLoad:
     INX H
     ANA A
     JNZ smallPrLoad
- 
