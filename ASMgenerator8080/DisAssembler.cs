@@ -185,9 +185,9 @@ namespace ASMgenerator8080
             var command = "";
             byte reg;
 
-            try
+            while (CurPos < bytes.Length)
             {
-                while (CurPos < bytes.Length)
+                try
                 {
                     PosChecker = CurPos;
                     if (DWList.ContainsKey(startAddr + CurPos))
@@ -253,6 +253,8 @@ namespace ASMgenerator8080
                             AsmCode.Add(tmpString);
                             CurPos += 1;
                         }
+                        else
+                            throw new Exception("1");
                     }
                     else if (opsRegIm8.ContainsKey(Convert.ToByte(bytes[CurPos] & maskOpsRegIm8)))
                     {
@@ -265,6 +267,8 @@ namespace ASMgenerator8080
                             AsmCode.Add(tmpString);
                             CurPos += 2;
                         }
+                        else
+                            throw new Exception("1");
                     }
                     else if (opsRegReg.ContainsKey(Convert.ToByte(bytes[CurPos] & maskOpsRegReg))) //mov
                     {
@@ -279,6 +283,8 @@ namespace ASMgenerator8080
                             AsmCode.Add(tmpString);
                             CurPos += 1;
                         }
+                        else
+                            throw new Exception("1");
                     }
                     else if (opsRp.ContainsKey(Convert.ToByte(bytes[CurPos] & maskOpsRp))) //push
                     {
@@ -291,6 +297,8 @@ namespace ASMgenerator8080
                             AsmCode.Add(tmpString);
                             CurPos += 1;
                         }
+                        else
+                            throw new Exception("1");
                     }
                     else if (opsRpIm16.ContainsKey(Convert.ToByte(bytes[CurPos] & maskOpsRpIm16)))
                     {
@@ -305,12 +313,16 @@ namespace ASMgenerator8080
                             CurPos += 3;
                         }
                         else
-                        {
-                            throw new Exception("Invalid binary data");
-                        }
+                            throw new Exception("1");
                     }
-                    else
+                    throw new Exception("1");
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message == "1")
                     {
+                        if (CurPos == bytes.Length)
+                            break;
                         AddrTmp = (startAddr == -1) ? CurPos : startAddr + CurPos;
                         DBList.Add(AddrTmp, "Data" + lastDataIndex++);
                         LineAddres.Add(LineAddres.Keys.Last() + 1, null);
@@ -318,12 +330,11 @@ namespace ASMgenerator8080
                         AsmCode.Add(tmpString);
                         ++CurPos;
                     }
-                    //tmpString = "";
+                    else
+                        throw;
                 }
-            }
-            catch (IndexOutOfRangeException ex)
-            {
-
+                
+                //tmpString = "";
             }
                     
                 //var tmp = new ArrayList();

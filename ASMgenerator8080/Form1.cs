@@ -880,5 +880,10 @@ namespace ASMgenerator8080
             var prsettings = new ProgramSet();
             prsettings.ShowDialog(this);
         }
+
+        private void fromMemoryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

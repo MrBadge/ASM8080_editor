@@ -38,7 +38,7 @@ namespace ASMgenerator8080
             }
             else
             {
-                Form1.strtAddr = Convert.ToInt16(textBox1.Text);
+                Form1.strtAddr = Convert.ToInt16(textBox1.Text, 16);
                 this.Close();
             }
         }
