@@ -173,12 +173,12 @@ namespace ASMgenerator8080
             if (startAddr != -1)
             {
                 LineAddres.Add(startAddr, null);
-                LineAddresTmp.Add(startAddr, null);
-                for (var i = 0; i < bytes.Length; ++i)
-                {
-                    LineAddresTmp.Add(LineAddresTmp.Keys.Last() + 1, null);
-                }
-                CurLabel = 0;
+                //LineAddresTmp.Add(startAddr, null);
+                //for (var i = 0; i < bytes.Length; ++i)
+                //{
+                //    LineAddresTmp.Add(LineAddresTmp.Keys.Last() + 1, null);
+                //}
+                //CurLabel = 0;
             }
             int CurPos = 0;
             var tmpString = "";
@@ -221,13 +221,28 @@ namespace ASMgenerator8080
                         if (startAddr != -1)
                         {
                             if (opStr == "sta")
-                                DBList.Add(AddrTmp, "Data" + lastDataIndex++);
+                            {
+                                if (!DBList.ContainsKey(AddrTmp))
+                                {
+                                    DBList.Add(AddrTmp, "Data" + lastDataIndex++);
+                                }
+                            }
                             else if (opStr == "shld")
-                                DWList.Add(AddrTmp, "Data" + lastDataIndex++);
+                            {
+                                if (!DWList.ContainsKey(AddrTmp))
+                                {
+                                    DWList.Add(AddrTmp, "Data" + lastDataIndex++);
+                                }
+                            }
+
+
                         }
-                        if (LineAddresTmp.ContainsKey(AddrTmp) && LineAddresTmp[AddrTmp] == null)
+                        if (AddrTmp < startAddr + bytes.Length && AddrTmp >= startAddr)
                         {
-                            LineAddresTmp[AddrTmp] = "Label" + Convert.ToString(CurLabel);
+                            if (!LineAddresTmp.ContainsKey(AddrTmp))
+                            {
+                                LineAddresTmp.Add(AddrTmp, "Label" + Convert.ToString(CurLabel));
+                            }
                             ++CurLabel;
                         }
                         tmpString = opsIm16[bytes[CurPos]].ToUpper() + " 0x" + (bytes[CurPos + 2]).ToString("X") +
@@ -324,7 +339,10 @@ namespace ASMgenerator8080
                         if (CurPos == bytes.Length)
                             break;
                         AddrTmp = (startAddr == -1) ? CurPos : startAddr + CurPos;
-                        DBList.Add(AddrTmp, "Data" + lastDataIndex++);
+                        if (!DBList.ContainsKey(AddrTmp))
+                        {
+                            DBList.Add(AddrTmp, "Data" + lastDataIndex++);
+                        }
                         LineAddres.Add(LineAddres.Keys.Last() + 1, null);
                         tmpString = "Data" + (lastDataIndex - 1) + " DB 0x" + bytes[CurPos].ToString("X");
                         AsmCode.Add(tmpString);
@@ -333,64 +351,64 @@ namespace ASMgenerator8080
                     else
                         throw;
                 }
-                
+
                 //tmpString = "";
             }
-                    
-                //var tmp = new ArrayList();
-                foreach (var addrTmp in LineAddresTmp)
+
+            //var tmp = new ArrayList();
+            foreach (var addrTmp in LineAddresTmp)
+            {
+                if (LineAddres.ContainsKey(addrTmp.Key))
                 {
-                    if (addrTmp.Value != null)
-                    {
-                        LineAddres[addrTmp.Key] = addrTmp.Value;
-                    }
+                    LineAddres[addrTmp.Key] = LineAddresTmp[addrTmp.Key];
                 }
-                var tmpByte = "";
-                foreach (var addr in LineAddres)
+            }
+            var tmpByte = "";
+            foreach (var addr in LineAddres)
+            {
+                if (addr.Value != null)
                 {
-                    if (addr.Value != null)
+                    tmpByte = (Convert.ToByte((addr.Key & 0xff00) >> 8).ToString("X") +
+                               Convert.ToByte(addr.Key & 0xff).ToString("X"));
+                    if (!(DWList.ContainsKey(Convert.ToInt16(tmpByte, 16)) || DBList.ContainsKey(Convert.ToInt16(tmpByte, 16))))
+                        for (int i = 0; i < AsmCode.Count; ++i)
+                        {
+                            AsmCode[i] = AsmCode[i].Replace("0x" + tmpByte,
+                                (addr.Value) + " ;" + "0x" + tmpByte);
+                        }
+                    else if (DWList.ContainsKey(Convert.ToInt16(tmpByte, 16)))
+                        for (int i = 0; i < AsmCode.Count; ++i)
+                        {
+                            AsmCode[i] = AsmCode[i].Replace("0x" + tmpByte,
+                                (DWList[addr.Key]) + " ;" + "0x" + tmpByte);
+                        }
+                    else
                     {
-                        tmpByte = (Convert.ToByte((addr.Key & 0xff00) >> 8).ToString("X") +
-                                   Convert.ToByte(addr.Key & 0xff).ToString("X"));
-                        if (!(DWList.ContainsKey(Convert.ToInt16(tmpByte, 16)) || DBList.ContainsKey(Convert.ToInt16(tmpByte, 16))))
-                            for (int i = 0; i < AsmCode.Count; ++i)
-                            {
-                                AsmCode[i] = AsmCode[i].Replace("0x" + tmpByte,
-                                    (addr.Value) + " ;" + "0x" + tmpByte);
-                            }
-                        else if (DWList.ContainsKey(Convert.ToInt16(tmpByte, 16)))
-                            for (int i = 0; i < AsmCode.Count; ++i)
-                            {
-                                AsmCode[i] = AsmCode[i].Replace("0x" + tmpByte,
-                                    (DWList[addr.Key]) + " ;" + "0x" + tmpByte);
-                            }
+                        for (int i = 0; i < AsmCode.Count; ++i)
+                        {
+                            AsmCode[i] = AsmCode[i].Replace("0x" + tmpByte,
+                                (DBList[addr.Key]) + " ;" + "0x" + tmpByte);
+                        }
+                    }
+                    var index = 0;
+                    foreach (var addres in LineAddres)
+                    {
+                        if ((addres.Key == addr.Key))
+                        {
+                            //if (DWList.ContainsKey(addres.Key))
+                            //    AsmCode[index] = addres.Value + " " + AsmCode[index];
+                            //else
+                            if ((index < AsmCode.Count) && !(DWList.ContainsKey(addres.Key) || DBList.ContainsKey(addres.Key)))
+                                AsmCode[index] = addres.Value + ":\n" + AsmCode[index];
+                            break;
+                        }
                         else
                         {
-                            for (int i = 0; i < AsmCode.Count; ++i)
-                            {
-                                AsmCode[i] = AsmCode[i].Replace("0x" + tmpByte,
-                                    (DBList[addr.Key]) + " ;" + "0x" + tmpByte);
-                            }
-                        }
-                        var index = 0;
-                        foreach (var addres in LineAddres)
-                        {
-                            if ((addres.Key == addr.Key) )
-                            {
-                                //if (DWList.ContainsKey(addres.Key))
-                                //    AsmCode[index] = addres.Value + " " + AsmCode[index];
-                                //else
-                                if ((index < AsmCode.Count) && !(DWList.ContainsKey(addres.Key) || DBList.ContainsKey(addres.Key)))
-                                    AsmCode[index] = addres.Value + ":\n" + AsmCode[index];
-                                break;
-                            }
-                            else
-                            {
-                                ++index;
-                            }
+                            ++index;
                         }
                     }
                 }
+            }
             return AsmCode;
         }
     }
