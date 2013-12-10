@@ -330,7 +330,10 @@ namespace ASMgenerator8080
                         else
                             throw new Exception("1");
                     }
-                    throw new Exception("1");
+                    else
+                    {
+                        throw new Exception("1");
+                    }
                 }
                 catch (Exception ex)
                 {

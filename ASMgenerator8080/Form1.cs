@@ -909,7 +909,8 @@ namespace ASMgenerator8080
 
         private void fromMemoryToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            var tmp = GetMemoryDump(readFrom, readTo);
+            var tmp = Constants.BigProgramLoader;
+            //var tmp = GetMemoryDump(readFrom, readTo);
             if (tmp != null)
             {
                 DisAssembler(tmp, strtAddr, Convert.ToString(readFrom) + "-" + Convert.ToString(readTo));
