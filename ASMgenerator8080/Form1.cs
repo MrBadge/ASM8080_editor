@@ -30,6 +30,8 @@ namespace ASMgenerator8080
         public List<string> labels = new List<string>();
         Color currentLineColor = Color.FromArgb(100, 210, 210, 255);
         public static int strtAddr = 0x2100;
+        public static int readFrom = 0x2100;
+        public static int readTo = 0x2100;
 
         private static byte recivedByte = 0;
 
@@ -584,6 +586,12 @@ namespace ASMgenerator8080
             int arrLenght = endAddr - startAddr + 1;
             byte[] byteArr = new byte[arrLenght];
 
+            if (string.IsNullOrEmpty(PS.ComPortName))
+            {
+                MessageBox.Show("Choose an appropriate COM-Port first", "Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Exclamation);
+                return null;
+            }
             var port = new SerialPort(PS.ComPortName, PS.baud, PS.par, PS.databits, PS.sb);
             port.DataReceived += new SerialDataReceivedEventHandler(ByteRecievedHandler);
 
@@ -597,7 +605,7 @@ namespace ASMgenerator8080
             port.Write(ba, 0, 1);
             Thread.Sleep(Constants.sleepDelay);
 
-            ba[0] = (byte)((startAddr & 0x000000ff) >> 8);
+            ba[0] = (byte)(startAddr & 0x000000ff);
             port.Write(ba, 0, 1);
             Thread.Sleep(Constants.sleepDelay);
 
@@ -790,7 +798,10 @@ namespace ASMgenerator8080
         {
             if (CurrentTB == null) 
                 return;
-            if (GetBinary(CurrentTB.Text, Constants.defaultStartingAdress + Constants.smallProgramLoaderSize + Constants.BigProgramLoader.Length) == null) return;
+            if (
+                GetBinary(CurrentTB.Text,
+                    Constants.defaultStartingAdress + Constants.smallProgramLoaderSize +
+                    Constants.BigProgramLoader.Length) == null) return;
             var hexView = new HexDump();
             hexView.viewBinaryDump(BinGen);
         }
@@ -849,41 +860,72 @@ namespace ASMgenerator8080
             UpdateHighlighting(CurrentTB, CurrentTB.Range);
         }
 
-        private void DisAssembler(string filename, byte[] bytes, int staddr)
+        private void DisAssembler(byte[] bytes, int staddr, string tabname = null)
         {
-            if (CurrentTB == null) CreateTab(filename);
+            if (CurrentTB == null) CreateTab(tabname);
             var dis = new DisAssembler();
-            List<string> tmp = dis.GetAsmCode(bytes, staddr);
-            string text = "";
-            //var rg = new Regex(@"[a-fA-f][a-fA-f0-9]*:\s");
-            //var folding = false;
-            foreach (var line in tmp)
+            try
             {
-                //if (rg.IsMatch(line))
-                //    folding = true;
-                text += (string)line + "\n";
+                List<string> tmp = dis.GetAsmCode(bytes, staddr);
+                string text = "";
+                //var rg = new Regex(@"[a-fA-f][a-fA-f0-9]*:\s");
+                //var folding = false;
+                foreach (var line in tmp)
+                {
+                    //if (rg.IsMatch(line))
+                    //    folding = true;
+                    text += (string) line + "\n";
+                }
+                CurrentTB.Text = text;
+                CurrentTB.CollapseAllFoldingBlocks();
             }
-            CurrentTB.Text = text;
-            CurrentTB.CollapseAllFoldingBlocks();
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
-        private void fromFileToolStripMenuItem_Click(object sender, EventArgs e)
+        private void fromFileToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             var filename = OpenFile("Choose file to decompile", "All files (*.*)|*.*");
             if (filename == null) return;
             var bytes = File.ReadAllBytes(filename);
-            DisAssembler(filename, bytes, 0x2100);
+            DisAssembler(bytes, strtAddr, filename);
         }
 
-        private void setStartAddresToolStripMenuItem1_Click(object sender, EventArgs e)
+        private void getMemoryDumpToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var prsettings = new ProgramSet();
-            prsettings.ShowDialog(this);
+            var tmp = Constants.BigProgramLoader;//GetMemoryDump(readFrom, readTo);
+            if (tmp != null)
+            {
+                var hexView = new HexDump();
+                hexView.viewBinaryDump(tmp, strtAddr);
+            }
+            else
+            {
+                MessageBox.Show("Error reading from memory", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
+        private void fromMemoryToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            var tmp = GetMemoryDump(readFrom, readTo);
+            if (tmp != null)
+            {
+                DisAssembler(tmp, strtAddr, Convert.ToString(readFrom) + "-" + Convert.ToString(readTo));
+            }
+            else
+            {
+                MessageBox.Show("Error reading from memory", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+<<<<<<< HEAD
         private void fromMemoryToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
         }
+=======
+>>>>>>> 162d57daca4888a3aab35dbed127f171bee4b08a
     }
 }
