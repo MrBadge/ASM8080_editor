@@ -895,7 +895,7 @@ namespace ASMgenerator8080
 
         private void getMemoryDumpToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var tmp = Constants.BigProgramLoader;//GetMemoryDump(readFrom, readTo);
+            var tmp = GetMemoryDump(readFrom, readTo);
             if (tmp != null)
             {
                 var hexView = new HexDump();
