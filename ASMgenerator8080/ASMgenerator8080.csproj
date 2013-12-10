@@ -63,8 +63,9 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="FastColoredTextBox">
       <HintPath>..\FastColoredTextBox.dll</HintPath>
@@ -110,12 +111,6 @@
       <DependentUpon>PortSettings.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
-    <Compile Include="ProgramSet.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ProgramSet.Designer.cs">
-      <DependentUpon>ProgramSet.cs</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
@@ -126,15 +121,11 @@
     <EmbeddedResource Include="PortSettings.resx">
       <DependentUpon>PortSettings.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ProgramSet.resx">
-      <DependentUpon>ProgramSet.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="ASMgenerator8080_TemporaryKey.pfx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

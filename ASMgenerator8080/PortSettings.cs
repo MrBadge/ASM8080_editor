@@ -6,12 +6,15 @@ using System.Drawing;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace ASMgenerator8080
 {
     public partial class PortSettings : Form
     {
+        private static Regex reg = new Regex(@"0x[A-Fa-f0-9]{4}");
+
         public PortSettings(ComPortSettings tmp)
         {
             InitializeComponent();
@@ -47,11 +50,49 @@ namespace ASMgenerator8080
 
         private void button1_Click(object sender, EventArgs e)
         {
+            var error = false;
+            if (startAddr.Text.Length > 6 || !reg.IsMatch(startAddr.Text))
+            {
+                startAddr.Focus();
+                startAddr.SelectionStart = 0;
+                startAddr.SelectionLength = startAddr.Text.Length;
+                error = true;
+            }
+            else
+            {
+                Form1.strtAddr = Convert.ToUInt16(startAddr.Text, 16);
+            }
+            if (!error)
+            if (readFrom.Text.Length > 6 || !reg.IsMatch(readFrom.Text))
+            {
+                readFrom.Focus();
+                readFrom.SelectionStart = 0;
+                readFrom.SelectionLength = readFrom.Text.Length;
+                error = true;
+            }
+            else
+            {
+                Form1.readFrom = Convert.ToUInt16(readFrom.Text, 16);
+            }
+            if (!error)
+            if (readTo.Text.Length > 6 || !reg.IsMatch(readTo.Text))
+            {
+                readTo.Focus();
+                readTo.SelectionStart = 0;
+                readTo.SelectionLength = readTo.Text.Length;
+                error = true;
+            }
+            else
+            {
+                Form1.readTo = Convert.ToUInt16(readTo.Text, 16);
+            }
+            
             Form1.PS.databits = (int) databits.SelectedItem;
             Form1.PS.baud = (int) baud.SelectedItem;
             Form1.PS.par = (Parity) parity.SelectedItem;
             Form1.PS.sb = (StopBits) stopbits.SelectedItem;
-            Close();
+            if (!error)
+                Close();
         }
     }
 }
