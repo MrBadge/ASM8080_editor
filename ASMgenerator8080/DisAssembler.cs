@@ -354,12 +354,6 @@ namespace ASMgenerator8080
 
                 //tmpString = "";
             }
-<<<<<<< HEAD
-=======
-            catch (IndexOutOfRangeException ex)
-            {
-            }
->>>>>>> 162d57daca4888a3aab35dbed127f171bee4b08a
 
             //var tmp = new ArrayList();
             foreach (var addrTmp in LineAddresTmp)
@@ -376,13 +370,9 @@ namespace ASMgenerator8080
                 {
                     tmpByte = (Convert.ToByte((addr.Key & 0xff00) >> 8).ToString("X") +
                                Convert.ToByte(addr.Key & 0xff).ToString("X"));
-<<<<<<< HEAD
-                    if (!(DWList.ContainsKey(Convert.ToInt16(tmpByte, 16)) || DBList.ContainsKey(Convert.ToInt16(tmpByte, 16))))
-=======
                     if (
                         !(DWList.ContainsKey(Convert.ToInt16(tmpByte, 16)) ||
                           DBList.ContainsKey(Convert.ToInt16(tmpByte, 16))))
->>>>>>> 162d57daca4888a3aab35dbed127f171bee4b08a
                         for (int i = 0; i < AsmCode.Count; ++i)
                         {
                             AsmCode[i] = AsmCode[i].Replace("0x" + tmpByte,
@@ -410,12 +400,8 @@ namespace ASMgenerator8080
                             //if (DWList.ContainsKey(addres.Key))
                             //    AsmCode[index] = addres.Value + " " + AsmCode[index];
                             //else
-<<<<<<< HEAD
-                            if ((index < AsmCode.Count) && !(DWList.ContainsKey(addres.Key) || DBList.ContainsKey(addres.Key)))
-=======
                             if ((index < AsmCode.Count) &&
                                 !(DWList.ContainsKey(addres.Key) || DBList.ContainsKey(addres.Key)))
->>>>>>> 162d57daca4888a3aab35dbed127f171bee4b08a
                                 AsmCode[index] = addres.Value + ":\n" + AsmCode[index];
                             break;
                         }

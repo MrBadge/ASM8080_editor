@@ -920,12 +920,5 @@ namespace ASMgenerator8080
             }
         }
 
-<<<<<<< HEAD
-        private void fromMemoryToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-=======
->>>>>>> 162d57daca4888a3aab35dbed127f171bee4b08a
     }
 }
