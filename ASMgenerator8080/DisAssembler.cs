@@ -323,63 +323,65 @@ namespace ASMgenerator8080
             }
             catch (IndexOutOfRangeException ex)
             {
-
             }
-                    
-                //var tmp = new ArrayList();
-                foreach (var addrTmp in LineAddresTmp)
+
+            //var tmp = new ArrayList();
+            foreach (var addrTmp in LineAddresTmp)
+            {
+                if (LineAddres.ContainsKey(addrTmp.Key))
                 {
-                    if (addrTmp.Value != null)
-                    {
-                        LineAddres[addrTmp.Key] = addrTmp.Value;
-                    }
+                    LineAddres[addrTmp.Key] = LineAddresTmp[addrTmp.Key];
                 }
-                var tmpByte = "";
-                foreach (var addr in LineAddres)
+            }
+            var tmpByte = "";
+            foreach (var addr in LineAddres)
+            {
+                if (addr.Value != null)
                 {
-                    if (addr.Value != null)
+                    tmpByte = (Convert.ToByte((addr.Key & 0xff00) >> 8).ToString("X") +
+                               Convert.ToByte(addr.Key & 0xff).ToString("X"));
+                    if (
+                        !(DWList.ContainsKey(Convert.ToInt16(tmpByte, 16)) ||
+                          DBList.ContainsKey(Convert.ToInt16(tmpByte, 16))))
+                        for (int i = 0; i < AsmCode.Count; ++i)
+                        {
+                            AsmCode[i] = AsmCode[i].Replace("0x" + tmpByte,
+                                (addr.Value) + " ;" + "0x" + tmpByte);
+                        }
+                    else if (DWList.ContainsKey(Convert.ToInt16(tmpByte, 16)))
+                        for (int i = 0; i < AsmCode.Count; ++i)
+                        {
+                            AsmCode[i] = AsmCode[i].Replace("0x" + tmpByte,
+                                (DWList[addr.Key]) + " ;" + "0x" + tmpByte);
+                        }
+                    else
                     {
-                        tmpByte = (Convert.ToByte((addr.Key & 0xff00) >> 8).ToString("X") +
-                                   Convert.ToByte(addr.Key & 0xff).ToString("X"));
-                        if (!(DWList.ContainsKey(Convert.ToInt16(tmpByte, 16)) || DBList.ContainsKey(Convert.ToInt16(tmpByte, 16))))
-                            for (int i = 0; i < AsmCode.Count; ++i)
-                            {
-                                AsmCode[i] = AsmCode[i].Replace("0x" + tmpByte,
-                                    (addr.Value) + " ;" + "0x" + tmpByte);
-                            }
-                        else if (DWList.ContainsKey(Convert.ToInt16(tmpByte, 16)))
-                            for (int i = 0; i < AsmCode.Count; ++i)
-                            {
-                                AsmCode[i] = AsmCode[i].Replace("0x" + tmpByte,
-                                    (DWList[addr.Key]) + " ;" + "0x" + tmpByte);
-                            }
+                        for (int i = 0; i < AsmCode.Count; ++i)
+                        {
+                            AsmCode[i] = AsmCode[i].Replace("0x" + tmpByte,
+                                (DBList[addr.Key]) + " ;" + "0x" + tmpByte);
+                        }
+                    }
+                    var index = 0;
+                    foreach (var addres in LineAddres)
+                    {
+                        if ((addres.Key == addr.Key))
+                        {
+                            //if (DWList.ContainsKey(addres.Key))
+                            //    AsmCode[index] = addres.Value + " " + AsmCode[index];
+                            //else
+                            if ((index < AsmCode.Count) &&
+                                !(DWList.ContainsKey(addres.Key) || DBList.ContainsKey(addres.Key)))
+                                AsmCode[index] = addres.Value + ":\n" + AsmCode[index];
+                            break;
+                        }
                         else
                         {
-                            for (int i = 0; i < AsmCode.Count; ++i)
-                            {
-                                AsmCode[i] = AsmCode[i].Replace("0x" + tmpByte,
-                                    (DBList[addr.Key]) + " ;" + "0x" + tmpByte);
-                            }
-                        }
-                        var index = 0;
-                        foreach (var addres in LineAddres)
-                        {
-                            if ((addres.Key == addr.Key) )
-                            {
-                                //if (DWList.ContainsKey(addres.Key))
-                                //    AsmCode[index] = addres.Value + " " + AsmCode[index];
-                                //else
-                                if ((index < AsmCode.Count) && !(DWList.ContainsKey(addres.Key) || DBList.ContainsKey(addres.Key)))
-                                    AsmCode[index] = addres.Value + ":\n" + AsmCode[index];
-                                break;
-                            }
-                            else
-                            {
-                                ++index;
-                            }
+                            ++index;
                         }
                     }
                 }
+            }
             return AsmCode;
         }
     }

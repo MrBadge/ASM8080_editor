@@ -16,27 +16,44 @@ namespace ASMgenerator8080
     public partial class HexDump :  Form
     {
         private const int fontSize = 9;
+        private const int len = 16;
         private string fontName = "Courier New";
         private Size padSize;
         private BinaryGenerator binGen;
         private readonly SaveFileDialog SFD;
+        private byte[] bytes;
    
         public HexDump()
         {
             InitializeComponent();
+            KeyPreview = true;
+            dumpView.ReadOnly = true;
             SFD = new SaveFileDialog();
             SFD.Title = "Save";
             padSize = new Size(this.Size.Width - dumpView.Size.Width, this.Size.Height - dumpView.Size.Height);
         }
 
+        public void viewBinaryDump(byte[] buf, int stAddr)
+        {
+            bytes = buf;
+            string[] dump = getDumpStrings(buf);
+            updateDataGrid(dump, getASCIIDump(dump), stAddr);
+
+        }
+
         public void viewBinaryDump(BinaryGenerator binGen)
         {
             //if (string.IsNullOrEmpty(source)) return;
-            this.binGen = binGen;
-            int len = 16;
+            //this.binGen = binGen;
+            bytes = (byte[])binGen.getBinaryDump().ToArray(typeof(byte));
             string[] dump = binGen.getBinaryDumpToString(len);
-            string[] ASCIDump = binGen.getACIIDumpToString(len);
+            string[] ASCIIDump = binGen.getACIIDumpToString(len);
+            updateDataGrid(dump, ASCIIDump, binGen.getStartAddress());
+            
+        }
 
+        public void updateDataGrid(string[] dump, string[] ASCIIDump, int stAddr)
+        {
             dumpView.ColumnCount = 3;
             dumpView.Columns[0].Name = "Address";
             dumpView.Columns[1].Name = "Memory dump";
@@ -52,10 +69,14 @@ namespace ASMgenerator8080
             dumpView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             dumpView.Font = new Font(fontName, fontSize);
 
-            int startAddr = binGen.getStartAddress();
+            int startAddr = stAddr;
             int strLen = 3 * len;
             for (int i = 0; i < dump.Length; ++i)
-                dumpView.Rows.Add(new string[] { (startAddr + i * len).ToString("x") + ":", completeString(dump[i], len), completeString(ASCIDump[i], len, true) });
+                dumpView.Rows.Add(new string[]
+                {
+                    (startAddr + i*len).ToString("x") + ":", completeString(dump[i], len),
+                    completeString(ASCIIDump[i], len, true)
+                });
 
             string zeroString = "";
             string zeroStringASCII = "";
@@ -67,9 +88,9 @@ namespace ASMgenerator8080
 
             int maxAddr = (0x23ff - startAddr) / 0x10;
             for (int i = dump.Length; i <= maxAddr; ++i)
-                dumpView.Rows.Add(new string[] {(startAddr + i*len).ToString("x") + ":",  zeroString, zeroStringASCII});
+                dumpView.Rows.Add(new string[] { (startAddr + i * len).ToString("x") + ":", zeroString, zeroStringASCII });
 
-            this.Show();
+            this.Show();    
         }
 
         private string stringToASCII(string s)
@@ -84,12 +105,25 @@ namespace ASMgenerator8080
             {
                 if (nums[i].Length != 0)
                 {
-                    num = Convert.ToByte("0x" + nums[i]);
+                    num = Convert.ToByte("0x" + nums[i], 16);
                     res += num < 32 || num > 127 ? '.' : (char)num;
                 }
             }
 
             return res;
+        }
+
+        private string[] getASCIIDump(string[] dump)
+        {
+            string[] tmp = new string[dump.Length];
+
+            int index = 0;
+            foreach (var s in dump)
+            {
+                tmp[index++] = stringToASCII(s);
+            }
+
+            return tmp;
         }
 
         private string completeString(string s, int len, bool asciiMode = false)
@@ -107,6 +141,24 @@ namespace ASMgenerator8080
         {
             
         }*/
+
+        private string[] getDumpStrings(byte[] buf)
+        {
+            string[] dump = new string[buf.Length%len == 0 ? buf.Length/len : buf.Length/len + 1];
+            int index = 0;
+        
+            for (int i = 0; i < buf.Length; ++i)
+            {
+                if (i != 0 && i%len == 0) ++index;
+                var tmp = buf[i].ToString("X") + ' ';
+                dump[index] += tmp.Length < 3 ? '0' + tmp: tmp;
+            }
+
+            if (dump[index].Length < len)
+                completeString(dump[index], len);
+
+            return dump;
+        }
 
         private void HexDump_Resize(object sender, EventArgs e)
         {
@@ -128,11 +180,11 @@ namespace ASMgenerator8080
             if (SFD.ShowDialog() != DialogResult.OK)
                 return false;
 
-            ArrayList mem = binGen.getBinaryDump();
+            //ArrayList mem = binGen.getBinaryDump();
 
             try
             {
-                File.WriteAllBytes(SFD.FileName, mem.OfType<byte>().ToArray());
+                File.WriteAllBytes(SFD.FileName, bytes);
             }
             catch (Exception ex)
             {

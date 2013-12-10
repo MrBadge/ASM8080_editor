@@ -65,10 +65,10 @@
             this.serialPortSettingsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.showSmallLoaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.decompileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.fromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.fromMemoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.setStartAddresToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.setStartAddresToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.decompileToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.fromFileToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.fromMemoryToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.getMemoryDumpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tsFiles)).BeginInit();
             this.menu.SuspendLayout();
@@ -100,7 +100,7 @@
             // 
             this.panel1.Controls.Add(this.tsFiles);
             this.panel1.Location = new System.Drawing.Point(24, 52);
-            this.panel1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.panel1.Margin = new System.Windows.Forms.Padding(6);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(808, 531);
             this.panel1.TabIndex = 5;
@@ -328,8 +328,7 @@
             this.loadCustomASMDescFileToolStripMenuItem,
             this.serialPortToolStripMenuItem1,
             this.serialPortSettingsToolStripMenuItem1,
-            this.showSmallLoaderToolStripMenuItem,
-            this.setStartAddresToolStripMenuItem1});
+            this.showSmallLoaderToolStripMenuItem});
             this.settingsToolStripMenuItem1.Name = "settingsToolStripMenuItem1";
             this.settingsToolStripMenuItem1.Size = new System.Drawing.Size(113, 38);
             this.settingsToolStripMenuItem1.Text = "Settings";
@@ -359,8 +358,9 @@
             // serialPortSettingsToolStripMenuItem1
             // 
             this.serialPortSettingsToolStripMenuItem1.Name = "serialPortSettingsToolStripMenuItem1";
+            this.serialPortSettingsToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
             this.serialPortSettingsToolStripMenuItem1.Size = new System.Drawing.Size(378, 36);
-            this.serialPortSettingsToolStripMenuItem1.Text = "Serial port settings";
+            this.serialPortSettingsToolStripMenuItem1.Text = "Settings";
             this.serialPortSettingsToolStripMenuItem1.Click += new System.EventHandler(this.serialPortSettingsToolStripMenuItem_Click);
             // 
             // showSmallLoaderToolStripMenuItem
@@ -373,39 +373,42 @@
             // decompileToolStripMenuItem
             // 
             this.decompileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fromFileToolStripMenuItem,
-            this.fromMemoryToolStripMenuItem,
-            this.setStartAddresToolStripMenuItem});
+            this.decompileToolStripMenuItem1,
+            this.getMemoryDumpToolStripMenuItem});
             this.decompileToolStripMenuItem.Name = "decompileToolStripMenuItem";
-            this.decompileToolStripMenuItem.Size = new System.Drawing.Size(142, 38);
-            this.decompileToolStripMenuItem.Text = "Decompile";
+            this.decompileToolStripMenuItem.Size = new System.Drawing.Size(84, 38);
+            this.decompileToolStripMenuItem.Text = "Tools";
             this.decompileToolStripMenuItem.Click += new System.EventHandler(this.decompileToolStripMenuItem_Click);
             // 
-            // fromFileToolStripMenuItem
+            // decompileToolStripMenuItem1
             // 
-            this.fromFileToolStripMenuItem.Name = "fromFileToolStripMenuItem";
-            this.fromFileToolStripMenuItem.Size = new System.Drawing.Size(255, 36);
-            this.fromFileToolStripMenuItem.Text = "From file";
-            this.fromFileToolStripMenuItem.Click += new System.EventHandler(this.fromFileToolStripMenuItem_Click);
+            this.decompileToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fromFileToolStripMenuItem1,
+            this.fromMemoryToolStripMenuItem1});
+            this.decompileToolStripMenuItem1.Name = "decompileToolStripMenuItem1";
+            this.decompileToolStripMenuItem1.Size = new System.Drawing.Size(293, 36);
+            this.decompileToolStripMenuItem1.Text = "Decompile";
             // 
-            // fromMemoryToolStripMenuItem
+            // fromFileToolStripMenuItem1
             // 
-            this.fromMemoryToolStripMenuItem.Name = "fromMemoryToolStripMenuItem";
-            this.fromMemoryToolStripMenuItem.Size = new System.Drawing.Size(255, 36);
-            this.fromMemoryToolStripMenuItem.Text = "From memory";
+            this.fromFileToolStripMenuItem1.Name = "fromFileToolStripMenuItem1";
+            this.fromFileToolStripMenuItem1.Size = new System.Drawing.Size(244, 36);
+            this.fromFileToolStripMenuItem1.Text = "From file";
+            this.fromFileToolStripMenuItem1.Click += new System.EventHandler(this.fromFileToolStripMenuItem1_Click);
             // 
-            // setStartAddresToolStripMenuItem
+            // fromMemoryToolStripMenuItem1
             // 
-            this.setStartAddresToolStripMenuItem.Name = "setStartAddresToolStripMenuItem";
-            this.setStartAddresToolStripMenuItem.Size = new System.Drawing.Size(255, 36);
-            this.setStartAddresToolStripMenuItem.Text = "Set start addres";
+            this.fromMemoryToolStripMenuItem1.Name = "fromMemoryToolStripMenuItem1";
+            this.fromMemoryToolStripMenuItem1.Size = new System.Drawing.Size(244, 36);
+            this.fromMemoryToolStripMenuItem1.Text = "From memory";
+            this.fromMemoryToolStripMenuItem1.Click += new System.EventHandler(this.fromMemoryToolStripMenuItem1_Click);
             // 
-            // setStartAddresToolStripMenuItem1
+            // getMemoryDumpToolStripMenuItem
             // 
-            this.setStartAddresToolStripMenuItem1.Name = "setStartAddresToolStripMenuItem1";
-            this.setStartAddresToolStripMenuItem1.Size = new System.Drawing.Size(378, 36);
-            this.setStartAddresToolStripMenuItem1.Text = "Program settings";
-            this.setStartAddresToolStripMenuItem1.Click += new System.EventHandler(this.setStartAddresToolStripMenuItem1_Click);
+            this.getMemoryDumpToolStripMenuItem.Name = "getMemoryDumpToolStripMenuItem";
+            this.getMemoryDumpToolStripMenuItem.Size = new System.Drawing.Size(293, 36);
+            this.getMemoryDumpToolStripMenuItem.Text = "Get memory dump";
+            this.getMemoryDumpToolStripMenuItem.Click += new System.EventHandler(this.getMemoryDumpToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -417,7 +420,7 @@
             this.Controls.Add(this.menu);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menu;
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
@@ -469,10 +472,10 @@
         private System.Windows.Forms.ToolStripMenuItem highlightCurrentLineToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem decompileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showSmallLoaderToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem fromFileToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem fromMemoryToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem setStartAddresToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem setStartAddresToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem decompileToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem fromFileToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem fromMemoryToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem getMemoryDumpToolStripMenuItem;
     }
 }
 
