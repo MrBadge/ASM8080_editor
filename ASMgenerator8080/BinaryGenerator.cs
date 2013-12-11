@@ -10,8 +10,7 @@ namespace ASMgenerator8080
 {
     public class BinaryGenerator
     {
-        private const int minAddr = 0x2100;
-        private const int maxAddr = 0x10000;
+        
 
         private const string incorrect_ops = "Incorrect operands";
         private const string incorrect_const = "Incorrect constant";
@@ -239,7 +238,7 @@ namespace ASMgenerator8080
 
         private void setStartAddress(int startAddress)
         {
-            if (startAddress >= minAddr && startAddress < maxAddr)
+            if (startAddress >= Constants.minAddr && startAddress < Constants.maxAddr)
             {
                 startAddr = startAddress;
                 currentAddr = startAddr;

@@ -107,6 +107,18 @@ namespace ASMgenerator8080
                 MessageBox.Show("Ending adress is less than starting Adress", "Error", MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }
+            else if (rFi < Constants.minAddr || rTi > Constants.maxAddr)
+            {
+                error = true;
+                readFrom.Focus();
+                readFrom.SelectionStart = 0;
+                readFrom.SelectionLength = readFrom.Text.Length;
+                MessageBox.Show(
+                    "Min address = " + Constants.minAddr.ToString("X") + "Max address = " +
+                    Constants.maxAddr.ToString("X"), "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
             else
             {
                 Form1.readFrom = rFi;
