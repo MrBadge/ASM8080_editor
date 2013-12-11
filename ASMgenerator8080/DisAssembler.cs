@@ -193,8 +193,8 @@ namespace ASMgenerator8080
                     if (DWList.ContainsKey(startAddr + CurPos))
                     {
                         LineAddres.Add(LineAddres.Keys.Last() + 2, null);
-                        tmpString = DWList[startAddr + CurPos] + " DW 0x" + bytes[CurPos].ToString("X") +
-                                    bytes[CurPos + 1].ToString("X");
+                        tmpString = DWList[startAddr + CurPos] + " DW 0x" + bytes[CurPos + 1].ToString("X") +
+                                    bytes[CurPos].ToString("X");
                         AsmCode.Add(tmpString);
                         CurPos += 2;
                     }
