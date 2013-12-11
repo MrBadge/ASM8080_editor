@@ -30,6 +30,7 @@ namespace ASMgenerator8080
             dumpView.ReadOnly = true;
             SFD = new SaveFileDialog();
             SFD.Title = "Save";
+            SFD.Filter = "Bin files (*.bin) | *.bin";
             padSize = new Size(this.Size.Width - dumpView.Size.Width, this.Size.Height - dumpView.Size.Height);
         }
 

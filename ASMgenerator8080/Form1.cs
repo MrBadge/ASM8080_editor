@@ -600,28 +600,43 @@ namespace ASMgenerator8080
             var port = new SerialPort(PS.ComPortName, PS.baud, PS.par, PS.databits, PS.sb);
             port.DataReceived += new SerialDataReceivedEventHandler(ByteRecievedHandler);
 
-            byte[] ba = {0};
-
-            ba[0] = 0x01;
-            port.Write(ba, 0, 1);
-            Thread.Sleep(Constants.sleepDelay);
-
-            ba[0] = (byte)((startAddr & 0x0000ff00) >> 8);
-            port.Write(ba, 0, 1);
-            Thread.Sleep(Constants.sleepDelay);
-
-            ba[0] = (byte)(startAddr & 0x000000ff);
-            port.Write(ba, 0, 1);
-            Thread.Sleep(Constants.sleepDelay);
-
-            ba[0] = 0x03;
-            for (int i = 0; i < arrLenght; i++)
+            try
             {
+                stStrip.Items[0].Text = "Recieving bytes from KR580...";
+                stStrip.Refresh();
+                port.Open();
+                byte[] ba = {0};
+
+                ba[0] = 0x01;
                 port.Write(ba, 0, 1);
                 Thread.Sleep(Constants.sleepDelay);
-                byteArr[i] = recivedByte;
+
+                ba[0] = (byte) ((startAddr & 0x0000ff00) >> 8);
+                port.Write(ba, 0, 1);
+                Thread.Sleep(Constants.sleepDelay);
+
+                ba[0] = (byte) (startAddr & 0x000000ff);
+                port.Write(ba, 0, 1);
+                Thread.Sleep(Constants.sleepDelay);
+
+                ba[0] = 0x03;
+                for (int i = 0; i < arrLenght; i++)
+                {
+                    port.Write(ba, 0, 1);
+                    Thread.Sleep(Constants.sleepDelay);
+                    byteArr[i] = recivedByte;
+                }
+                port.Close();
+                stStrip.Items[0].Text = "Done";
+                stStrip.Refresh();
+                return byteArr;
             }
-            return byteArr;
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                stStrip.Items[0].Text = "Error";
+                return null;
+            }
         }
 
         private static void ByteRecievedHandler(
@@ -804,9 +819,9 @@ namespace ASMgenerator8080
             if (CurrentTB == null) 
                 return;
             if (
-                GetBinary(CurrentTB.Text,
-                    Constants.defaultStartingAdress + Constants.smallProgramLoaderSize +
-                    Constants.BigProgramLoader.Length) == null) return;
+                GetBinary(CurrentTB.Text, strtAddr
+                    /*Constants.defaultStartingAdress + Constants.smallProgramLoaderSize +
+                    Constants.BigProgramLoader.Length*/) == null) return;
             var hexView = new HexDump();
             hexView.viewBinaryDump(BinGen);
         }
@@ -890,7 +905,10 @@ namespace ASMgenerator8080
             var filename = OpenFile("Choose file to decompile", "All files (*.*)|*.*");
             if (filename == null) return;
             var bytes = File.ReadAllBytes(filename);
+            stStrip.Items[0].Text = "Decompiling...";
+            stStrip.Refresh();
             DisAssembler(bytes, strtAddr, filename);
+            stStrip.Items[0].Text = "Done!";
         }
 
         private void getMemoryDumpToolStripMenuItem_Click(object sender, EventArgs e)
@@ -901,19 +919,22 @@ namespace ASMgenerator8080
                 var hexView = new HexDump();
                 hexView.viewBinaryDump(tmp, readFrom);
             }
-            else
-            {
-                MessageBox.Show("Error reading from memory", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            //else
+            //{
+            //    MessageBox.Show("Error reading from memory", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //}
         }
 
         private void fromMemoryToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            var tmp = Constants.BigProgramLoader;
-//            var tmp = GetMemoryDump(readFrom, readTo);
+            //var tmp = Constants.BigProgramLoader;
+            var tmp = GetMemoryDump(readFrom, readTo);
             if (tmp != null)
             {
+                stStrip.Items[0].Text = "Decompiling...";
+                stStrip.Refresh();
                 DisAssembler(tmp, readFrom, Convert.ToString(readFrom) + "-" + Convert.ToString(readTo));
+                stStrip.Items[0].Text = "Done!";
             }
             else
             {

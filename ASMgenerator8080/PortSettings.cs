@@ -51,6 +51,7 @@ namespace ASMgenerator8080
             readFrom.Text = "0x" + Convert.ToString(Form1.readFrom, 16).ToUpper();
             readTo.Text = "0x" + Convert.ToString(Form1.readTo, 16).ToUpper();
 
+            startAddr.Focus();
             KeyPreview = true;
         }
 
@@ -111,12 +112,14 @@ namespace ASMgenerator8080
                 Form1.readFrom = rFi;
                 Form1.readTo = rTi;
             }
-            Form1.PS.databits = (int) databits.SelectedItem;
-            Form1.PS.baud = (int) baud.SelectedItem;
-            Form1.PS.par = (Parity) parity.SelectedItem;
-            Form1.PS.sb = (StopBits) stopbits.SelectedItem;
             if (!error)
+            {
+                Form1.PS.databits = (int) databits.SelectedItem;
+                Form1.PS.baud = (int) baud.SelectedItem;
+                Form1.PS.par = (Parity) parity.SelectedItem;
+                Form1.PS.sb = (StopBits) stopbits.SelectedItem;
                 Close();
+            }
         }
 
         private void PortSettings_KeyPress(object sender, KeyPressEventArgs e)
