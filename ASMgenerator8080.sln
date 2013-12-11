@@ -1,9 +1,27 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASMgenerator8080", "ASMgenerator8080\ASMgenerator8080.csproj", "{2D434CBE-E34D-411E-A9D8-C98DD0836129}"
+# Visual Studio 2012
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C98385C1-B4D9-466C-A97A-33CE9577AEBF}"
+	ProjectSection(SolutionItems) = preProject
+		ASMgenerator8080\App.config = ASMgenerator8080\App.config
+		ASMgenerator8080\BinaryGenerator.cs = ASMgenerator8080\BinaryGenerator.cs
+		ASMgenerator8080\BinaryGeneratorException.cs = ASMgenerator8080\BinaryGeneratorException.cs
+		ASMgenerator8080\BinaryGeneratorWarning.cs = ASMgenerator8080\BinaryGeneratorWarning.cs
+		ASMgenerator8080\ComPortSettings.cs = ASMgenerator8080\ComPortSettings.cs
+		ASMgenerator8080\Constants.cs = ASMgenerator8080\Constants.cs
+		ASMgenerator8080\DisAssembler.cs = ASMgenerator8080\DisAssembler.cs
+		ASMgenerator8080\favicon.ico = ASMgenerator8080\favicon.ico
+		ASMgenerator8080\Form1.cs = ASMgenerator8080\Form1.cs
+		ASMgenerator8080\Form1.Designer.cs = ASMgenerator8080\Form1.Designer.cs
+		ASMgenerator8080\Form1.resx = ASMgenerator8080\Form1.resx
+		ASMgenerator8080\HexDump.cs = ASMgenerator8080\HexDump.cs
+		ASMgenerator8080\HexDump.Designer.cs = ASMgenerator8080\HexDump.Designer.cs
+		ASMgenerator8080\HexDump.resx = ASMgenerator8080\HexDump.resx
+		ASMgenerator8080\PortSettings.cs = ASMgenerator8080\PortSettings.cs
+		ASMgenerator8080\PortSettings.Designer.cs = ASMgenerator8080\PortSettings.Designer.cs
+		ASMgenerator8080\PortSettings.resx = ASMgenerator8080\PortSettings.resx
+		ASMgenerator8080\Program.cs = ASMgenerator8080\Program.cs
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +29,8 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2D434CBE-E34D-411E-A9D8-C98DD0836129}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2D434CBE-E34D-411E-A9D8-C98DD0836129}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2D434CBE-E34D-411E-A9D8-C98DD0836129}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2D434CBE-E34D-411E-A9D8-C98DD0836129}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -557,7 +557,7 @@ namespace ASMgenerator8080
             return temp;
         }
 
-        private void SendBigLoader(byte[] BigLoaderHex, int startAddr = 0x2100)
+        private void SendBigLoader(byte[] BigLoaderHex)
         {
             try
             {
@@ -913,6 +913,7 @@ namespace ASMgenerator8080
 
         private void getMemoryDumpToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            SendBigLoader(Constants.BigProgramLoader);
             var tmp = GetMemoryDump(readFrom, readTo);
             if (tmp != null)
             {
@@ -927,6 +928,7 @@ namespace ASMgenerator8080
 
         private void fromMemoryToolStripMenuItem1_Click(object sender, EventArgs e)
         {
+            SendBigLoader(Constants.BigProgramLoader);
             //var tmp = Constants.BigProgramLoader;
             var tmp = GetMemoryDump(readFrom, readTo);
             if (tmp != null)
