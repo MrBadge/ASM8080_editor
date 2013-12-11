@@ -46,7 +46,10 @@ namespace ASMgenerator8080
         {
             //if (string.IsNullOrEmpty(source)) return;
             //this.binGen = binGen;
-            bytes = (byte[])binGen.getBinaryDump().ToArray(typeof(byte));
+            var tmp = binGen.getBinaryDump();
+            if (tmp[tmp.Count-1] == null)
+                tmp.RemoveAt(tmp.Count - 1);
+            bytes = (byte[])tmp.ToArray(typeof(byte));
             string[] dump = binGen.getBinaryDumpToString(len);
             string[] ASCIIDump = binGen.getACIIDumpToString(len);
             updateDataGrid(dump, ASCIIDump, binGen.getStartAddress());

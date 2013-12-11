@@ -15,7 +15,7 @@ namespace ASMgenerator8080
         private const string incorrect_ops = "Incorrect operands";
         private const string incorrect_const = "Incorrect constant";
         private const string miss_ops = "Missing operands";
-        private const string to_much_ops = "To many operands";
+        private const string to_much_ops = "Too many operands";
         private const string incorrect_cmd = "Unknown command";
         private const string incorrect_label = "Incorrect label";
         private const string unres_label = "Unresolved label";
@@ -780,9 +780,9 @@ namespace ASMgenerator8080
                 try
                 {
                     opcs = opsRpIm16[mnemonic];
-                    if (partsLen > 2) throw new BinaryGeneratorException(to_much_ops, linenumber);
+                    if (partsLen > 3) throw new BinaryGeneratorException(to_much_ops, linenumber);
                     //if (partsLen < 2) return -3;
-                    if (partsLen < 2) throw new BinaryGeneratorException(miss_ops, linenumber);
+                    if (partsLen < 3) throw new BinaryGeneratorException(miss_ops, linenumber);
                     int rp = parseRegisterPair(parts[1]);
                     //if (rp == -1) return -3;
                     if (rp == -1) throw new BinaryGeneratorException(incorrect_ops, linenumber);
@@ -855,6 +855,10 @@ namespace ASMgenerator8080
                     opcs = opsReg[mnemonic];
                     if (partsLen > 2) throw new BinaryGeneratorException(to_much_ops, linenumber);
                     if (partsLen < 2) throw new BinaryGeneratorException(miss_ops, linenumber);
+                    //if (parts[1].ToLower() == "hl")
+                    //{
+                    //    parts[1] = "m";
+                    //}
                     int reg = parseRegister(parts[1]);
                     //if (reg == -1) return -1;
                     if (reg == -1) throw new BinaryGeneratorException(incorrect_ops, linenumber);
