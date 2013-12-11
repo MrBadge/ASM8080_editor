@@ -9,6 +9,7 @@ using System.Drawing;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
+using System.Net.Configuration;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -169,7 +170,7 @@ namespace ASMgenerator8080
         //}
         //}
 
-        private void CreateTab(string fileName, string text = "")
+        private void CreateTab(string fileName, string text = "", bool tryLoad = true)
         {
             try
             {
@@ -188,7 +189,7 @@ namespace ASMgenerator8080
                 {
                     Tag = fileName
                 };
-                if (fileName != null)
+                if (fileName != null && tryLoad == true)
                     tb.Text = File.ReadAllText(fileName);
                 //else
                 //    tb.Text = "\n";
@@ -581,7 +582,11 @@ namespace ASMgenerator8080
         private byte[] GetMemoryDump(int startAddr, int endAddr)
         {
             if (endAddr < startAddr)
-                throw new Exception("Ending adress is less than starting Adress");
+            {
+                MessageBox.Show("Ending adress is less than starting Adress", "Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return null;
+            }
 
             int arrLenght = endAddr - startAddr + 1;
             byte[] byteArr = new byte[arrLenght];
@@ -847,11 +852,6 @@ namespace ASMgenerator8080
                 CurrentTB.Invalidate();
         }
 
-        private void decompileToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void showSmallLoaderToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (SLoader == null) return;
@@ -862,7 +862,7 @@ namespace ASMgenerator8080
 
         private void DisAssembler(byte[] bytes, int staddr, string tabname = null)
         {
-            if (CurrentTB == null) CreateTab(tabname);
+            if (CurrentTB == null) CreateTab(tabname, "", false);
             var dis = new DisAssembler();
             try
             {
@@ -899,7 +899,7 @@ namespace ASMgenerator8080
             if (tmp != null)
             {
                 var hexView = new HexDump();
-                hexView.viewBinaryDump(tmp, strtAddr);
+                hexView.viewBinaryDump(tmp, readFrom);
             }
             else
             {
@@ -913,7 +913,7 @@ namespace ASMgenerator8080
 //            var tmp = GetMemoryDump(readFrom, readTo);
             if (tmp != null)
             {
-                DisAssembler(tmp, strtAddr, Convert.ToString(readFrom) + "-" + Convert.ToString(readTo));
+                DisAssembler(tmp, readFrom, Convert.ToString(readFrom) + "-" + Convert.ToString(readTo));
             }
             else
             {

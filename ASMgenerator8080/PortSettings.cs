@@ -46,12 +46,23 @@ namespace ASMgenerator8080
             databits.Items.Add(8);
             databits.SelectedItem = tmp.databits;
             databits.DropDownStyle = ComboBoxStyle.DropDownList;
+
+            startAddr.Text = "0x" + Convert.ToString(Form1.strtAddr, 16).ToUpper();
+            readFrom.Text = "0x" + Convert.ToString(Form1.readFrom, 16).ToUpper();
+            readTo.Text = "0x" + Convert.ToString(Form1.readTo, 16).ToUpper();
+
+            KeyPreview = true;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             var error = false;
-            if (startAddr.Text.Length > 6 || !reg.IsMatch(startAddr.Text))
+            var stA = startAddr.Text.Trim();
+            var rF = readFrom.Text.Trim();
+            var rT = readTo.Text.Trim();
+            int rFi = 0;
+            int rTi = 0;
+            if (stA.Length > 6 || !reg.IsMatch(stA))
             {
                 startAddr.Focus();
                 startAddr.SelectionStart = 0;
@@ -60,10 +71,10 @@ namespace ASMgenerator8080
             }
             else
             {
-                Form1.strtAddr = Convert.ToUInt16(startAddr.Text, 16);
+                Form1.strtAddr = Convert.ToUInt16(stA, 16);
             }
             if (!error)
-            if (readFrom.Text.Length > 6 || !reg.IsMatch(readFrom.Text))
+            if (rF.Length > 6 || !reg.IsMatch(rF))
             {
                 readFrom.Focus();
                 readFrom.SelectionStart = 0;
@@ -72,10 +83,10 @@ namespace ASMgenerator8080
             }
             else
             {
-                Form1.readFrom = Convert.ToUInt16(readFrom.Text, 16);
+                rFi = Convert.ToUInt16(rF, 16);
             }
             if (!error)
-            if (readTo.Text.Length > 6 || !reg.IsMatch(readTo.Text))
+            if (rT.Length > 6 || !reg.IsMatch(rT))
             {
                 readTo.Focus();
                 readTo.SelectionStart = 0;
@@ -84,15 +95,36 @@ namespace ASMgenerator8080
             }
             else
             {
-                Form1.readTo = Convert.ToUInt16(readTo.Text, 16);
+                rTi = Convert.ToUInt16(rT, 16);
             }
-            
+            if (rFi > rTi)
+            {
+                error = true;
+                readFrom.Focus();
+                readFrom.SelectionStart = 0;
+                readFrom.SelectionLength = readFrom.Text.Length;
+                MessageBox.Show("Ending adress is less than starting Adress", "Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            else
+            {
+                Form1.readFrom = rFi;
+                Form1.readTo = rTi;
+            }
             Form1.PS.databits = (int) databits.SelectedItem;
             Form1.PS.baud = (int) baud.SelectedItem;
             Form1.PS.par = (Parity) parity.SelectedItem;
             Form1.PS.sb = (StopBits) stopbits.SelectedItem;
             if (!error)
                 Close();
+        }
+
+        private void PortSettings_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)13)
+            {
+                button1_Click(this, e);
+            }
         }
     }
 }

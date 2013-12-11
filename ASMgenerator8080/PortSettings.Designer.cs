@@ -39,12 +39,12 @@
             this.baud = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.stAddr = new System.Windows.Forms.Panel();
+            this.readTo = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.readFrom = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.startAddr = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.readFrom = new System.Windows.Forms.TextBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.readTo = new System.Windows.Forms.TextBox();
             this.comSet.SuspendLayout();
             this.stAddr.SuspendLayout();
             this.SuspendLayout();
@@ -55,7 +55,7 @@
             this.button1.Margin = new System.Windows.Forms.Padding(6);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(188, 40);
-            this.button1.TabIndex = 8;
+            this.button1.TabIndex = 7;
             this.button1.Text = "Apply";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
@@ -84,7 +84,7 @@
             this.databits.Margin = new System.Windows.Forms.Padding(6);
             this.databits.Name = "databits";
             this.databits.Size = new System.Drawing.Size(202, 33);
-            this.databits.TabIndex = 17;
+            this.databits.TabIndex = 5;
             // 
             // stopbits
             // 
@@ -94,7 +94,7 @@
             this.stopbits.Margin = new System.Windows.Forms.Padding(6);
             this.stopbits.Name = "stopbits";
             this.stopbits.Size = new System.Drawing.Size(202, 33);
-            this.stopbits.TabIndex = 16;
+            this.stopbits.TabIndex = 6;
             // 
             // label4
             // 
@@ -126,7 +126,7 @@
             this.parity.Margin = new System.Windows.Forms.Padding(6);
             this.parity.Name = "parity";
             this.parity.Size = new System.Drawing.Size(202, 33);
-            this.parity.TabIndex = 13;
+            this.parity.TabIndex = 4;
             // 
             // label2
             // 
@@ -145,9 +145,10 @@
             this.baud.FormattingEnabled = true;
             this.baud.Location = new System.Drawing.Point(202, 39);
             this.baud.Margin = new System.Windows.Forms.Padding(6);
+            this.baud.MaxDropDownItems = 3;
             this.baud.Name = "baud";
             this.baud.Size = new System.Drawing.Size(202, 33);
-            this.baud.TabIndex = 11;
+            this.baud.TabIndex = 3;
             // 
             // label1
             // 
@@ -174,43 +175,13 @@
             this.stAddr.Size = new System.Drawing.Size(417, 150);
             this.stAddr.TabIndex = 11;
             // 
-            // startAddr
+            // readTo
             // 
-            this.startAddr.Location = new System.Drawing.Point(225, 29);
-            this.startAddr.Name = "startAddr";
-            this.startAddr.Size = new System.Drawing.Size(166, 31);
-            this.startAddr.TabIndex = 5;
-            this.startAddr.Text = "0x2100";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label5.Location = new System.Drawing.Point(15, 23);
-            this.label5.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(201, 37);
-            this.label5.TabIndex = 4;
-            this.label5.Text = "Start addres:";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label6.Location = new System.Drawing.Point(15, 79);
-            this.label6.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(166, 37);
-            this.label6.TabIndex = 6;
-            this.label6.Text = "Read from";
-            // 
-            // readFrom
-            // 
-            this.readFrom.Location = new System.Drawing.Point(184, 85);
-            this.readFrom.Name = "readFrom";
-            this.readFrom.Size = new System.Drawing.Size(78, 31);
-            this.readFrom.TabIndex = 7;
-            this.readFrom.Text = "0x2100";
+            this.readTo.Location = new System.Drawing.Point(313, 85);
+            this.readTo.Name = "readTo";
+            this.readTo.Size = new System.Drawing.Size(78, 31);
+            this.readTo.TabIndex = 2;
+            this.readTo.Text = "0x2100";
             // 
             // label7
             // 
@@ -223,13 +194,43 @@
             this.label7.TabIndex = 8;
             this.label7.Text = "to";
             // 
-            // readTo
+            // readFrom
             // 
-            this.readTo.Location = new System.Drawing.Point(313, 85);
-            this.readTo.Name = "readTo";
-            this.readTo.Size = new System.Drawing.Size(78, 31);
-            this.readTo.TabIndex = 9;
-            this.readTo.Text = "0x2100";
+            this.readFrom.Location = new System.Drawing.Point(184, 85);
+            this.readFrom.Name = "readFrom";
+            this.readFrom.Size = new System.Drawing.Size(78, 31);
+            this.readFrom.TabIndex = 1;
+            this.readFrom.Text = "0x2100";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label6.Location = new System.Drawing.Point(15, 79);
+            this.label6.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(166, 37);
+            this.label6.TabIndex = 6;
+            this.label6.Text = "Read from";
+            // 
+            // startAddr
+            // 
+            this.startAddr.Location = new System.Drawing.Point(225, 29);
+            this.startAddr.Name = "startAddr";
+            this.startAddr.Size = new System.Drawing.Size(166, 31);
+            this.startAddr.TabIndex = 0;
+            this.startAddr.Text = "0x2100";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label5.Location = new System.Drawing.Point(15, 23);
+            this.label5.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(201, 37);
+            this.label5.TabIndex = 4;
+            this.label5.Text = "Start addres:";
             // 
             // PortSettings
             // 
@@ -244,6 +245,7 @@
             this.Name = "PortSettings";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Program Settings";
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.PortSettings_KeyPress);
             this.comSet.ResumeLayout(false);
             this.comSet.PerformLayout();
             this.stAddr.ResumeLayout(false);
