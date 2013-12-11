@@ -169,7 +169,7 @@ namespace ASMgenerator8080
             var DBList = new Dictionary<int, string>();
             var DWList = new Dictionary<int, string>();
             var AddrTmp = 0;
-            var CurLabel = -1;
+            var CurLabel = 0;
             if (startAddr != -1)
             {
                 LineAddres.Add(startAddr, null);
@@ -234,8 +234,6 @@ namespace ASMgenerator8080
                                     DWList.Add(AddrTmp, "Data" + lastDataIndex++);
                                 }
                             }
-
-
                         }
                         if (AddrTmp < startAddr + bytes.Length && AddrTmp >= startAddr)
                         {
