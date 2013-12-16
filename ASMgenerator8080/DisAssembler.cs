@@ -350,7 +350,9 @@ namespace ASMgenerator8080
                         ++CurPos;
                     }
                     else
-                        throw;
+                    {
+                        break;
+                    }
                 }
 
                 //tmpString = "";

@@ -35,6 +35,7 @@ namespace ASMgenerator8080
         public static int readTo = 0x2100;
 
         private static byte recivedByte = 0;
+        private static bool isByteRecived = false;
 
         public Form1()
         {
@@ -622,8 +623,10 @@ namespace ASMgenerator8080
                 ba[0] = 0x03;
                 for (int i = 0; i < arrLenght; i++)
                 {
+                    isByteRecived = false;
                     port.Write(ba, 0, 1);
-                    Thread.Sleep(Constants.sleepDelay);
+                    //Thread.Sleep(Constants.sleepDelay);
+                    while (!isByteRecived) {}
                     byteArr[i] = recivedByte;
                 }
                 port.Close();
@@ -648,12 +651,13 @@ namespace ASMgenerator8080
             try
             {
                 port.Read(buffer, 0, 1);
+                recivedByte = buffer[0];
+                isByteRecived = true;
             }
             catch (Exception)
             {
                 throw new Exception("Something wrong with recieving data");
             }
-            recivedByte = buffer[0];
         }
 
         private void sendToKR580ToolStripMenuItem_Click(object sender, EventArgs e)
