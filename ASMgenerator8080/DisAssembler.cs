@@ -99,10 +99,14 @@ namespace ASMgenerator8080
             {0xa0, "ana"},
             {0xa8, "xra"},
             {0xb0, "ora"},
-            {0xb8, "cmp"},
+            {0xb8, "cmp"}
+        };
+
+        private static readonly Dictionary<byte, string> opsRegIncDcr = new Dictionary<byte, string>
+        {
             {0x04, "inr"},
             {0x05, "dcr"}
-        };
+        }; 
 
         private static readonly Dictionary<byte, string> opsRp = new Dictionary<byte, string>
         {
@@ -149,6 +153,7 @@ namespace ASMgenerator8080
 
         //private const byte maskOpsIm8 = 0xCC;
         private const byte maskOpsReg = 0xF8;
+        private const byte maskOpsRegIncDcr = 0xC7;
         private const byte maskOpsRegIm8 = 0xC7;
         private const byte maskOpsRegReg = 0xC0;
         private const byte maskOpsRp = 0xCF;
@@ -258,7 +263,21 @@ namespace ASMgenerator8080
                     else if (opsReg.ContainsKey(Convert.ToByte(bytes[CurPos] & maskOpsReg))) //add
                     {
                         command = opsReg[Convert.ToByte(bytes[CurPos] & maskOpsReg)].ToUpper();
-                        reg = Convert.ToByte(bytes[CurPos] & ~maskOpsReg);
+                        reg = Convert.ToByte((bytes[CurPos] & ~maskOpsReg));
+                        if (Rnames.ContainsKey(reg))
+                        {
+                            tmpString = command + " " + Rnames[reg];
+                            LineAddres.Add(LineAddres.Keys.Last() + 1, null);
+                            AsmCode.Add(tmpString);
+                            CurPos += 1;
+                        }
+                        else
+                            throw new Exception("1");
+                    }
+                    else if (opsRegIncDcr.ContainsKey(Convert.ToByte(bytes[CurPos] & maskOpsRegIncDcr))) //add
+                    {
+                        command = opsRegIncDcr[Convert.ToByte(bytes[CurPos] & maskOpsRegIncDcr)].ToUpper();
+                        reg = Convert.ToByte((bytes[CurPos] & ~maskOpsRegIncDcr) >> 3);
                         if (Rnames.ContainsKey(reg))
                         {
                             tmpString = command + " " + Rnames[reg];
@@ -316,7 +335,7 @@ namespace ASMgenerator8080
                     else if (opsRpIm16.ContainsKey(Convert.ToByte(bytes[CurPos] & maskOpsRpIm16)))
                     {
                         command = opsRpIm16[Convert.ToByte(bytes[CurPos] & maskOpsRpIm16)].ToUpper();
-                        reg = Convert.ToByte(bytes[CurPos] & ~maskOpsRpIm16);
+                        reg = Convert.ToByte((bytes[CurPos] & ~maskOpsRpIm16) >> 4);
                         if (RPnames.ContainsKey(reg))
                         {
                             tmpString = command + " " + RPnames[reg] + ", 0x" +
