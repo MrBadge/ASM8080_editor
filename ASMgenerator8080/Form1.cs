@@ -881,7 +881,7 @@ namespace ASMgenerator8080
 
         private void DisAssembler(byte[] bytes, int staddr, string tabname = null)
         {
-            if (CurrentTB == null) CreateTab(tabname, "", false);
+            CreateTab(tabname, "", false);
             var dis = new DisAssembler();
             try
             {
