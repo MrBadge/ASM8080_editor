@@ -896,6 +896,7 @@ namespace ASMgenerator8080
                     text += (string) line + "\n";
                 }
                 CurrentTB.Text = text;
+                if (tabname != null) CurrentTB.Name = tabname;
                 CurrentTB.CollapseAllFoldingBlocks();
             }
             catch (Exception e)
