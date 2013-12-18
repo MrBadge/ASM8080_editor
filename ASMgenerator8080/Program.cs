@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-//using System.Linq;
-//using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ASMgenerator8080
@@ -16,7 +13,14 @@ namespace ASMgenerator8080
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            try
+            {
+                Application.Run(new Form1());
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

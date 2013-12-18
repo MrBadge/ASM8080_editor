@@ -9,6 +9,7 @@ namespace ASMgenerator8080
         public static int sleepDelay = 20;
         public const int minAddr = 0x0000;//0x2100;
         public const int maxAddr = 0xFFFF;
+        public const int MaxTimeout = 10000000;
 
         public static List<string> Commands = new List<string>
         {

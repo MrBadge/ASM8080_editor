@@ -560,8 +560,8 @@ namespace ASMgenerator8080
 
         private void SendBigLoader(byte[] BigLoaderHex)
         {
-            try
-            {
+            //try
+            //{
                 var port = new SerialPort(PS.ComPortName, 4800, Parity.Even, 8, StopBits.Two);
                 port.Open();
                 //port.Write(BigLoaderHex, 0, BigLoaderHex.Length)
@@ -573,20 +573,22 @@ namespace ASMgenerator8080
                     Thread.Sleep(Constants.sleepDelay);
                 }
                 port.Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+                //MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            //    throw;
+            //}
         }
 
         private byte[] GetMemoryDump(int startAddr, int endAddr)
         {
             if (endAddr < startAddr)
             {
-                MessageBox.Show("Ending adress is less than starting Adress", "Error", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                return null;
+                //MessageBox.Show("Ending adress is less than starting Adress", "Error", MessageBoxButtons.OK,
+                  //  MessageBoxIcon.Error);
+                throw new Exception("Ending adress is less than starting Adress");
+                //return null;
             }
 
             int arrLenght = endAddr - startAddr + 1;
@@ -594,15 +596,16 @@ namespace ASMgenerator8080
 
             if (string.IsNullOrEmpty(PS.ComPortName))
             {
-                MessageBox.Show("Choose an appropriate COM-Port first", "Error", MessageBoxButtons.OK,
-                    MessageBoxIcon.Exclamation);
-                return null;
+                throw new Exception("Choose an appropriate COM-Port first");
+                //MessageBox.Show("Choose an appropriate COM-Port first", "Error", MessageBoxButtons.OK,
+                //    MessageBoxIcon.Exclamation);
+                //return null;
             }
             var port = new SerialPort(PS.ComPortName, PS.baud, PS.par, PS.databits, PS.sb);
             port.DataReceived += new SerialDataReceivedEventHandler(ByteRecievedHandler);
 
-            try
-            {
+            //try
+            //{
                 stStrip.Items[0].Text = "Recieving bytes from KR580...";
                 stStrip.Refresh();
                 port.Open();
@@ -621,25 +624,33 @@ namespace ASMgenerator8080
                 Thread.Sleep(Constants.sleepDelay);
 
                 ba[0] = 0x03;
+                var timeout = 0;
                 for (int i = 0; i < arrLenght; i++)
                 {
                     isByteRecived = false;
                     port.Write(ba, 0, 1);
                     //Thread.Sleep(Constants.sleepDelay);
-                    while (!isByteRecived) {}
+                    while (!isByteRecived)
+                    {
+                        if (++timeout > Constants.MaxTimeout)
+                        {
+                            throw new Exception("Timeout exceeded");
+                        }
+                    }
+                    timeout = 0;
                     byteArr[i] = recivedByte;
                 }
                 port.Close();
                 stStrip.Items[0].Text = "Done";
                 stStrip.Refresh();
                 return byteArr;
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-                stStrip.Items[0].Text = "Error";
-                return null;
-            }
+            //}
+            //catch (Exception e)
+            //{
+            //    MessageBox.Show(e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            //    stStrip.Items[0].Text = "Error";
+            //    return null;
+            //}
         }
 
         private static void ByteRecievedHandler(
@@ -917,13 +928,24 @@ namespace ASMgenerator8080
 
         private void getMemoryDumpToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SendBigLoader(Constants.BigProgramLoader);
-            var tmp = GetMemoryDump(readFrom, readTo);
-            if (tmp != null)
+            try
             {
+                SendBigLoader(Constants.BigProgramLoader);
+                var tmp = GetMemoryDump(readFrom, readTo);
                 var hexView = new HexDump();
                 hexView.viewBinaryDump(tmp, readFrom);
             }
+            catch (Exception exp)
+            {
+                MessageBox.Show(exp.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);Ы
+            }
+            //SendBigLoader(Constants.BigProgramLoader);
+            //var tmp = GetMemoryDump(readFrom, readTo);
+            //if (tmp != null)
+            //{
+                //var hexView = new HexDump();
+                //hexView.viewBinaryDump(tmp, readFrom);
+            //}
             //else
             //{
             //    MessageBox.Show("Error reading from memory", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -932,21 +954,38 @@ namespace ASMgenerator8080
 
         private void fromMemoryToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            SendBigLoader(Constants.BigProgramLoader);
-            //var tmp = Constants.BigProgramLoader;
-            var tmp = GetMemoryDump(readFrom, readTo);
-            if (tmp != null)
+            try
             {
-                stStrip.Items[0].Text = "Decompiling...";
-                stStrip.Refresh();
-                DisAssembler(tmp, readFrom, Convert.ToString(readFrom) + "-" + Convert.ToString(readTo));
-                stStrip.Items[0].Text = "Done!";
+                SendBigLoader(Constants.BigProgramLoader);
+                //var tmp = Constants.BigProgramLoader;
+                var tmp = GetMemoryDump(readFrom, readTo);
+                if (tmp != null)
+                {
+                    stStrip.Items[0].Text = "Decompiling...";
+                    stStrip.Refresh();
+                    DisAssembler(tmp, readFrom, Convert.ToString(readFrom) + "-" + Convert.ToString(readTo));
+                    stStrip.Items[0].Text = "Done!";
+                }
             }
-            else
+            catch (Exception exp)
             {
-                MessageBox.Show("Error reading from memory", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(exp.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                stStrip.Items[0].Text = "Error";
             }
+            //else
+            //{
+            //    MessageBox.Show("Error reading from memory", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //}
         }
 
+        private void decompileToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            getMemoryDumpToolStripMenuItem.Enabled = PS.ComPortName != null;
+        }
+
+        private void decompileToolStripMenuItem1_DropDownOpening(object sender, EventArgs e)
+        {
+            fromMemoryToolStripMenuItem1.Enabled = PS.ComPortName != null;
+        }
     }
 }

@@ -125,7 +125,7 @@
             this.menu.Location = new System.Drawing.Point(0, 0);
             this.menu.Name = "menu";
             this.menu.Padding = new System.Windows.Forms.Padding(12, 4, 0, 4);
-            this.menu.Size = new System.Drawing.Size(856, 44);
+            this.menu.Size = new System.Drawing.Size(856, 46);
             this.menu.TabIndex = 1;
             this.menu.Text = "menu";
             // 
@@ -138,7 +138,7 @@
             this.saveToolStripMenuItem1,
             this.saveAsToolStripMenuItem1});
             this.fileToolStripMenuItem1.Name = "fileToolStripMenuItem1";
-            this.fileToolStripMenuItem1.Size = new System.Drawing.Size(64, 36);
+            this.fileToolStripMenuItem1.Size = new System.Drawing.Size(64, 38);
             this.fileToolStripMenuItem1.Text = "File";
             this.fileToolStripMenuItem1.DropDownOpening += new System.EventHandler(this.fileToolStripMenuItem_DropDownOpening);
             // 
@@ -196,7 +196,7 @@
             this.commUncommToolStripMenuItem,
             this.highlightCurrentLineToolStripMenuItem});
             this.editToolStripMenuItem1.Name = "editToolStripMenuItem1";
-            this.editToolStripMenuItem1.Size = new System.Drawing.Size(67, 36);
+            this.editToolStripMenuItem1.Size = new System.Drawing.Size(67, 38);
             this.editToolStripMenuItem1.Text = "Edit";
             this.editToolStripMenuItem1.DropDownOpening += new System.EventHandler(this.editToolStripMenuItem_DropDownOpening);
             // 
@@ -293,7 +293,7 @@
             this.sendToKR580ToolStripMenuItem1,
             this.viewHexToolStripMenuItem1});
             this.projectToolStripMenuItem1.Name = "projectToolStripMenuItem1";
-            this.projectToolStripMenuItem1.Size = new System.Drawing.Size(100, 36);
+            this.projectToolStripMenuItem1.Size = new System.Drawing.Size(100, 38);
             this.projectToolStripMenuItem1.Text = "Project";
             this.projectToolStripMenuItem1.DropDownOpening += new System.EventHandler(this.projectToolStripMenuItem_DropDownOpening);
             // 
@@ -330,7 +330,7 @@
             this.serialPortSettingsToolStripMenuItem1,
             this.showSmallLoaderToolStripMenuItem});
             this.settingsToolStripMenuItem1.Name = "settingsToolStripMenuItem1";
-            this.settingsToolStripMenuItem1.Size = new System.Drawing.Size(113, 36);
+            this.settingsToolStripMenuItem1.Size = new System.Drawing.Size(113, 38);
             this.settingsToolStripMenuItem1.Text = "Settings";
             // 
             // loadCustomASMDescFileToolStripMenuItem
@@ -376,8 +376,9 @@
             this.decompileToolStripMenuItem1,
             this.getMemoryDumpToolStripMenuItem});
             this.decompileToolStripMenuItem.Name = "decompileToolStripMenuItem";
-            this.decompileToolStripMenuItem.Size = new System.Drawing.Size(84, 36);
+            this.decompileToolStripMenuItem.Size = new System.Drawing.Size(84, 38);
             this.decompileToolStripMenuItem.Text = "Tools";
+            this.decompileToolStripMenuItem.DropDownOpening += new System.EventHandler(this.decompileToolStripMenuItem_DropDownOpening);
             // 
             // decompileToolStripMenuItem1
             // 
@@ -387,6 +388,7 @@
             this.decompileToolStripMenuItem1.Name = "decompileToolStripMenuItem1";
             this.decompileToolStripMenuItem1.Size = new System.Drawing.Size(293, 36);
             this.decompileToolStripMenuItem1.Text = "Decompile";
+            this.decompileToolStripMenuItem1.DropDownOpening += new System.EventHandler(this.decompileToolStripMenuItem1_DropDownOpening);
             // 
             // fromFileToolStripMenuItem1
             // 
