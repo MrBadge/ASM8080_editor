@@ -342,8 +342,9 @@ namespace ASMgenerator8080
                         reg = Convert.ToByte((bytes[CurPos] & ~maskOpsRpIm16) >> 4);
                         if (RPnames.ContainsKey(reg))
                         {
+                            AddrTmp = (bytes[CurPos + 2] << 8) | (bytes[CurPos + 1]);
                             tmpString = command + " " + RPnames[reg] + ", 0x" +
-                                        (bytes[CurPos + 2]).ToString("X") + (bytes[CurPos + 1]).ToString("X");
+                                        AddrTmp.ToString("X");
                             LineAddres.Add(LineAddres.Keys.Last() + 3, null);
                             AsmCode.Add(tmpString);
                             CurPos += 3;
