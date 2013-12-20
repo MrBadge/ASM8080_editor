@@ -938,7 +938,7 @@ namespace ASMgenerator8080
             }
             catch (Exception exp)
             {
-                MessageBox.Show(exp.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);Ы
+                MessageBox.Show(exp.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             //SendBigLoader(Constants.BigProgramLoader);
             //var tmp = GetMemoryDump(readFrom, readTo);

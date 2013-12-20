@@ -225,19 +225,22 @@ namespace ASMgenerator8080
                         string opStr = opsIm16[bytes[CurPos]].ToLower();
                         if (startAddr != -1)
                         {
-                            if (opStr == "sta")
+                            switch (opStr)
                             {
-                                if (!DBList.ContainsKey(AddrTmp))
-                                {
-                                    DBList.Add(AddrTmp, "Data" + lastDataIndex++);
-                                }
-                            }
-                            else if (opStr == "shld")
-                            {
-                                if (!DWList.ContainsKey(AddrTmp))
-                                {
-                                    DWList.Add(AddrTmp, "Data" + lastDataIndex++);
-                                }
+                                case "lda":
+                                case "sta":
+                                case "shld":
+                                case "lhld":
+                                    //if (!DBList.ContainsKey(AddrTmp))
+                                    //{
+                                    //    DBList.Add(AddrTmp, "Data" + lastDataIndex++);
+                                    //}
+                                    //break;
+                                    if (!DWList.ContainsKey(AddrTmp))
+                                    {
+                                        DWList.Add(AddrTmp, "Data" + lastDataIndex++);
+                                    }
+                                    break;
                             }
                         }
                         if (AddrTmp < startAddr + bytes.Length && AddrTmp >= startAddr)
@@ -248,8 +251,9 @@ namespace ASMgenerator8080
                             }
                             ++CurLabel;
                         }
-                        tmpString = opsIm16[bytes[CurPos]].ToUpper() + " 0x" + (bytes[CurPos + 2]).ToString("X") +
-                                    (bytes[CurPos + 1]).ToString("X");
+                        tmpString = opsIm16[bytes[CurPos]].ToUpper() + " 0x" + AddrTmp.ToString("X");
+                            //(bytes[CurPos + 2]).ToString("X") +
+                                   // (bytes[CurPos + 1]).ToString("X");
                         AsmCode.Add(tmpString);
                         CurPos += 3;
                     }
@@ -390,8 +394,9 @@ namespace ASMgenerator8080
             {
                 if (addr.Value != null)
                 {
-                    tmpByte = (Convert.ToByte((addr.Key & 0xff00) >> 8).ToString("X") +
-                               Convert.ToByte(addr.Key & 0xff).ToString("X"));
+                    tmpByte = addr.Key.ToString("X");
+                        //(Convert.ToByte((addr.Key & 0xff00) >> 8).ToString("X") +
+                               //Convert.ToByte(addr.Key & 0xff).ToString("X"));
                     if (
                         !(DWList.ContainsKey(Convert.ToInt16(tmpByte, 16)) ||
                           DBList.ContainsKey(Convert.ToInt16(tmpByte, 16))))
