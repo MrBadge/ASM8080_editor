@@ -229,13 +229,13 @@ namespace ASMgenerator8080
                             {
                                 case "lda":
                                 case "sta":
+                                    if (!DBList.ContainsKey(AddrTmp))
+                                    {
+                                        DBList.Add(AddrTmp, "Data" + lastDataIndex++);
+                                    }
+                                    break;
                                 case "shld":
                                 case "lhld":
-                                    //if (!DBList.ContainsKey(AddrTmp))
-                                    //{
-                                    //    DBList.Add(AddrTmp, "Data" + lastDataIndex++);
-                                    //}
-                                    //break;
                                     if (!DWList.ContainsKey(AddrTmp))
                                     {
                                         DWList.Add(AddrTmp, "Data" + lastDataIndex++);
