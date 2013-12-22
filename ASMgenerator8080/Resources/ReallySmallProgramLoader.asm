@@ -1,8 +1,11 @@
-;com port must be initialized with parameters: 4800 baud, 7 bit, parity even, two stop bits
+;маскировка прерывания
 MVI A, 0xFC
 OUT 0xFF
-MVI H, 021h ;the address must reference to the end of this loader, where main loader will start
+
+;выставление адреса начала большого загрузчика
+MVI H, 021h
 MVI L, 33h
+
 init_timer_and_uart: 
     MVI A, 40h ; сброс
     OUT 0FBh

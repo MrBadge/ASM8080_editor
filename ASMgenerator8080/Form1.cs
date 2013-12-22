@@ -560,35 +560,23 @@ namespace ASMgenerator8080
 
         private void SendBigLoader(byte[] BigLoaderHex)
         {
-            //try
-            //{
-                var port = new SerialPort(PS.ComPortName, 4800, Parity.Even, 8, StopBits.Two);
-                port.Open();
-                //port.Write(BigLoaderHex, 0, BigLoaderHex.Length)
-                byte[] ba = {0};
-                foreach (var b in BigLoaderHex)
-                {
-                    ba[0] = b;
-                    port.Write(ba, 0, 1);
-                    Thread.Sleep(Constants.sleepDelay);
-                }
-                port.Close();
-            //}
-            //catch (Exception ex)
-            //{
-                //MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-            //    throw;
-            //}
+            var port = new SerialPort(PS.ComPortName, 4800, Parity.Even, 8, StopBits.Two);
+            port.Open();
+            byte[] ba = {0};
+            foreach (var b in BigLoaderHex)
+            {
+                ba[0] = b;
+                port.Write(ba, 0, 1);
+                Thread.Sleep(Constants.sleepDelay);
+            }
+            port.Close();
         }
 
         private byte[] GetMemoryDump(int startAddr, int endAddr)
         {
             if (endAddr < startAddr)
             {
-                //MessageBox.Show("Ending adress is less than starting Adress", "Error", MessageBoxButtons.OK,
-                  //  MessageBoxIcon.Error);
                 throw new Exception("Ending adress is less than starting Adress");
-                //return null;
             }
 
             int arrLenght = endAddr - startAddr + 1;
@@ -597,60 +585,47 @@ namespace ASMgenerator8080
             if (string.IsNullOrEmpty(PS.ComPortName))
             {
                 throw new Exception("Choose an appropriate COM-Port first");
-                //MessageBox.Show("Choose an appropriate COM-Port first", "Error", MessageBoxButtons.OK,
-                //    MessageBoxIcon.Exclamation);
-                //return null;
             }
             var port = new SerialPort(PS.ComPortName, PS.baud, PS.par, PS.databits, PS.sb);
             port.DataReceived += new SerialDataReceivedEventHandler(ByteRecievedHandler);
 
-            //try
-            //{
-                stStrip.Items[0].Text = "Recieving bytes from KR580...";
-                stStrip.Refresh();
-                port.Open();
-                byte[] ba = {0};
+            stStrip.Items[0].Text = "Recieving bytes from KR580...";
+            stStrip.Refresh();
+            port.Open();
+            byte[] ba = {0};
 
-                ba[0] = 0x01;
+            ba[0] = 0x01;
+            port.Write(ba, 0, 1);
+            Thread.Sleep(Constants.sleepDelay);
+
+            ba[0] = (byte) ((startAddr & 0x0000ff00) >> 8);
+            port.Write(ba, 0, 1);
+            Thread.Sleep(Constants.sleepDelay);
+
+            ba[0] = (byte) (startAddr & 0x000000ff);
+            port.Write(ba, 0, 1);
+            Thread.Sleep(Constants.sleepDelay);
+
+            ba[0] = 0x03;
+            var timeout = 0;
+            for (int i = 0; i < arrLenght; i++)
+            {
+                isByteRecived = false;
                 port.Write(ba, 0, 1);
-                Thread.Sleep(Constants.sleepDelay);
-
-                ba[0] = (byte) ((startAddr & 0x0000ff00) >> 8);
-                port.Write(ba, 0, 1);
-                Thread.Sleep(Constants.sleepDelay);
-
-                ba[0] = (byte) (startAddr & 0x000000ff);
-                port.Write(ba, 0, 1);
-                Thread.Sleep(Constants.sleepDelay);
-
-                ba[0] = 0x03;
-                var timeout = 0;
-                for (int i = 0; i < arrLenght; i++)
+                while (!isByteRecived)
                 {
-                    isByteRecived = false;
-                    port.Write(ba, 0, 1);
-                    //Thread.Sleep(Constants.sleepDelay);
-                    while (!isByteRecived)
+                    if (++timeout > Constants.MaxTimeout)
                     {
-                        if (++timeout > Constants.MaxTimeout)
-                        {
-                            throw new Exception("Timeout exceeded");
-                        }
+                        throw new Exception("Timeout exceeded");
                     }
-                    timeout = 0;
-                    byteArr[i] = recivedByte;
                 }
-                port.Close();
-                stStrip.Items[0].Text = "Done";
-                stStrip.Refresh();
-                return byteArr;
-            //}
-            //catch (Exception e)
-            //{
-            //    MessageBox.Show(e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-            //    stStrip.Items[0].Text = "Error";
-            //    return null;
-            //}
+                timeout = 0;
+                byteArr[i] = recivedByte;
+            }
+            port.Close();
+            stStrip.Items[0].Text = "Done";
+            stStrip.Refresh();
+            return byteArr;
         }
 
         private static void ByteRecievedHandler(
@@ -675,8 +650,6 @@ namespace ASMgenerator8080
         {
             if (CurrentTB == null)
             {
-                //MessageBox.Show("Nothing to send yet", "Error", MessageBoxButtons.OK,
-                    //MessageBoxIcon.Exclamation);
                 return;    
             }
             if (string.IsNullOrEmpty(PS.ComPortName))
@@ -687,10 +660,10 @@ namespace ASMgenerator8080
             }
             if (GetBinary(CurrentTB.Text, Constants.defaultStartingAdress + Constants.smallProgramLoaderSize + Constants.BigProgramLoader.Length) == null)
                 return;
-            // start address = 0x2100 + small loader size + big loader size
+
             byte[] tmp = GetNewSettings(PS);
             Constants.BigProgramLoader[16] = tmp[0];
-            Constants.BigProgramLoader[20] = tmp[1]; //Constants.BigProgramLoader[9] = tmp[1];
+            Constants.BigProgramLoader[20] = tmp[1];
             SendBigLoader(Constants.BigProgramLoader);
             var port = new SerialPort(PS.ComPortName, PS.baud, PS.par, PS.databits, PS.sb);
             try
@@ -717,7 +690,6 @@ namespace ASMgenerator8080
                     }
 
                 Cursor.Current = Cursors.WaitCursor;
-                //port.Write(data, 0, data.Length);
                 for (int i = 0; i < data.Length; ++i)
                 {
                     port.Write(data, i, 1);
@@ -940,17 +912,6 @@ namespace ASMgenerator8080
             {
                 MessageBox.Show(exp.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            //SendBigLoader(Constants.BigProgramLoader);
-            //var tmp = GetMemoryDump(readFrom, readTo);
-            //if (tmp != null)
-            //{
-                //var hexView = new HexDump();
-                //hexView.viewBinaryDump(tmp, readFrom);
-            //}
-            //else
-            //{
-            //    MessageBox.Show("Error reading from memory", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //}
         }
 
         private void fromMemoryToolStripMenuItem1_Click(object sender, EventArgs e)
