@@ -56,6 +56,7 @@ programLoader:
         CALL writeByte
         JMP programLoader
     Addr1 DW 2123h
+    
 ;read byte from terminal 
 ;used registers: A, B 
 ;input: none 
