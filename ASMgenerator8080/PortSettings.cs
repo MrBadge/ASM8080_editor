@@ -141,5 +141,10 @@ namespace ASMgenerator8080
                 button1_Click(this, e);
             }
         }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

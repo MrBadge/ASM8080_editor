@@ -228,9 +228,10 @@
             this.label5.Location = new System.Drawing.Point(15, 23);
             this.label5.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(201, 37);
+            this.label5.Size = new System.Drawing.Size(217, 37);
             this.label5.TabIndex = 4;
-            this.label5.Text = "Start addres:";
+            this.label5.Text = "Start address:";
+            this.label5.Click += new System.EventHandler(this.label5_Click);
             // 
             // PortSettings
             // 
